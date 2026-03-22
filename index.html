@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Storyteller — Welcome</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,700&family=Lora:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400&family=Bebas+Neue&family=Great+Vibes&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── RESET & BASE ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0d1f;
+      --bg-alt:    #12122a;
+      --text:      #e8e4dc;
+      --accent:    #c9a96e;
+      --gold:      #c9a96e;
+      --gold-faint:#2a2840;
+      --muted:     #7a7898;
+      --toc-width: 260px;
+      --content-max: 760px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 17px;
+      line-height: 1.78;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ─── TYPOGRAPHY ────────────────────────────────────────────── */
+    h1, h2, h3, h4 {
+      font-family: 'Playfair Display', 'Georgia', serif;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    p { margin-bottom: 1.25em; }
+    p:last-child { margin-bottom: 0; }
+
+    em { font-style: italic; }
+
+    /* ─── LAYOUT WRAPPER ────────────────────────────────────────── */
+    #page-shell {
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── TOC RAIL ──────────────────────────────────────────────── */
+    #toc-rail {
+      width: var(--toc-width);
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 56px 32px 40px 40px;
+      border-right: 1px solid rgba(201, 169, 110, 0.25);
+      background: var(--bg);
+      z-index: 100;
+    }
+
+    #toc-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 40px;
+    }
+
+    #toc-nav {
+      position: relative;
+      flex: 1;
+    }
+
+    #toc-line {
+      position: absolute;
+      left: 0;
+      top: 4px;
+      bottom: 4px;
+      width: 1px;
+      background: var(--gold-faint);
+    }
+
+    #toc-dot {
+      position: absolute;
+      left: -3px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      top: 4px;
+    }
+
+    #toc-nav ul {
+      list-style: none;
+      padding-left: 18px;
+    }
+
+    #toc-nav ul li {
+      margin-bottom: 20px;
+    }
+
+    #toc-nav ul li a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+      display: block;
+      line-height: 1.4;
+    }
+
+    #toc-nav ul li a:hover,
+    #toc-nav ul li.active a {
+      color: var(--accent);
+    }
+
+    #toc-footer {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: auto;
+    }
+
+    /* ─── CONTENT COLUMN ────────────────────────────────────────── */
+    #content-column {
+      flex: 1;
+      min-width: 0;
+      padding: 64px 80px 120px 80px;
+      max-width: calc(var(--content-max) + 160px);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── PAGE HEADER ───────────────────────────────────────────── */
+    #page-header {
+      margin-bottom: 80px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid var(--gold-faint);
+    }
+
+    #page-header .kicker {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    #page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.8rem;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.08;
+      letter-spacing: -0.01em;
+    }
+
+    #page-header .subtitle {
+      font-family: 'Lora', serif;
+      font-size: 1.05rem;
+      color: var(--muted);
+      margin-top: 20px;
+      font-style: italic;
+      max-width: 520px;
+    }
+
+    /* ── LETTER SECTION ─────────────────────────────────────────── */
+    .letter-section {
+      position: relative;
+      z-index: 1;
+      padding: 0;
+    }
+
+    .letter-body {
+      max-width: 620px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .letter-para-wrap {
+      min-height: unset;
+      display: block;
+      padding: 0;
+      margin-bottom: 1.6em;
+    }
+
+    .letter-sig-wrap {
+      min-height: unset;
+      margin-top: 1.5em;
+    }
+
+    .letter-para {
+      font-family: 'Lora', Georgia, serif;
+      font-style: italic;
+      font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+      line-height: 1.85;
+      color: #e8e4dc;
+      min-height: 1.85em; /* prevent layout jump while empty */
+    }
+
+    /* Blinking cursor appended to active paragraph */
+    .letter-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: rgba(201, 169, 110, 0.8);
+      margin-left: 2px;
+      vertical-align: text-bottom;
+      animation: cursor-blink 0.75s step-end infinite;
+    }
+
+    @keyframes cursor-blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    .letter-quill {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 1.8s ease, transform 1.8s ease;
+      cursor: pointer;
+    }
+
+    .letter-quill.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Subtle hover pulse on letter quill to invite click */
+    .letter-quill.revealed:hover .quill-img {
+      filter:
+        invert(1)
+        sepia(1)
+        saturate(2.5)
+        hue-rotate(200deg)
+        brightness(2.0)
+        drop-shadow(0 0 20px rgba(180, 210, 255, 0.9))
+        drop-shadow(0 0 56px rgba(140, 180, 255, 0.5));
+    }
+
+    /* Everything below the letter, gated until unlocked */
+    #content-gate {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+      pointer-events: none;
+    }
+
+    #content-gate.unlocked {
+      max-height: none;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .quill-img {
+      width: clamp(80px, 14vw, 130px);
+      height: auto;
+      /* black SVG → starlight blue-white: invert to white, sepia+hue for blue tint */
+      filter:
+        invert(1)
+        sepia(1)
+        saturate(2.5)
+        hue-rotate(200deg)
+        brightness(1.5)
+        drop-shadow(0 0 10px rgba(160, 190, 255, 0.5))
+        drop-shadow(0 0 28px rgba(120, 160, 255, 0.2));
+      transition: filter 1.2s ease;
+    }
+
+    .letter-quill:hover .quill-img {
+      filter:
+        invert(1)
+        sepia(1)
+        saturate(2.5)
+        hue-rotate(200deg)
+        brightness(1.8)
+        drop-shadow(0 0 16px rgba(180, 210, 255, 0.75))
+        drop-shadow(0 0 48px rgba(140, 180, 255, 0.35));
+    }
+
+    /* Continue arrow — fades in after signature */
+    .letter-continue {
+      margin-top: 4rem;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+      font-size: 1.5rem;
+      color: var(--muted);
+      animation: none;
+      text-align: center;
+    }
+
+    .letter-continue.visible {
+      opacity: 1;
+    }
+
+    .letter-continue span {
+      display: inline-block;
+      animation: float 2s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
+    }
+
+    /* ─── SECTION SCAFFOLDING ───────────────────────────────────── */
+    .section {
+      margin-bottom: 96px;
+      padding-top: 24px;
+    }
+
+    .section-header {
+      margin-bottom: 0;
+      padding-bottom: 2rem;
+    }
+
+    .section-header::after {
+      content: '✦';
+      display: block;
+      text-align: center;
+      font-size: 1.1rem;
+      color: rgba(201, 169, 110, 0.45);
+      margin-top: 2rem;
+      letter-spacing: 0.5em;
+    }
+
+    .section-kicker {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    /* Default section h2 — Playfair Display */
+    .section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    /* "What It Is", "What It's Not", "Philosophy" section headers — Bebas Neue, large */
+    #section-is .section-header h2,
+    #section-not .section-header h2,
+    #section-philosophy .section-header h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      line-height: 1;
+      margin: 0 0 4rem;
+    }
+
+    /* ─── SECTION VISUAL SEPARATION ─────────────────────────────── */
+    #section-letter {
+      background: transparent;
+    }
+
+    #section-not {
+      background: #12122a;
+      padding: 10vh 0;
+      border-top: 1px solid rgba(201, 169, 110, 0.15);
+      border-bottom: 1px solid rgba(201, 169, 110, 0.15);
+      margin-left: -80px;
+      margin-right: -80px;
+      padding-left: 80px;
+      padding-right: 80px;
+    }
+
+    #section-is {
+      background: #0d0d1f;
+      padding: 10vh 0;
+    }
+
+    #section-philosophy {
+      background: #0a0a1a;
+      padding: 12vh 0;
+      border-top: 1px solid rgba(201, 169, 110, 0.15);
+      margin-left: -80px;
+      margin-right: -80px;
+      padding-left: 80px;
+      padding-right: 80px;
+    }
+
+    /* ─── WHAT IT'S NOT ─────────────────────────────────────────── */
+    .not-item {
+      margin-bottom: 72px;
+      padding-bottom: 72px;
+      border-bottom: 1px solid rgba(201, 169, 110, 0.3);
+    }
+
+    .not-word {
+      color: #cc2a2a;
+      transition: color 12s ease;
+    }
+
+    .not-item:hover .not-word {
+      color: #cc2a2a;
+      transition: color 0.4s ease;
+    }
+
+    .not-item:not(:hover) .not-word {
+      color: var(--text);
+      transition: color 12s ease;
+    }
+
+    .not-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .not-heading {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: clamp(1.8rem, 4vw, 3.2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 1.2rem;
+    }
+
+    .performed-stanza {
+      font-family: 'Lora', Georgia, serif;
+      font-style: italic;
+      font-size: clamp(1.3rem, 2.5vw, 1.9rem) !important;
+      line-height: 1.6 !important;
+      color: var(--accent) !important;
+      margin-top: 1.5rem !important;
+      letter-spacing: 0.01em;
+    }
+
+    .not-item p {
+      font-size: 1.15rem;
+      line-height: 1.82;
+      color: var(--text);
+      max-width: 640px;
+    }
+
+    .not-image {
+      width: 100%;
+      object-fit: contain;
+      max-height: none;
+      height: auto;
+      border-radius: 4px;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.4);
+      display: block;
+      margin-top: 32px;
+      margin-bottom: 48px;
+      background: var(--bg-alt);
+    }
+
+    /* Hand-drawn style rule SVG */
+    .hand-rule {
+      width: 100%;
+      height: 12px;
+      margin-top: 48px;
+      opacity: 0.35;
+      display: none;
+    }
+
+    /* ─── WHAT IT IS (EVOCATIONS) ───────────────────────────────── */
+    #section-is .transition-graf {
+      font-style: italic;
+      color: var(--muted);
+      font-size: 1.02rem;
+      margin-bottom: 56px;
+      max-width: 580px;
+      line-height: 1.75;
+    }
+
+    .evocation {
+      margin-bottom: 0;
+    }
+
+    .evocation-item {
+      min-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 6vh 0;
+      border-bottom: none;
+    }
+
+    /* Evocation lines — intimate and readable, not display text */
+    .evocation-line {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+      font-weight: 500;
+      color: var(--accent);
+      line-height: 1.42;
+      margin-top: 52px;
+      margin-bottom: 8px;
+    }
+
+    .evocation-image {
+      width: 100%;
+      object-fit: contain;
+      max-height: none;
+      height: auto;
+      border-radius: 4px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+      display: block;
+      margin-top: 28px;
+      margin-bottom: 0;
+      background: var(--bg-alt);
+      /* Base: slightly desaturated / dark, warms on hover */
+      filter: saturate(0.4) brightness(0.35) contrast(1.1);
+      /* Fade OUT (returning to dark) is slow — 2.5s */
+      transition: filter 2.5s ease, box-shadow 2.5s ease;
+    }
+
+    /* Wrapper needed for the light-leak pseudo-element */
+    .evocation-img-wrap {
+      position: relative;
+      display: block;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .evocation-img-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        115deg,
+        rgba(201, 169, 110, 0) 0%,
+        rgba(201, 169, 110, 0) 38%,
+        rgba(201, 169, 110, 0.22) 50%,
+        rgba(201, 169, 110, 0) 62%,
+        rgba(201, 169, 110, 0) 100%
+      );
+      background-size: 300% 100%;
+      background-position: 200% 0;
+      transition: background-position 0s linear, opacity 0.5s ease;
+      opacity: 0;
+      pointer-events: none;
+      border-radius: 4px;
+      mix-blend-mode: screen;
+    }
+
+    .evocation-img-wrap:hover::after {
+      opacity: 1;
+      background-position: -100% 0;
+      transition: background-position 1.8s ease, opacity 0.4s ease;
+    }
+
+    .evocation-img-wrap:hover .evocation-image {
+      filter: saturate(1.05) brightness(1.0) contrast(1.0);
+      box-shadow: 0 12px 60px rgba(201, 169, 110, 0.25), 0 6px 28px rgba(0,0,0,0.5);
+      /* Fade IN (brightening) is faster — 0.9s */
+      transition: filter 0.9s ease, box-shadow 0.9s ease;
+    }
+
+    .lazy-image {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 2.2s ease, transform 2s ease, filter 2.5s ease, box-shadow 2.5s ease;
+    }
+
+    .lazy-image.image-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .evocation-space {
+      height: 20px;
+    }
+
+    /* ─── PHILOSOPHY ────────────────────────────────────────────── */
+    .philosophy-list {
+      list-style: none;
+    }
+
+    .philosophy-item {
+      padding: 32px 0;
+      border-bottom: none;
+      min-height: 50vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .philosophy-heading {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: clamp(3.5rem, 8vw, 7.5rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      color: #c9a96e;
+      margin-bottom: 0.5em;
+      cursor: default;
+      transition: text-shadow 2s ease;
+      text-shadow: none;
+    }
+
+    .philosophy-heading:hover {
+      text-shadow: 0 0 40px rgba(201, 169, 110, 0.7), 0 0 80px rgba(201, 169, 110, 0.3);
+      transition: text-shadow 2s ease;
+    }
+
+    .philosophy-heading.glow-out {
+      text-shadow: none;
+      transition: text-shadow 6s ease;
+    }
+
+    .philosophy-desc {
+      font-family: 'Lora', Georgia, serif;
+      font-size: clamp(1.2rem, 2.5vw, 2rem);
+      line-height: 1.75;
+      color: var(--text);
+      max-width: 640px;
+      margin-bottom: 3.5rem;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 1.8s ease, transform 1.8s ease;
+    }
+
+    .philosophy-desc.desc-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .philosophy-item:last-child .philosophy-desc {
+      margin-bottom: 0;
+    }
+
+    /* ─── SCROLL REVEAL ─────────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+
+    .reveal.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    .evocation-line.reveal {
+      transition: opacity 0.85s ease, transform 0.85s ease;
+    }
+
+    /* ─── SCROLLBAR ─────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gold-faint); border-radius: 3px; }
+
+    /* ─── MOBILE ─────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      #toc-rail {
+        display: none;
+      }
+
+      #content-column {
+        padding: 40px 28px 80px;
+      }
+
+      #page-header h1 {
+        font-size: 2.6rem;
+      }
+
+      #section-is .section-header h2,
+      #section-not .section-header h2,
+      #section-philosophy .section-header h2 {
+        font-size: clamp(2.8rem, 12vw, 4rem);
+      }
+
+      .section h2 {
+        font-size: 1.75rem;
+      }
+
+      .evocation-line {
+        font-size: clamp(1.1rem, 4vw, 1.4rem);
+      }
+
+      .not-heading {
+        font-size: clamp(1.5rem, 6vw, 2.4rem);
+      }
+
+      #section-not {
+        margin-left: -28px;
+        margin-right: -28px;
+        padding-left: 28px;
+        padding-right: 28px;
+      }
+
+      #section-philosophy {
+        margin-left: -28px;
+        margin-right: -28px;
+        padding-left: 28px;
+        padding-right: 28px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      #toc-rail {
+        width: 200px;
+        padding: 48px 24px 32px 28px;
+      }
+      #content-column {
+        padding: 56px 48px 96px;
+      }
+    }
+
+    /* ─── INTRO SPLASH ───────────────────────────────────────────── */
+    #intro {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 1.8s ease;
+    }
+
+    /* Inner wrapper: text is the anchor, quill floats above it */
+    #intro-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none; /* let clicks fall through to #intro */
+    }
+
+    #intro.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #intro-quill {
+      width: clamp(100px, 18vw, 180px);
+      height: auto;
+      /* Inkwell base is ~30% from left of SVG bounding box.
+         Shift right by 20% of own width so it lands at center of text. */
+      transform: translateX(20%) translateY(12px);
+      filter:
+        invert(1)
+        sepia(1)
+        saturate(2.5)
+        hue-rotate(200deg)
+        brightness(1.5)
+        drop-shadow(0 0 14px rgba(160, 190, 255, 0.6))
+        drop-shadow(0 0 40px rgba(120, 160, 255, 0.25));
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 2s ease, transform 2s ease, filter 1.5s ease;
+    }
+
+    #intro-quill.intro-quill-in {
+      opacity: 1;
+      transform: translateX(20%) translateY(0);
+    }
+
+    @keyframes quill-pulse {
+      0%, 100% {
+        filter:
+          invert(1) sepia(1) saturate(2.5) hue-rotate(200deg) brightness(1.5)
+          drop-shadow(0 0 14px rgba(160, 190, 255, 0.6))
+          drop-shadow(0 0 40px rgba(120, 160, 255, 0.25));
+      }
+      50% {
+        filter:
+          invert(1) sepia(1) saturate(2.5) hue-rotate(200deg) brightness(1.9)
+          drop-shadow(0 0 22px rgba(180, 210, 255, 0.85))
+          drop-shadow(0 0 64px rgba(140, 180, 255, 0.4));
+      }
+    }
+
+    #intro-quill.pulsing {
+      animation: quill-pulse 3s ease-in-out infinite;
+    }
+
+    #intro-hint {
+      margin-top: 2.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(160, 190, 255, 0.4);
+      text-align: center;
+      width: 100%;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+    }
+
+    #intro-hint.hint-in {
+      opacity: 1;
+    }
+
+    /* Page shell hidden until intro dismissed */
+    #page-shell, #stars {
+      opacity: 0;
+      transition: opacity 2s ease;
+    }
+
+    #page-shell.page-in, #stars.page-in {
+      opacity: 1;
+    }
+
+    /* ─── CTA ENDING ─────────────────────────────────────────────── */
+    #section-cta {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 15vh 60px 20vh;
+      background: #060611;
+      margin-left: -80px;
+      margin-right: -80px;
+      padding-left: 80px;
+      padding-right: 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-prelude {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(201, 169, 110, 0.4);
+      margin-bottom: 4rem;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+    }
+
+    .cta-prelude.cta-visible { opacity: 1; }
+
+    .cta-question {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: clamp(2.2rem, 5.5vw, 5.2rem);
+      font-weight: 400;
+      line-height: 1.18;
+      letter-spacing: -0.01em;
+      color: #c9a96e;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .cta-word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .cta-word.word-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Breathing pulse once all words are revealed */
+    @keyframes cta-breathe {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.75; }
+    }
+
+    .cta-question.breathing {
+      animation: cta-breathe 4s ease-in-out infinite;
+    }
+
+    /* Letter shimmer on hover */
+    @keyframes letter-flare {
+      0%   { color: #c9a96e; text-shadow: none; }
+      30%  { color: #fff8e8; text-shadow: 0 0 18px rgba(255, 230, 150, 0.9), 0 0 40px rgba(201, 169, 110, 0.6); }
+      100% { color: #c9a96e; text-shadow: none; }
+    }
+
+    .cta-letter {
+      display: inline-block;
+      /* white-space keeps spaces from collapsing */
+    }
+
+    .cta-letter.flare {
+      animation: letter-flare 0.9s ease forwards;
+    }
+
+    .cta-flourish {
+      margin-top: 5rem;
+      font-size: 1.2rem;
+      color: rgba(201, 169, 110, 0.3);
+      letter-spacing: 0.6em;
+      opacity: 0;
+      transition: opacity 2s ease;
+    }
+
+    .cta-flourish.cta-visible { opacity: 1; }
+
+    @media (max-width: 600px) {
+      #section-cta {
+        margin-left: -28px;
+        margin-right: -28px;
+        padding-left: 28px;
+        padding-right: 28px;
+        min-height: 85vh;
+      }
+      .cta-question {
+        font-size: clamp(1.8rem, 7vw, 2.8rem);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── INTRO SPLASH ── -->
+<div id="intro" role="button" aria-label="Click to enter">
+  <div id="intro-inner">
+    <img id="intro-quill" src="quill-ink.svg" alt="" />
+    <p id="intro-hint">click to begin</p>
+  </div>
+</div>
+
+<!-- ── STARFIELD CANVAS ── (first child of body, sits behind everything) -->
+<canvas id="stars" style="position:fixed;inset:0;z-index:0;pointer-events:none;"></canvas>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PAGE SHELL
+════════════════════════════════════════════════════════════════ -->
+<div id="page-shell">
+
+  <!-- ── TOC RAIL ── -->
+  <nav id="toc-rail" aria-label="Page navigation">
+    <div id="toc-brand">Storyteller</div>
+    <div id="toc-nav">
+      <div id="toc-line"></div>
+      <div id="toc-dot"></div>
+      <ul>
+        <li id="toc-letter" class="active"><a href="#section-letter">Introduction</a></li>
+        <li id="toc-not"><a href="#section-not">What It&rsquo;s Not</a></li>
+        <li id="toc-is"><a href="#section-is">What It Is</a></li>
+        <li id="toc-philosophy"><a href="#section-philosophy">Philosophy</a></li>
+        <li id="toc-cta"><a href="#section-cta">The Question</a></li>
+      </ul>
+    </div>
+    <div id="toc-footer">Welcome</div>
+  </nav>
+
+  <!-- ── CONTENT ── -->
+  <main id="content-column">
+
+    <!-- Page header -->
+    <header id="page-header" class="reveal">
+      <p class="kicker">Welcome to</p>
+      <h1>Storyteller</h1>
+      <p class="subtitle">A new narrative medium. This is what it is... and what it is not.</p>
+    </header>
+
+    <!-- Letter section — typewriter reveal -->
+    <section id="section-letter" class="letter-section">
+      <div class="letter-body">
+        <div class="letter-para-wrap">
+          <p class="letter-para" id="letter-p0"></p>
+        </div>
+        <div class="letter-para-wrap">
+          <p class="letter-para" id="letter-p1"></p>
+        </div>
+        <div class="letter-para-wrap">
+          <p class="letter-para" id="letter-p2"></p>
+        </div>
+        <div class="letter-para-wrap">
+          <p class="letter-para" id="letter-p3"></p>
+        </div>
+        <div class="letter-para-wrap letter-sig-wrap">
+          <div class="letter-quill" id="letter-quill">
+            <img src="quill-ink.svg" alt="Quill" class="quill-img" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gate: hidden until quill clicked or scrolled past -->
+    <div id="content-gate">
+
+    <!-- ── WHAT IT'S NOT ── -->
+    <section id="section-not" class="section">
+      <div class="section-header reveal">
+        <span class="section-kicker">Section 1</span>
+        <h2>What Storyteller Is Not</h2>
+      </div>
+
+      <!-- Item 1 -->
+      <div class="not-item reveal">
+        <h3 class="not-heading">It is <span class="not-word">not</span> a tabletop RPG simulator.</h3>
+        <img class="not-image lazy-image" src="Pasted image 20260317204411.png" alt="A stage set for collaborative storytelling — rules, dice, a table" loading="lazy" />
+        <p>Tabletop RPGs are collaborative games mediated by rules, dice, and a human game master interpreting both. They are wonderful. Storyteller is not one.</p>
+        <p>Storyteller has no game master role for a human to fill, no rulebook to consult, no table to gather around. It is a solo experience delivered through headphones. A player does not roll for initiative. They speak, and the story responds. The rules, where they exist at all, are invisible infrastructure; never the point.</p>
+        <p>That said, Storyteller can deliver an RPG style experience to a player who wants one. It can be crunchy, nerdy, stats and dice. You can engage in combat the way you would with friends at a table. You can have your character sheet cake and eat it too. But these are features layered onto a platform, not the nature of the platform itself.</p>
+        <p>Storyteller contains RPGs the way a concert hall contains jazz. The hall is not jazz.</p>
+      </div>
+
+      <!-- Item 2 -->
+      <div class="not-item reveal reveal-delay-1">
+        <h3 class="not-heading">It is <span class="not-word">not</span> an AI dungeon master.</h3>
+        <img class="not-image lazy-image" src="Pasted image 20260317204604.png" alt="The difference between improvisation and composed performance" loading="lazy" />
+        <p>The AI dungeon master... an LLM improvising a campaign in real time... is a genre of product that already exists. It produces variable, often incoherent experiences that feel like talking to a very fast improv partner. Storyteller is not this.</p>
+        <p>The Narrator is not improvising. It is <em>performing a Story</em>. A structured narrative blueprint authored deliberately by a human creator.</p>
+        <p>Storyteller's job is faithful, adaptive interpretation, not freeform generation.</p>
+        <p>The difference between a dungeon master and the Narrator is the difference between a musician playing by ear and one performing a composition. Both are skilled. Only one is Storyteller.</p>
+      </div>
+
+      <!-- Item 3 -->
+      <div class="not-item reveal reveal-delay-2">
+        <h3 class="not-heading">It is <span class="not-word">not</span> a chatbot.</h3>
+        <img class="not-image lazy-image" src="Pasted image 20260318055026.png" alt="Immersion versus conversation — a world vs. a chat window" loading="lazy" />
+        <p>Chatbots respond. Storyteller performs.</p>
+        <p>The interaction model is fundamentally different: a chatbot exists to answer, assist, or converse. Storyteller exists to immerse.</p>
+        <p>The player is not having a conversation with an AI. They are inside a story that happens to respond to them.</p>
+        <p>The Narrator does not have opinions about the weather; it has a world to deliver.</p>
+      </div>
+
+      <!-- Item 4 -->
+      <div class="not-item reveal reveal-delay-1">
+        <h3 class="not-heading">It is <span class="not-word">not</span> an audio game or podcast with choices.</h3>
+        <img class="not-image lazy-image" src="Pasted image 20260318055121.png" alt="Branching paths versus a living adaptive narrative" loading="lazy" />
+        <p>Interactive audio experiences... branching podcasts, audio dramas with decision points... are linear narratives with the illusion of agency.</p>
+        <p>The story is pre-written in full; the player selects from predetermined branches.</p>
+        <p>Storyteller is not branching. It is adaptive.</p>
+        <p>The same Story plays differently for every person who encounters it ... because the system responds to who that person actually is; their choices, their voice, their patterns; not which branch they selected.</p>
+      </div>
+
+      <!-- Item 5 -->
+      <div class="not-item reveal reveal-delay-2">
+        <h3 class="not-heading">It is <span class="not-word">not</span> a video game.</h3>
+        <img class="not-image lazy-image" src="Pasted image 20260318055214.png" alt="The screen as barrier versus the voice as gateway" loading="lazy" />
+        <p>Video games are primarily visual, primarily mechanical, and built around designed challenge. Storyteller is voice-first, primarily narrative, and built around immersion.</p>
+        <p>There are no graphics to render, no controller to master, no skill ceiling to climb.</p>
+        <p>The closest video game analogue is interactive fiction; and even that is a pale shadow of what Storyteller is reaching for, because interactive fiction is text on a screen, not a performed experience in your ears with the lights off.</p>
+      </div>
+    </section>
+
+    <!-- ── WHAT IT IS ── -->
+    <section id="section-is" class="section">
+      <div class="section-header reveal">
+        <span class="section-kicker">Section 2</span>
+        <h2>What Storyteller Is</h2>
+      </div>
+
+      <p class="transition-graf reveal">It can do many of the things the products above do. That is not what it is.</p>
+
+      <div class="evocation reveal">
+        <p class="evocation-line">Storyteller is a new narrative medium.</p>
+      </div>
+
+      <div class="evocation reveal reveal-delay-1">
+        <p class="evocation-line">Storyteller is the story that knows your name. Not because you typed it into a box ... but because it listened, and it remembered, and it was waiting to perform for you.</p>
+        <p class="evocation-line">And now, you've <em>arrived</em>.</p>
+        <div class="evocation-img-wrap"><img class="evocation-image lazy-image" src="Pasted image 20260318055822.png" alt="A story that knows your name" loading="lazy" /></div>
+      </div>
+
+      <div class="evocation reveal reveal-delay-1">
+        <p class="evocation-line">Storyteller is performed by a Narrator who never breaks character, never loses the thread, never gets tired, and never gives you the same story twice.</p>
+        <p class="evocation-line">A voice in your ears that makes the real world go quiet, and wraps you in another place and time.</p>
+      </div>
+
+      <div class="evocation reveal reveal-delay-2">
+        <p class="evocation-line">Storyteller is the book with that magical embrace.</p>
+        <div class="evocation-img-wrap"><img class="evocation-image lazy-image" src="Pasted image 20260317202546.png" alt="The book with that magical embrace" loading="lazy" /></div>
+      </div>
+
+      <div class="evocation reveal reveal-delay-1">
+        <p class="evocation-line">Storyteller is the feeling at the top of the first page of a novel you already know you love, stretched out to fill an entire evening, an entire weekend, an entire chapter of your life.</p>
+      </div>
+
+      <div class="evocation reveal">
+        <p class="evocation-line">Storyteller is comfortable headphones on, lights low, and reality politely stepping aside.</p>
+      </div>
+
+      <div class="evocation reveal reveal-delay-2">
+        <p class="evocation-line">Storyteller is the adventure you always wanted to be inside. Not watching, not controlling, but in the thick of it.</p>
+        <p class="evocation-line">Where the wind is real and the stakes are yours and the character who just said your name really does need your help.</p>
+        <div class="evocation-img-wrap"><img class="evocation-image lazy-image" src="Pasted image 20260318060140.png" alt="Inside the adventure, not watching it" loading="lazy" /></div>
+      </div>
+
+      <div class="evocation reveal reveal-delay-1">
+        <p class="evocation-line">Storyteller is the promise of the old text adventures, finally kept. The interactive story that doesn&rsquo;t feel like a puzzle. The world that doesn&rsquo;t feel like a game. The fiction that doesn&rsquo;t feel like fiction.</p>
+        <div class="evocation-img-wrap"><img class="evocation-image lazy-image" src="Pasted image 20260317203023.png" alt="The promise of the old text adventures, finally kept" loading="lazy" /></div>
+      </div>
+
+      <div class="evocation reveal reveal-delay-2">
+        <p class="evocation-line">Storyteller is the campfire and the dark beyond it and the voice that knows exactly how long to pause before the next reveal.</p>
+        <div class="evocation-img-wrap"><img class="evocation-image lazy-image" src="Pasted image 20260317202650.png" alt="The campfire and the dark beyond it" loading="lazy" /></div>
+      </div>
+
+      <div class="evocation reveal reveal-delay-1">
+        <p class="evocation-line">Storyteller is yours. Only yours. A Story that ten thousand other people have played; and none of them played your version, because your version didn&rsquo;t exist until you showed up.</p>
+        <div class="evocation-img-wrap"><img class="evocation-image lazy-image" src="Pasted image 20260317203514.png" alt="Your version, only yours" loading="lazy" /></div>
+      </div>
+
+      <div class="evocation reveal reveal-delay-2">
+        <p class="evocation-line">Storyteller is what comes after books. After video games. What comes after podcasts and TV and everything else that asks you to sit still and receive.</p>
+        <p class="evocation-line">Storyteller asks you to be there. And then it makes being there feel like the most natural thing in the world.</p>
+      </div>
+    </section>
+
+    <!-- ── PHILOSOPHY ── -->
+    <section id="section-philosophy" class="section">
+      <div class="section-header reveal">
+        <span class="section-kicker">Section 3</span>
+        <h2>Philosophy</h2>
+      </div>
+
+      <ul class="philosophy-list">
+        <li class="philosophy-item reveal">
+          <h3 class="philosophy-heading">Surprise and Delight</h3>
+          <p class="philosophy-desc">We design for wonder. Every moment should hold the possibility of unexpected joy.</p>
+        </li>
+        <li class="philosophy-item reveal reveal-delay-1">
+          <h3 class="philosophy-heading">Fluid by Design</h3>
+          <p class="philosophy-desc">No two experiences are the same, because no two people are the same. The system adapts continuously.</p>
+        </li>
+        <li class="philosophy-item reveal reveal-delay-2">
+          <h3 class="philosophy-heading">Values and Ethics</h3>
+          <p class="philosophy-desc">We build for enrichment, never manipulation. Hard questions before, during, and after every decision.</p>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ── CTA ENDING ── -->
+    <section id="section-cta">
+      <p class="cta-prelude" id="cta-prelude">The only question left</p>
+      <h2 class="cta-question" id="cta-question" aria-label="The only question left is: what story do you want to tell?"></h2>
+      <p class="cta-flourish" id="cta-flourish">✦ &nbsp; ✦ &nbsp; ✦</p>
+    </section>
+
+    </div><!-- /#content-gate -->
+
+  </main>
+</div><!-- /#page-shell -->
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── INTRO SPLASH ─────────────────────────────────────────────── */
+  var intro      = document.getElementById('intro');
+  var introQuill = document.getElementById('intro-quill');
+  var introHint  = document.getElementById('intro-hint');
+  var pageShell  = document.getElementById('page-shell');
+  var starsCanvas = document.getElementById('stars');
+
+  // Quill fades in after a beat
+  setTimeout(function () {
+    introQuill.classList.add('intro-quill-in');
+  }, 300);
+
+  // Hint text appears after quill is settled
+  setTimeout(function () {
+    introQuill.classList.add('pulsing');
+    introHint.classList.add('hint-in');
+  }, 2600);
+
+  function dismissIntro() {
+    // Quill lifts and fades with the overlay
+    introQuill.style.transition = 'opacity 1.2s ease, transform 1.4s ease, filter 1.2s ease';
+    introQuill.style.transform = 'translateX(20%) translateY(-24px)';
+    introQuill.style.opacity = '0';
+    introHint.style.opacity = '0';
+
+    // Stars fade in slightly before page shell
+    setTimeout(function () {
+      starsCanvas.classList.add('page-in');
+    }, 400);
+
+    // Overlay fades
+    intro.classList.add('fade-out');
+
+    // Page shell fades in
+    setTimeout(function () {
+      pageShell.classList.add('page-in');
+    }, 700);
+
+    // Remove overlay from DOM after transition
+    setTimeout(function () {
+      intro.style.display = 'none';
+    }, 2200);
+
+    // Start typewriter after page is visible
+    setTimeout(function () {
+      typeParagraphs(0);
+    }, 1800);
+  }
+
+  intro.addEventListener('click', dismissIntro);
+  intro.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') dismissIntro();
+  });
+
+  /* ── ELEMENTS ── */
+  const tocItems       = document.querySelectorAll('#toc-nav ul li');
+  const tocDot         = document.getElementById('toc-dot');
+  const tocNavList     = document.querySelector('#toc-nav ul');
+
+  /* ── STARFIELD ────────────────────────────────────────────────── */
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  const STAR_COUNT = 280;
+  const stars = Array.from({ length: STAR_COUNT }, () => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    r: Math.random() * 1.4 + 0.3,
+    alpha: Math.random() * 0.7 + 0.2,
+    twinkleSpeed: Math.random() * 0.008 + 0.003,
+    twinkleOffset: Math.random() * Math.PI * 2,
+    // a few larger "feature" stars
+    bright: Math.random() < 0.06,
+  }));
+
+  let frame = 0;
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    frame += 0.016;
+    stars.forEach(s => {
+      const twinkle = Math.sin(frame * s.twinkleSpeed * 60 + s.twinkleOffset);
+      const alpha = s.alpha + twinkle * 0.25;
+      const r = s.bright ? s.r * 1.8 : s.r;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+      if (s.bright) {
+        // soft glow for bright stars
+        const grd = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r * 4);
+        grd.addColorStop(0, `rgba(210, 200, 255, ${alpha})`);
+        grd.addColorStop(1, `rgba(210, 200, 255, 0)`);
+        ctx.fillStyle = grd;
+        ctx.arc(s.x, s.y, r * 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+      }
+      ctx.fillStyle = `rgba(210, 200, 255, ${Math.max(0, Math.min(1, alpha))})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+
+  /* ── STARDUST CURSOR (PROMINENT) ──────────────────────────────── */
+  const dustCanvas = document.createElement('canvas');
+  dustCanvas.style.cssText = 'position:fixed;inset:0;z-index:9998;pointer-events:none;';
+  document.body.appendChild(dustCanvas);
+  const dustCtx = dustCanvas.getContext('2d');
+
+  function resizeDust() {
+    dustCanvas.width = window.innerWidth;
+    dustCanvas.height = window.innerHeight;
+  }
+  resizeDust();
+  window.addEventListener('resize', resizeDust);
+
+  const particles = [];
+  let mouseX = -999, mouseY = -999;
+
+  window.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    // Spawn 2 particles per move — sparse, delicate trail
+    const count = 2;
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 0.8 + 0.2;
+      particles.push({
+        x: mouseX + (Math.random() - 0.5) * 6,
+        y: mouseY + (Math.random() - 0.5) * 6,
+        r: Math.random() * 0.8 + 0.3,      // tiny, crisp
+        alpha: 1.0,                         // full brightness on spawn
+        vx: Math.cos(angle) * speed * 0.4,
+        vy: Math.sin(angle) * speed * 0.4 - 0.3, // gentle upward drift
+        life: 1.0,
+        decay: Math.random() * 0.002 + 0.001, // very slow fade
+        hue: Math.random() * 60 + 200,
+      });
+    }
+  });
+
+  function animateDust() {
+    dustCtx.clearRect(0, 0, dustCanvas.width, dustCanvas.height);
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.02; // slight gravity
+      p.life -= p.decay;
+      if (p.life <= 0) { particles.splice(i, 1); continue; }
+
+      const alpha = p.alpha * p.life;
+      const radius = p.r; // fixed size — no shrink, stays crisp
+
+      // Crisp point — no glow blur
+      dustCtx.beginPath();
+      dustCtx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+      dustCtx.fillStyle = `hsla(${p.hue}, 70%, 88%, ${alpha})`;
+      dustCtx.fill();
+    }
+    requestAnimationFrame(animateDust);
+  }
+  animateDust();
+
+  /* ── LETTER TYPEWRITER ─────────────────────────────────────────── */
+  var letterParas = [
+    { el: document.getElementById('letter-p0'), text: 'Dear friend,' },
+    { el: document.getElementById('letter-p1'), text: 'We\u2019ve been at this for over a year. Dreaming it. Defining it. Coming back to it in the early mornings and the late nights when the idea is loudest.' },
+    { el: document.getElementById('letter-p2'), text: 'A lot has been written down. A lot has been thrown out. What remains\u2026 what you\u2019re about to read\u2026 is what has proven true every time we tested it.' },
+    { el: document.getElementById('letter-p3'), text: 'This isn\u2019t a finished design document. It\u2019s a foundation; a starting point. The clearest picture we have of what Storyteller is, what it isn\u2019t, and what it\u2019s reaching for.' },
+  ];
+  var letterQuill = document.getElementById('letter-quill');
+  var letterTypingDone = false;
+  var activeTimers = [];  // track all pending timeouts so skip can cancel them
+  var letterSkipped = false;
+
+  function safeTimeout(fn, delay) {
+    var id = setTimeout(fn, delay);
+    activeTimers.push(id);
+    return id;
+  }
+
+  function cancelAllTimers() {
+    activeTimers.forEach(clearTimeout);
+    activeTimers = [];
+  }
+
+  // Immediately flush all remaining text into each paragraph, remove cursors
+  function skipTyping() {
+    if (letterSkipped) return;
+    letterSkipped = true;
+    cancelAllTimers();
+    // Remove any lingering cursors and set full text on each para
+    letterParas.forEach(function (para) {
+      var cursors = para.el.querySelectorAll('.letter-cursor');
+      cursors.forEach(function (c) { c.parentNode.removeChild(c); });
+      para.el.textContent = para.text;
+    });
+    // Show quill immediately
+    letterQuill.classList.add('revealed');
+    letterTypingDone = true;
+  }
+
+  // Typing speed — 10% faster base, wider random spread for organic feel
+  function charDelay(ch) {
+    if (ch === '\u2026') return 220 + Math.random() * 140; // ellipsis — long dramatic pause
+    if (ch === '.' || ch === '!' || ch === '?') return 150 + Math.random() * 110;
+    if (ch === ',') return 90 + Math.random() * 80;
+    if (ch === ';') return 80 + Math.random() * 60;
+    if (ch === ' ') return 22 + Math.random() * 26;
+    // Occasional hesitation — ~8% of letters get a longer pause
+    if (Math.random() < 0.08) return 110 + Math.random() * 80;
+    return 38 + Math.random() * 30;
+  }
+
+  function typeText(el, text, onDone) {
+    var cursor = document.createElement('span');
+    cursor.className = 'letter-cursor';
+    el.appendChild(cursor);
+
+    var i = 0;
+    function next() {
+      if (letterSkipped) return;
+      if (i >= text.length) {
+        if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
+        if (onDone) onDone();
+        return;
+      }
+      var ch = text[i++];
+      var textNode = document.createTextNode(ch);
+      el.insertBefore(textNode, cursor);
+      safeTimeout(next, charDelay(ch));
+    }
+    next();
+  }
+
+  function typeParagraphs(index) {
+    if (letterSkipped) return;
+    if (index >= letterParas.length) {
+      safeTimeout(function () {
+        letterQuill.classList.add('revealed');
+        letterTypingDone = true;
+      }, 600);
+      return;
+    }
+    var para = letterParas[index];
+    var pause = index === 0 ? 0 : 520;
+    safeTimeout(function () {
+      typeText(para.el, para.text, function () {
+        typeParagraphs(index + 1);
+      });
+    }, pause);
+  }
+
+  // Click anywhere on letter section to skip
+  document.getElementById('section-letter').addEventListener('click', function () {
+    if (!letterTypingDone) skipTyping();
+  });
+
+  /* ── CONTENT GATE ───────────────────────────────────────────────── */
+  var contentGate = document.getElementById('content-gate');
+  var gateUnlocked = false;
+
+  function unlockContent() {
+    if (gateUnlocked) return;
+    gateUnlocked = true;
+    contentGate.classList.add('unlocked');
+    // Kick scroll-reveal for newly visible elements
+    setTimeout(observeRevealElements, 100);
+  }
+
+  // Unlock on quill click
+  letterQuill.addEventListener('click', function () {
+    if (letterTypingDone) unlockContent();
+  });
+
+  // Unlock on scroll past the letter section
+  var letterSection = document.getElementById('section-letter');
+  var scrollGateObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      // When letter section scrolls out of view (bottom), unlock
+      if (!entry.isIntersecting && entry.boundingClientRect.bottom < 0) {
+        unlockContent();
+      }
+    });
+  }, { threshold: 0 });
+  scrollGateObserver.observe(letterSection);
+
+  /* ── LAZY IMAGE OBSERVER ─────────────────────────────────────────── */
+  const imageObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('image-visible');
+        imageObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.lazy-image').forEach(img => imageObserver.observe(img));
+
+  /* ── PHILOSOPHY GLOW + DESC REVEAL ──────────────────────────────── */
+  document.querySelectorAll('.philosophy-heading').forEach(h => {
+    h.addEventListener('mouseleave', () => {
+      h.classList.remove('glow-out');
+      // force reflow so transition restarts
+      void h.offsetWidth;
+      h.classList.add('glow-out');
+    });
+    h.addEventListener('mouseenter', () => {
+      h.classList.remove('glow-out');
+    });
+  });
+
+  const descObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('desc-visible');
+        descObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  document.querySelectorAll('.philosophy-desc').forEach(el => descObserver.observe(el));
+
+  /* ── IMAGE TILT ──────────────────────────────────────────────────── */
+  // not-images: tilt on <img> directly (no wrap needed)
+  document.querySelectorAll('.not-image').forEach(img => {
+    var wrap = img.parentElement;
+    wrap.style.perspective = '800px';
+
+    img.addEventListener('mousemove', function (e) {
+      var rect = img.getBoundingClientRect();
+      var cx = rect.left + rect.width / 2;
+      var cy = rect.top + rect.height / 2;
+      var dx = (e.clientX - cx) / (rect.width / 2);
+      var dy = (e.clientY - cy) / (rect.height / 2);
+      var maxTilt = 3;
+      var rotX = -dy * maxTilt;
+      var rotY =  dx * maxTilt;
+      img.style.transition = 'transform 0.6s ease, box-shadow 0.6s ease';
+      img.style.transform = 'rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) scale(1.02)';
+      img.style.boxShadow = '0 8px 40px rgba(201, 169, 110, 0.18), 0 6px 28px rgba(0,0,0,0.4)';
+    });
+
+    img.addEventListener('mouseleave', function () {
+      img.style.transition = 'transform 0.5s ease, box-shadow 0.5s ease';
+      img.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+      img.style.boxShadow = '0 6px 28px rgba(0,0,0,0.4)';
+    });
+  });
+
+  // evocation-images: tilt on the .evocation-img-wrap to preserve ::after light-leak
+  document.querySelectorAll('.evocation-img-wrap').forEach(function (wrap) {
+    var img = wrap.querySelector('.evocation-image');
+    wrap.parentElement.style.perspective = '800px';
+
+    wrap.addEventListener('mousemove', function (e) {
+      var rect = wrap.getBoundingClientRect();
+      var cx = rect.left + rect.width / 2;
+      var cy = rect.top + rect.height / 2;
+      var dx = (e.clientX - cx) / (rect.width / 2);
+      var dy = (e.clientY - cy) / (rect.height / 2);
+      var maxTilt = 3;
+      var rotX = -dy * maxTilt;
+      var rotY =  dx * maxTilt;
+      wrap.style.transition = 'transform 0.6s ease';
+      wrap.style.transform = 'rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) scale(1.02)';
+    });
+
+    wrap.addEventListener('mouseleave', function () {
+      wrap.style.transition = 'transform 0.5s ease';
+      wrap.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+    });
+  });
+
+  /* ── SCROLL REVEAL ── */
+  var revealObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  function observeRevealElements() {
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      revealObserver.observe(el);
+    });
+  }
+
+  observeRevealElements();
+
+  /* ── TOC ACTIVE STATE ── */
+  /* ── CTA WORD-BY-WORD REVEAL ─────────────────────────────────────── */
+  (function () {
+    var ctaSection = document.getElementById('section-cta');
+    var ctaQuestion = document.getElementById('cta-question');
+    var ctaPrelude = document.getElementById('cta-prelude');
+    var ctaFlourish = document.getElementById('cta-flourish');
+
+    // Split text into letter spans inside word spans
+    // Structure: <span class="cta-word"><span class="cta-letter">W</span>...</span>
+    var text = 'What story do you want to tell?';
+    var words = text.split(' ');
+    var letterIndex = 0; // global index across all letters for ripple delay
+    ctaQuestion.innerHTML = words.map(function (w) {
+      var letters = w.split('').map(function (ch) {
+        var idx = letterIndex++;
+        return '<span class="cta-letter" data-li="' + idx + '">' + ch + '</span>';
+      }).join('');
+      return '<span class="cta-word">' + letters + '</span>';
+    }).join(' ');
+
+    var ctaSpans = ctaQuestion.querySelectorAll('.cta-word');
+    var ctaLetters = ctaQuestion.querySelectorAll('.cta-letter');
+    var triggered = false;
+
+    var ctaObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && !triggered) {
+          triggered = true;
+
+          // Fade prelude in first
+          setTimeout(function () {
+            ctaPrelude.classList.add('cta-visible');
+          }, 200);
+
+          // Cascade words in (word-level for the fade-in animation)
+          ctaSpans.forEach(function (span, i) {
+            setTimeout(function () {
+              span.classList.add('word-in');
+            }, 900 + i * 120);
+          });
+
+          // After all words in: breathing + flourish
+          var totalDelay = 900 + ctaSpans.length * 120 + 600;
+          setTimeout(function () {
+            ctaQuestion.classList.add('breathing');
+            ctaFlourish.classList.add('cta-visible');
+
+            // Wire up hover ripple now that letters are visible
+            attachCtaHover();
+          }, totalDelay);
+
+          ctaObserver.unobserve(ctaSection);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    ctaObserver.observe(ctaSection);
+
+    // Hover ripple — fire a left-to-right letter flare on mouseenter
+    function attachCtaHover() {
+      var rippleTimer = null;
+      ctaQuestion.addEventListener('mouseenter', function () {
+        // Pause breathing while hovered
+        ctaQuestion.style.animationPlayState = 'paused';
+
+        if (rippleTimer) clearTimeout(rippleTimer);
+
+        // Remove any existing flare classes
+        ctaLetters.forEach(function (l) { l.classList.remove('flare'); });
+
+        var total = ctaLetters.length;
+        var rippleDuration = 1200; // ms total sweep across all letters
+        ctaLetters.forEach(function (letter, i) {
+          var delay = (i / total) * rippleDuration;
+          setTimeout(function () {
+            letter.classList.remove('flare');
+            void letter.offsetWidth; // force reflow so animation restarts
+            letter.classList.add('flare');
+          }, delay);
+        });
+      });
+
+      ctaQuestion.addEventListener('mouseleave', function () {
+        ctaQuestion.style.animationPlayState = 'running';
+      });
+    }
+  }());
+
+  var sections = [
+    { id: 'section-letter',     tocId: 'toc-letter' },
+    { id: 'section-not',        tocId: 'toc-not' },
+    { id: 'section-is',         tocId: 'toc-is' },
+    { id: 'section-philosophy', tocId: 'toc-philosophy' },
+    { id: 'section-cta',        tocId: 'toc-cta' },
+  ];
+
+  // Map tocId -> list item index for dot positioning
+  var tocIdToIndex = {};
+  tocItems.forEach(function (li, i) {
+    tocIdToIndex[li.id] = i;
+  });
+
+  function moveDot(activeTocId) {
+    var idx = tocIdToIndex[activeTocId];
+    if (idx === undefined) return;
+
+    var items = tocNavList.querySelectorAll('li');
+    var totalItems = items.length;
+    // Distribute dot positions evenly across the nav height
+    var navHeight = tocNavList.offsetHeight;
+    var itemHeight = navHeight / totalItems;
+    var dotTop = idx * itemHeight + itemHeight / 2 - 3; // center in item, offset by half dot height
+    tocDot.style.top = dotTop + 'px';
+  }
+
+  var sectionObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        var matchingSection = sections.find(function (s) { return s.id === entry.target.id; });
+        if (matchingSection) {
+          tocItems.forEach(function (li) { li.classList.remove('active'); });
+          var activeLi = document.getElementById(matchingSection.tocId);
+          if (activeLi) {
+            activeLi.classList.add('active');
+            moveDot(matchingSection.tocId);
+          }
+        }
+      }
+    });
+  }, { threshold: 0.2, rootMargin: '-80px 0px -60% 0px' });
+
+  sections.forEach(function (s) {
+    var el = document.getElementById(s.id);
+    if (el) sectionObserver.observe(el);
+  });
+
+  // Initialize dot position
+  moveDot('toc-letter');
+
+})();
+</script>
+</body>
+</html>
