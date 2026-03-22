@@ -67,7 +67,9 @@
       flex-direction: column;
       padding: 56px 32px 40px 40px;
       border-right: 1px solid rgba(201, 169, 110, 0.25);
-      background: var(--bg);
+      background: rgba(13, 13, 31, 0.72);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       z-index: 100;
     }
 
@@ -388,7 +390,7 @@
     }
 
     #section-not {
-      background: #12122a;
+      background: rgba(18, 18, 42, 0.55);
       padding: 10vh 0;
       border-top: 1px solid rgba(201, 169, 110, 0.15);
       border-bottom: 1px solid rgba(201, 169, 110, 0.15);
@@ -399,12 +401,12 @@
     }
 
     #section-is {
-      background: #0d0d1f;
+      background: transparent;
       padding: 10vh 0;
     }
 
     #section-philosophy {
-      background: #0a0a1a;
+      background: rgba(10, 10, 26, 0.55);
       padding: 12vh 0;
       border-top: 1px solid rgba(201, 169, 110, 0.15);
       margin-left: -80px;
@@ -846,7 +848,7 @@
       justify-content: center;
       text-align: center;
       padding: 15vh 60px 20vh;
-      background: #060611;
+      background: transparent;
       margin-left: -80px;
       margin-right: -80px;
       padding-left: 80px;
@@ -1223,6 +1225,7 @@
   }
 
   intro.addEventListener('click', dismissIntro);
+  intro.addEventListener('touchstart', function (e) { e.preventDefault(); dismissIntro(); }, { passive: false });
   intro.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' || e.key === ' ') dismissIntro();
   });
@@ -1299,27 +1302,30 @@
   const particles = [];
   let mouseX = -999, mouseY = -999;
 
-  window.addEventListener('mousemove', e => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    // Spawn 2 particles per move — sparse, delicate trail
+  function spawnDust(x, y) {
     const count = 2;
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
       const speed = Math.random() * 0.8 + 0.2;
       particles.push({
-        x: mouseX + (Math.random() - 0.5) * 6,
-        y: mouseY + (Math.random() - 0.5) * 6,
-        r: Math.random() * 0.8 + 0.3,      // tiny, crisp
-        alpha: 1.0,                         // full brightness on spawn
+        x: x + (Math.random() - 0.5) * 6,
+        y: y + (Math.random() - 0.5) * 6,
+        r: Math.random() * 0.8 + 0.3,
+        alpha: 1.0,
         vx: Math.cos(angle) * speed * 0.4,
-        vy: Math.sin(angle) * speed * 0.4 - 0.3, // gentle upward drift
+        vy: Math.sin(angle) * speed * 0.4 - 0.3,
         life: 1.0,
-        decay: Math.random() * 0.002 + 0.001, // very slow fade
+        decay: Math.random() * 0.002 + 0.001,
         hue: Math.random() * 60 + 200,
       });
     }
-  });
+  }
+
+  window.addEventListener('mousemove', e => { spawnDust(e.clientX, e.clientY); });
+  window.addEventListener('touchmove', e => {
+    const t = e.touches[0];
+    spawnDust(t.clientX, t.clientY);
+  }, { passive: true });
 
   function animateDust() {
     dustCtx.clearRect(0, 0, dustCanvas.width, dustCanvas.height);
@@ -1434,10 +1440,13 @@
     }, pause);
   }
 
-  // Click anywhere on letter section to skip
+  // Click or tap anywhere on letter section to skip
   document.getElementById('section-letter').addEventListener('click', function () {
     if (!letterTypingDone) skipTyping();
   });
+  document.getElementById('section-letter').addEventListener('touchstart', function () {
+    if (!letterTypingDone) skipTyping();
+  }, { passive: true });
 
   /* ── CONTENT GATE ───────────────────────────────────────────────── */
   var contentGate = document.getElementById('content-gate');
@@ -1451,10 +1460,13 @@
     setTimeout(observeRevealElements, 100);
   }
 
-  // Unlock on quill click
+  // Unlock on quill click or tap
   letterQuill.addEventListener('click', function () {
     if (letterTypingDone) unlockContent();
   });
+  letterQuill.addEventListener('touchstart', function () {
+    if (letterTypingDone) unlockContent();
+  }, { passive: true });
 
   // Unlock on scroll past the letter section
   var letterSection = document.getElementById('section-letter');
@@ -1482,15 +1494,15 @@
 
   /* ── PHILOSOPHY GLOW + DESC REVEAL ──────────────────────────────── */
   document.querySelectorAll('.philosophy-heading').forEach(h => {
-    h.addEventListener('mouseleave', () => {
-      h.classList.remove('glow-out');
-      // force reflow so transition restarts
-      void h.offsetWidth;
-      h.classList.add('glow-out');
-    });
-    h.addEventListener('mouseenter', () => {
-      h.classList.remove('glow-out');
-    });
+    function glowOn()  { h.classList.remove('glow-out'); }
+    function glowOff() { h.classList.remove('glow-out'); void h.offsetWidth; h.classList.add('glow-out'); }
+    h.addEventListener('mouseenter', glowOn);
+    h.addEventListener('mouseleave', glowOff);
+    // Mobile: tap to glow, auto-fade after 2s
+    h.addEventListener('touchstart', function () {
+      glowOn();
+      setTimeout(glowOff, 2000);
+    }, { passive: true });
   });
 
   const descObserver = new IntersectionObserver((entries) => {
@@ -1505,54 +1517,51 @@
   document.querySelectorAll('.philosophy-desc').forEach(el => descObserver.observe(el));
 
   /* ── IMAGE TILT ──────────────────────────────────────────────────── */
-  // not-images: tilt on <img> directly (no wrap needed)
-  document.querySelectorAll('.not-image').forEach(img => {
-    var wrap = img.parentElement;
-    wrap.style.perspective = '800px';
+  function applyTilt(el, clientX, clientY, maxTilt) {
+    var rect = el.getBoundingClientRect();
+    var cx = rect.left + rect.width / 2;
+    var cy = rect.top + rect.height / 2;
+    var dx = (clientX - cx) / (rect.width / 2);
+    var dy = (clientY - cy) / (rect.height / 2);
+    var rotX = -dy * maxTilt;
+    var rotY =  dx * maxTilt;
+    el.style.transition = 'transform 0.6s ease, box-shadow 0.6s ease';
+    el.style.transform = 'rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) scale(1.02)';
+  }
 
+  function resetTilt(el) {
+    el.style.transition = 'transform 0.5s ease, box-shadow 0.5s ease';
+    el.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+  }
+
+  // not-images
+  document.querySelectorAll('.not-image').forEach(function (img) {
+    img.parentElement.style.perspective = '800px';
     img.addEventListener('mousemove', function (e) {
-      var rect = img.getBoundingClientRect();
-      var cx = rect.left + rect.width / 2;
-      var cy = rect.top + rect.height / 2;
-      var dx = (e.clientX - cx) / (rect.width / 2);
-      var dy = (e.clientY - cy) / (rect.height / 2);
-      var maxTilt = 3;
-      var rotX = -dy * maxTilt;
-      var rotY =  dx * maxTilt;
-      img.style.transition = 'transform 0.6s ease, box-shadow 0.6s ease';
-      img.style.transform = 'rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) scale(1.02)';
+      applyTilt(img, e.clientX, e.clientY, 3);
       img.style.boxShadow = '0 8px 40px rgba(201, 169, 110, 0.18), 0 6px 28px rgba(0,0,0,0.4)';
     });
-
     img.addEventListener('mouseleave', function () {
-      img.style.transition = 'transform 0.5s ease, box-shadow 0.5s ease';
-      img.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+      resetTilt(img);
       img.style.boxShadow = '0 6px 28px rgba(0,0,0,0.4)';
     });
+    img.addEventListener('touchmove', function (e) {
+      var t = e.touches[0];
+      applyTilt(img, t.clientX, t.clientY, 3);
+    }, { passive: true });
+    img.addEventListener('touchend', function () { resetTilt(img); }, { passive: true });
   });
 
-  // evocation-images: tilt on the .evocation-img-wrap to preserve ::after light-leak
+  // evocation-images: tilt the wrap to preserve ::after light-leak
   document.querySelectorAll('.evocation-img-wrap').forEach(function (wrap) {
-    var img = wrap.querySelector('.evocation-image');
     wrap.parentElement.style.perspective = '800px';
-
-    wrap.addEventListener('mousemove', function (e) {
-      var rect = wrap.getBoundingClientRect();
-      var cx = rect.left + rect.width / 2;
-      var cy = rect.top + rect.height / 2;
-      var dx = (e.clientX - cx) / (rect.width / 2);
-      var dy = (e.clientY - cy) / (rect.height / 2);
-      var maxTilt = 3;
-      var rotX = -dy * maxTilt;
-      var rotY =  dx * maxTilt;
-      wrap.style.transition = 'transform 0.6s ease';
-      wrap.style.transform = 'rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) scale(1.02)';
-    });
-
-    wrap.addEventListener('mouseleave', function () {
-      wrap.style.transition = 'transform 0.5s ease';
-      wrap.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
-    });
+    wrap.addEventListener('mousemove', function (e) { applyTilt(wrap, e.clientX, e.clientY, 3); });
+    wrap.addEventListener('mouseleave', function () { resetTilt(wrap); });
+    wrap.addEventListener('touchmove', function (e) {
+      var t = e.touches[0];
+      applyTilt(wrap, t.clientX, t.clientY, 3);
+    }, { passive: true });
+    wrap.addEventListener('touchend', function () { resetTilt(wrap); }, { passive: true });
   });
 
   /* ── SCROLL REVEAL ── */
@@ -1635,8 +1644,7 @@
     // Hover ripple — fire a left-to-right letter flare on mouseenter
     function attachCtaHover() {
       var rippleTimer = null;
-      ctaQuestion.addEventListener('mouseenter', function () {
-        // Pause breathing while hovered
+      function ctaRipple() {
         ctaQuestion.style.animationPlayState = 'paused';
 
         if (rippleTimer) clearTimeout(rippleTimer);
@@ -1650,15 +1658,22 @@
           var delay = (i / total) * rippleDuration;
           setTimeout(function () {
             letter.classList.remove('flare');
-            void letter.offsetWidth; // force reflow so animation restarts
+            void letter.offsetWidth;
             letter.classList.add('flare');
           }, delay);
         });
-      });
+      }
 
-      ctaQuestion.addEventListener('mouseleave', function () {
+      function ctaRippleEnd() {
         ctaQuestion.style.animationPlayState = 'running';
-      });
+      }
+
+      ctaQuestion.addEventListener('mouseenter', ctaRipple);
+      ctaQuestion.addEventListener('mouseleave', ctaRippleEnd);
+      ctaQuestion.addEventListener('touchstart', function () {
+        ctaRipple();
+        setTimeout(ctaRippleEnd, 2000);
+      }, { passive: true });
     }
   }());
 
