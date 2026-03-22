@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Storyteller — What It Is and Where We Are</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0a0f;
+      --bg-raised: #111118;
+      --text: #e8e6e0;
+      --text-muted: #888;
+      --text-dim: #555;
+
+      --violet: #a855f7;
+      --violet-dim: #3b1f5e;
+      --violet-glow: rgba(168, 85, 247, 0.12);
+      --violet-rgb: 168, 85, 247;
+
+      --blue: #3b82f6;
+      --blue-dim: #1a2d5e;
+      --blue-glow: rgba(59, 130, 246, 0.12);
+      --blue-rgb: 59, 130, 246;
+
+      --emerald: #10b981;
+      --emerald-dim: #0a3d28;
+      --emerald-glow: rgba(16, 185, 129, 0.12);
+      --emerald-rgb: 16, 185, 129;
+
+      --amber: #f59e0b;
+      --amber-dim: #4a2e00;
+      --amber-glow: rgba(245, 158, 11, 0.12);
+      --amber-rgb: 245, 158, 11;
+
+      --crimson: #ef4444;
+      --crimson-dim: #4a0f0f;
+      --crimson-glow: rgba(239, 68, 68, 0.12);
+      --crimson-rgb: 239, 68, 68;
+
+      /* Dynamic accent — updated by JS as you scroll */
+      --active-accent: var(--violet);
+      --active-accent-rgb: 168, 85, 247;
+      --section-tint-opacity: 0;
+      --section-tint-r: 168;
+      --section-tint-g: 85;
+      --section-tint-b: 247;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 18px;
+      line-height: 1.7;
+      overflow-x: hidden;
+      /* Page load — starts invisible */
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    /* ─── SCROLL PROGRESS BAR ─── */
+    #scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 9999;
+      background: linear-gradient(
+        90deg,
+        var(--violet) 0%,
+        var(--blue) 25%,
+        var(--emerald) 50%,
+        var(--amber) 75%,
+        var(--crimson) 100%
+      );
+      background-size: 400% 100%;
+      background-position: 0% 0%;
+      transform-origin: left;
+      transition: background-position 0.6s ease;
+    }
+
+    /* ─── CURSOR GLOW ─── */
+    #cursor-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(
+        circle,
+        rgba(var(--active-accent-rgb), 0.08) 0%,
+        transparent 70%
+      );
+      transition: background 0.6s ease;
+      will-change: transform;
+    }
+
+    @media (hover: none) {
+      #cursor-glow { display: none; }
+    }
+
+    /* ─── SECTION TINT OVERLAY ─── */
+    #section-tint {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: rgb(
+        var(--section-tint-r),
+        var(--section-tint-g),
+        var(--section-tint-b)
+      );
+      opacity: 0;
+      transition: opacity 0.8s ease, background 0.8s ease;
+    }
+
+    /* ─── SCROLL REVEAL BASE STATES ─── */
+    /* All animated elements start hidden; JS adds .is-visible */
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal-fade-up {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+                    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform, opacity;
+      }
+
+      .reveal-fade-up.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .reveal-slide-left {
+        opacity: 0;
+        transform: translateX(-60px);
+        transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform, opacity;
+      }
+
+      .reveal-slide-left.is-visible {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .reveal-slide-right {
+        opacity: 0;
+        transform: translateX(40px);
+        transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+                    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform, opacity;
+      }
+
+      .reveal-slide-right.is-visible {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .reveal-scale-up {
+        opacity: 0;
+        transform: scale(0.92);
+        transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform, opacity;
+      }
+
+      .reveal-scale-up.is-visible {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      /* Section number pulse glow when entering viewport */
+      .section-number.section-num-glow {
+        animation: sectionNumPulse 1.2s ease-out forwards;
+      }
+
+      @keyframes sectionNumPulse {
+        0%   { opacity: 0.04; text-shadow: none; }
+        30%  { opacity: 0.12; text-shadow: 0 0 60px currentColor; }
+        100% { opacity: 0.04; text-shadow: none; }
+      }
+
+      /* Eyebrow line draw */
+      .section-tag-line {
+        display: inline-block;
+        width: 0;
+        height: 2px;
+        vertical-align: middle;
+        margin-right: 10px;
+        transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .is-visible .section-tag-line,
+      .section-tag.is-visible .section-tag-line {
+        width: 24px;
+      }
+
+      /* Hero load sequence */
+      .hero-eyebrow {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      .hero-word {
+        opacity: 0;
+        transform: translateY(20px);
+        display: inline-block;
+        transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform, opacity;
+      }
+
+      .hero-subtitle {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+      }
+
+      .hero-meta-line {
+        opacity: 0;
+      }
+
+      .hero-rule {
+        width: 0 !important;
+        transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .hero-rule.hero-rule-in {
+        width: 60px !important;
+      }
+
+      /* NAV initial state */
+      nav {
+        transform: translateY(-100%);
+        transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      nav.nav-in {
+        transform: translateY(0);
+      }
+    }
+
+    /* ─── COMPANION CALLOUT ─── */
+    .companion-callout {
+      max-width: 760px;
+      margin: 0 auto 80px;
+      padding: 22px 28px;
+      border-left: 3px solid var(--violet);
+      background: var(--violet-glow);
+      border-radius: 0 6px 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .companion-callout-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      color: var(--violet);
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .companion-callout-text {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .companion-callout-text a {
+      color: var(--violet);
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.4);
+      transition: border-color 0.2s;
+    }
+    .companion-callout-text a:hover { border-color: var(--violet); }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 0 40px;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 0;
+      align-items: center;
+      height: 52px;
+      overflow-x: auto;
+    }
+
+    nav ul::-webkit-scrollbar { display: none; }
+
+    nav li a {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 6px 16px;
+      border-radius: 20px;
+      transition: color 0.2s, background 0.2s;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    nav li a:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.05);
+    }
+
+    nav li a.nav-active {
+      color: var(--active-accent);
+    }
+
+    nav li.nav-brand a {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      padding-left: 0;
+      margin-right: 8px;
+      background: none;
+    }
+
+    nav li.nav-companion a {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      color: var(--violet) !important;
+      border: 1px solid var(--violet);
+      padding: 5px 14px;
+      border-radius: 3px;
+      transition: background 0.2s, color 0.2s;
+    }
+    nav li.nav-companion a:hover {
+      background: var(--violet);
+      color: #0a0a0f !important;
+    }
+
+    nav li.nav-divider {
+      width: 1px;
+      height: 20px;
+      background: rgba(255,255,255,0.1);
+      margin: 0 8px;
+      flex-shrink: 0;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 80px 60px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Parallax wrapper for hero content */
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      will-change: transform;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: -10%;
+      width: 70%;
+      height: 120%;
+      background: radial-gradient(ellipse at center, rgba(168, 85, 247, 0.07) 0%, transparent 70%);
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -10%;
+      right: -5%;
+      width: 50%;
+      height: 80%;
+      background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--violet);
+      margin-bottom: 32px;
+      will-change: transform, opacity;
+      transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
+    }
+
+    .hero-eyebrow.hero-eyebrow-in {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 12vw, 180px);
+      line-height: 0.9;
+      letter-spacing: 0.01em;
+      color: var(--text);
+      margin-bottom: 0;
+    }
+
+    .hero-title .line-accent {
+      color: var(--violet);
+    }
+
+    /* Each title line gets wrapped for animation */
+    .hero-title-line {
+      display: block;
+      overflow: hidden;
+      line-height: 1.0;
+    }
+
+    .hero-subtitle {
+      margin-top: 48px;
+      max-width: 680px;
+      font-size: 22px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      will-change: transform, opacity;
+      transition: opacity 0.6s ease 0.8s, transform 0.6s ease 0.8s;
+    }
+
+    .hero-subtitle.hero-subtitle-in {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+
+    .hero-subtitle em {
+      color: var(--text);
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    .hero-rule {
+      height: 2px;
+      background: var(--violet);
+      margin: 40px 0;
+    }
+
+    .hero-meta {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      will-change: opacity;
+      transition: opacity 0.5s ease 1.1s;
+    }
+
+    .hero-meta.hero-meta-in {
+      opacity: 1 !important;
+    }
+
+    /* ─── SCROLL HINT ─── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      animation: scrollHintBounceIn 0.6s ease 1s forwards;
+    }
+
+    .scroll-hint-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(180deg, var(--violet), transparent);
+      animation: scrollHintPulse 2s ease-in-out infinite 1.6s;
+    }
+
+    .scroll-hint-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    @keyframes scrollHintBounceIn {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    @keyframes scrollHintPulse {
+      0%, 100% { opacity: 1; transform: scaleY(1); }
+      50%       { opacity: 0.4; transform: scaleY(0.7); }
+    }
+
+    /* ─── SECTION BASE ─── */
+    section {
+      padding: 100px 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 160px;
+      line-height: 1;
+      position: absolute;
+      top: 60px;
+      right: 60px;
+      opacity: 0.04;
+      color: var(--text);
+      pointer-events: none;
+      user-select: none;
+      will-change: transform, opacity;
+    }
+
+    .section-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    /* The animated line is now a child span; old ::before removed */
+    .section-tag::before {
+      content: none;
+    }
+
+    .section-tag-line {
+      display: inline-block;
+      width: 24px;
+      height: 2px;
+      flex-shrink: 0;
+      margin-right: 10px;
+      will-change: width;
+    }
+
+    .section-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 6vw, 96px);
+      line-height: 0.95;
+      letter-spacing: 0.01em;
+      margin-bottom: 48px;
+    }
+
+    .sub-heading {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      line-height: 1.3;
+      margin-bottom: 20px;
+    }
+
+    p {
+      margin-bottom: 24px;
+      color: var(--text-muted);
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* ─── LINK UNDERLINE ANIMATION ─── */
+    a:not(.companion-callout-text a):not(nav a) {
+      position: relative;
+      text-decoration: none;
+    }
+
+    a:not(.companion-callout-text a):not(nav a)::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      width: 0;
+      height: 1px;
+      background: currentColor;
+      transition: width 0.25s ease;
+    }
+
+    a:not(.companion-callout-text a):not(nav a):hover::after {
+      width: 100%;
+    }
+
+    /* ─── SECTION 1: HOW IT WORKS ─── */
+    #how-it-works {
+      background: var(--bg);
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+
+    #how-it-works .section-tag { color: var(--violet); }
+    #how-it-works .section-tag .section-tag-line { background: var(--violet); }
+    #how-it-works .section-heading { color: var(--text); }
+
+    #how-it-works .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    #how-it-works .col-left p {
+      font-size: 20px;
+      line-height: 1.6;
+    }
+
+    .narrator-pull {
+      font-family: 'DM Serif Display', serif;
+      font-size: 32px;
+      line-height: 1.35;
+      color: var(--text);
+      font-style: italic;
+      margin-bottom: 40px;
+      padding-left: 28px;
+      border-left: 3px solid var(--violet);
+    }
+
+    /* Pull-quote typewriter cursor */
+    .typewriter-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      vertical-align: middle;
+      background: currentColor;
+      margin-left: 2px;
+      animation: blink 0.7s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* Component Cards */
+    .component-cards {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-top: 80px;
+    }
+
+    .component-card {
+      background: var(--bg-raised);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 4px;
+      padding: 28px 20px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.3s ease,
+                  box-shadow 0.3s ease;
+      cursor: default;
+    }
+
+    .component-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      transition: opacity 0.3s ease;
+    }
+
+    .component-card:nth-child(1)::before { background: var(--violet); }
+    .component-card:nth-child(2)::before { background: var(--blue); }
+    .component-card:nth-child(3)::before { background: var(--emerald); }
+    .component-card:nth-child(4)::before { background: var(--amber); }
+    .component-card:nth-child(5)::before { background: var(--crimson); }
+
+    .component-card:nth-child(1):hover {
+      transform: translateY(-4px);
+      border-color: rgba(168, 85, 247, 0.35);
+      box-shadow: 0 8px 32px rgba(168, 85, 247, 0.15);
+    }
+    .component-card:nth-child(2):hover {
+      transform: translateY(-4px);
+      border-color: rgba(59, 130, 246, 0.35);
+      box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15);
+    }
+    .component-card:nth-child(3):hover {
+      transform: translateY(-4px);
+      border-color: rgba(16, 185, 129, 0.35);
+      box-shadow: 0 8px 32px rgba(16, 185, 129, 0.15);
+    }
+    .component-card:nth-child(4):hover {
+      transform: translateY(-4px);
+      border-color: rgba(245, 158, 11, 0.35);
+      box-shadow: 0 8px 32px rgba(245, 158, 11, 0.15);
+    }
+    .component-card:nth-child(5):hover {
+      transform: translateY(-4px);
+      border-color: rgba(239, 68, 68, 0.35);
+      box-shadow: 0 8px 32px rgba(239, 68, 68, 0.15);
+    }
+
+    .card-glyph {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      margin-bottom: 16px;
+    }
+
+    .component-card:nth-child(1) .card-glyph { color: var(--violet); }
+    .component-card:nth-child(2) .card-glyph { color: var(--blue); }
+    .component-card:nth-child(3) .card-glyph { color: var(--emerald); }
+    .component-card:nth-child(4) .card-glyph { color: var(--amber); }
+    .component-card:nth-child(5) .card-glyph { color: var(--crimson); }
+
+    .card-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      margin-bottom: 10px;
+      line-height: 1;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    /* ─── SECTION 2: BUILDING FIRST ─── */
+    #building-first {
+      background: linear-gradient(180deg, var(--bg) 0%, #0d0d16 100%);
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+
+    #building-first .section-tag { color: var(--blue); }
+    #building-first .section-tag .section-tag-line { background: var(--blue); }
+    #building-first .section-heading { color: var(--text); }
+
+    .building-layout {
+      display: grid;
+      grid-template-columns: 5fr 4fr;
+      gap: 100px;
+      align-items: start;
+    }
+
+    #building-first p {
+      font-size: 19px;
+      line-height: 1.65;
+    }
+
+    .proof-block {
+      background: var(--blue-glow);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 4px;
+      padding: 40px 36px;
+      position: sticky;
+      top: 80px;
+      transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .proof-block:hover {
+      box-shadow: 0 12px 48px rgba(59, 130, 246, 0.12);
+      border-color: rgba(59, 130, 246, 0.35);
+    }
+
+    .proof-block-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 20px;
+    }
+
+    .proof-block-stat {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 72px;
+      line-height: 1;
+      color: var(--text);
+      margin-bottom: 4px;
+      transition: transform 0.2s ease, text-shadow 0.2s ease;
+      cursor: default;
+    }
+
+    .proof-block-stat:hover {
+      transform: scale(1.05);
+      text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+    }
+
+    .proof-block-caption {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .proof-detail {
+      border-top: 1px solid rgba(59, 130, 246, 0.15);
+      padding-top: 24px;
+    }
+
+    .proof-detail p {
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .proof-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      padding: 4px 10px;
+      border-radius: 2px;
+      margin-bottom: 8px;
+    }
+
+    /* ─── SECTION 3: GLOSSARY PROBLEM ─── */
+    #glossary-problem {
+      background: #0d0d16;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      overflow: hidden;
+    }
+
+    #glossary-problem .section-tag { color: var(--emerald); }
+    #glossary-problem .section-tag .section-tag-line { background: var(--emerald); }
+    #glossary-problem .section-heading { color: var(--text); }
+
+    .glossary-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .glossary-pull {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(28px, 3.5vw, 44px);
+      line-height: 1.25;
+      color: var(--text);
+      margin-bottom: 0;
+      font-style: italic;
+    }
+
+    .glossary-pull em {
+      color: var(--emerald);
+      font-style: normal;
+    }
+
+    .registry-viz {
+      background: var(--bg-raised);
+      border: 1px solid rgba(16, 185, 129, 0.15);
+      border-radius: 4px;
+      padding: 32px;
+      margin-top: 48px;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .registry-viz:hover {
+      box-shadow: 0 8px 32px rgba(16, 185, 129, 0.08);
+    }
+
+    .registry-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--emerald);
+      margin-bottom: 20px;
+    }
+
+    .registry-chain {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .chain-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .chain-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      flex-shrink: 0;
+      opacity: 0.5;
+    }
+
+    .chain-item.chain-root .chain-dot {
+      opacity: 1;
+      box-shadow: 0 0 8px var(--emerald);
+    }
+
+    .chain-item.chain-root span {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .chain-connector {
+      width: 1px;
+      height: 16px;
+      background: rgba(16, 185, 129, 0.2);
+      margin-left: 3px;
+    }
+
+    /* ─── SECTION 4: SHERLOCK ─── */
+    #sherlock {
+      background: var(--bg);
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+
+    #sherlock .section-tag { color: var(--amber); }
+    #sherlock .section-tag .section-tag-line { background: var(--amber); }
+    #sherlock .section-heading { color: var(--text); }
+
+    .sherlock-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    /* Hero data callout */
+    .data-hero {
+      background: var(--bg-raised);
+      border: 1px solid rgba(245, 158, 11, 0.15);
+      border-radius: 4px;
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .data-hero:hover {
+      box-shadow: 0 12px 48px rgba(245, 158, 11, 0.1);
+    }
+
+    .data-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--amber) 0%, transparent 100%);
+    }
+
+    .data-hero-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 40px;
+    }
+
+    .data-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 40px;
+    }
+
+    .data-stat {
+      border-left: 2px solid rgba(245, 158, 11, 0.3);
+      padding-left: 20px;
+    }
+
+    .data-stat-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 64px;
+      line-height: 1;
+      color: var(--text);
+      margin-bottom: 4px;
+      transition: transform 0.2s ease, text-shadow 0.2s ease;
+      cursor: default;
+    }
+
+    .data-stat-value:hover {
+      transform: scale(1.07);
+      text-shadow: 0 0 24px rgba(245, 158, 11, 0.5);
+    }
+
+    .data-stat-unit {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      color: var(--amber);
+    }
+
+    .data-stat-label {
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .data-stat-large {
+      grid-column: span 2;
+      border-left: none;
+      padding-left: 0;
+      border-top: 1px solid rgba(245, 158, 11, 0.15);
+      padding-top: 32px;
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+
+    .data-stat-large .data-stat-value {
+      font-size: 80px;
+    }
+
+    .data-hero-note {
+      font-size: 13px;
+      color: var(--text-dim);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding-top: 24px;
+      margin: 0;
+    }
+
+    #sherlock p {
+      font-size: 19px;
+      line-height: 1.65;
+    }
+
+    /* ─── SECTION 5: WHAT COMES NEXT ─── */
+    #what-comes-next {
+      background: linear-gradient(180deg, var(--bg) 0%, #0f080a 100%);
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+
+    #what-comes-next .section-tag { color: var(--crimson); }
+    #what-comes-next .section-tag .section-tag-line { background: var(--crimson); }
+    #what-comes-next .section-heading { color: var(--text); }
+
+    .next-layout {
+      display: grid;
+      grid-template-columns: 4fr 5fr;
+      gap: 100px;
+      align-items: start;
+    }
+
+    .phase-marker {
+      position: sticky;
+      top: 80px;
+    }
+
+    .phase-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--crimson);
+      margin-bottom: 12px;
+    }
+
+    .phase-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 200px;
+      line-height: 0.85;
+      color: var(--crimson);
+      opacity: 0.15;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .phase-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .phase-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--crimson);
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      padding: 8px 16px;
+      border-radius: 2px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--crimson);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    #what-comes-next p {
+      font-size: 19px;
+      line-height: 1.65;
+    }
+
+    .next-steps {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .step-item {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 24px;
+      padding: 28px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      align-items: start;
+    }
+
+    .step-item:first-child { border-top: 1px solid rgba(255,255,255,0.05); }
+
+    .step-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      color: var(--crimson);
+      opacity: 0.4;
+      line-height: 1;
+      padding-top: 2px;
+    }
+
+    .step-text {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .step-text strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 60px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      opacity: 0.15;
+      line-height: 1;
+    }
+
+    .footer-meta {
+      text-align: right;
+    }
+
+    .footer-meta p {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1024px) {
+      section { padding: 80px 40px; }
+      nav { padding: 0 24px; }
+      .hero { padding: 60px 40px; }
+      footer { padding: 40px; }
+
+      .component-cards {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      #how-it-works .two-col,
+      .building-layout,
+      .glossary-layout,
+      .sherlock-layout,
+      .next-layout {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+
+      .proof-block,
+      .phase-marker { position: static; }
+
+      .section-number { display: none; }
+    }
+
+    @media (max-width: 640px) {
+      section { padding: 60px 24px; }
+      nav { padding: 0 16px; }
+      .hero { padding: 40px 24px 60px; }
+      footer { padding: 32px 24px; flex-direction: column; gap: 24px; align-items: flex-start; }
+      .footer-meta { text-align: left; }
+
+      .component-cards {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .data-stats { grid-template-columns: 1fr; }
+      .data-stat-large { grid-column: span 1; }
+
+      .phase-num { font-size: 120px; }
+    }
+
+    /* ─── REDUCED MOTION — everything stays visible ─── */
+    @media (prefers-reduced-motion: reduce) {
+      .reveal-fade-up,
+      .reveal-slide-left,
+      .reveal-slide-right,
+      .reveal-scale-up {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+
+      .hero-eyebrow,
+      .hero-subtitle,
+      .hero-meta {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+
+      .hero-word {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+
+      nav {
+        transform: none !important;
+      }
+
+      body {
+        opacity: 1 !important;
+      }
+
+      .hero-rule {
+        width: 60px !important;
+      }
+
+      .section-tag-line {
+        width: 24px !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SCROLL PROGRESS BAR -->
+  <div id="scroll-progress"></div>
+
+  <!-- CURSOR GLOW -->
+  <div id="cursor-glow"></div>
+
+  <!-- SECTION TINT -->
+  <div id="section-tint"></div>
+
+  <!-- NAV -->
+  <nav id="main-nav">
+    <ul>
+      <li class="nav-brand"><a href="#">Storyteller</a></li>
+      <li class="nav-divider"></li>
+      <li><a href="#how-it-works" data-section="how-it-works">How It Works</a></li>
+      <li><a href="#building-first" data-section="building-first">Building First</a></li>
+      <li><a href="#glossary-problem" data-section="glossary-problem">Glossary</a></li>
+      <li><a href="#sherlock" data-section="sherlock">Sherlock</a></li>
+      <li><a href="#what-comes-next" data-section="what-comes-next">What's Next</a></li>
+      <li class="nav-divider"></li>
+      <li class="nav-companion"><a href="phase-1-technical.html">Full Article &rarr;</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero" id="hero">
+    <div class="hero-content">
+      <div class="hero-eyebrow" id="hero-eyebrow">Current State &nbsp;/&nbsp; Phase One &nbsp;/&nbsp; 2026</div>
+      <h1 class="hero-title" id="hero-title">
+        <span class="hero-title-line"><span class="hero-word">An</span> <span class="hero-word">app</span></span>
+        <span class="hero-title-line"><span class="hero-word">where</span> <span class="hero-word">you</span></span>
+        <span class="hero-title-line"><span class="hero-word line-accent">talk,</span></span>
+        <span class="hero-title-line"><span class="hero-word">and</span> <span class="hero-word">a</span> <span class="hero-word">story</span></span>
+        <span class="hero-title-line"><span class="hero-word">talks</span> <span class="hero-word">back.</span></span>
+      </h1>
+      <div class="hero-rule" id="hero-rule"></div>
+      <p class="hero-subtitle" id="hero-subtitle">
+        Think of the best storyteller you know. Someone who <em>remembers every detail</em>, adjusts on the fly, and never breaks the spell no matter what you throw at them. Storyteller is trying to be that.
+      </p>
+      <p class="hero-meta" id="hero-meta" style="margin-top: 40px; color: var(--text-dim);">
+        Storyteller &nbsp;&bull;&nbsp; Phase One Report &nbsp;&bull;&nbsp; Internal
+      </p>
+    </div>
+    <div class="scroll-hint" id="scroll-hint">
+      <span class="scroll-hint-label">Scroll</span>
+      <div class="scroll-hint-line"></div>
+    </div>
+  </header>
+
+  <!-- COMPANION CALLOUT -->
+  <div class="companion-callout reveal-slide-right">
+    <span class="companion-callout-label">Deep Dive</span>
+    <p class="companion-callout-text">For the full technical breakdown — architecture, system design, term registry, and the Sherlock pipeline — see the <a href="phase-1-technical.html">complete Phase 1 article</a>.</p>
+  </div>
+
+  <!-- SECTION 1: HOW IT WORKS -->
+  <section id="how-it-works" data-accent="violet" data-accent-rgb="168,85,247">
+    <div class="section-number" data-count-to="01" id="secnum-1">01</div>
+    <div class="section-inner">
+      <div class="section-tag reveal-fade-up">
+        <span class="section-tag-line"></span>01 &mdash; How It Works
+      </div>
+      <h2 class="section-heading reveal-slide-left">Inside<br>The Engine</h2>
+
+      <div class="two-col">
+        <div class="col-left">
+          <div class="narrator-pull reveal-slide-right" data-typewriter>
+            "Hesitate, and it notices. Be rude to someone in the story, and they remember."
+          </div>
+          <p class="reveal-fade-up">
+            When you start a session, a voice called the <strong>Narrator</strong> takes over. It describes the world, plays the characters, and reacts to whatever you say. Explore every corner of a room, and the descriptions get richer. The story bends around you without any special effort on your part.
+          </p>
+        </div>
+        <div class="col-right">
+          <p class="reveal-fade-up" style="--delay: 80ms">
+            The person who builds a story is called an <strong>Author</strong>. Authors use a separate set of tools — the Create Engine — to write stories, design characters, and set the rules. When they're done, everything packages into a single file called a <strong>.tome</strong> (or <strong>StoryPak</strong>).
+          </p>
+          <p class="reveal-fade-up" style="--delay: 160ms">
+            A StoryPak runs on the Play Engine the way an app runs on a phone. Stories can't touch each other. One engine, many stories.
+          </p>
+        </div>
+      </div>
+
+      <!-- Component Cards -->
+      <div class="component-cards">
+        <div class="component-card reveal-scale-up" style="--delay: 0ms">
+          <div class="card-glyph">Voice &mdash; 01</div>
+          <div class="card-name">The Narrator</div>
+          <p class="card-desc">Describes the world, plays every character, reacts to what you say in real time.</p>
+        </div>
+        <div class="component-card reveal-scale-up" style="--delay: 100ms">
+          <div class="card-glyph">Interface &mdash; 02</div>
+          <div class="card-name">The Guide</div>
+          <p class="card-desc">Sets you up before a story starts. Handles settings, onboarding, and coming back after a break.</p>
+        </div>
+        <div class="component-card reveal-scale-up" style="--delay: 200ms">
+          <div class="card-glyph">Sound &mdash; 03</div>
+          <div class="card-name">The Deejay</div>
+          <p class="card-desc">Manages all music and sound effects in real time — reacting to the story as it unfolds.</p>
+        </div>
+        <div class="component-card reveal-scale-up" style="--delay: 300ms">
+          <div class="card-glyph">Memory &mdash; 04</div>
+          <div class="card-name">The Chronicle</div>
+          <p class="card-desc">Remembers everything across every session you've ever played. Nothing is forgotten.</p>
+        </div>
+        <div class="component-card reveal-scale-up" style="--delay: 400ms">
+          <div class="card-glyph">Core &mdash; 05</div>
+          <div class="card-name">Play Engine</div>
+          <p class="card-desc">Runs all of them, second by second. The foundation every story is built on.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: BUILDING FIRST -->
+  <section id="building-first" data-accent="blue" data-accent-rgb="59,130,246">
+    <div class="section-number" data-count-to="02" id="secnum-2">02</div>
+    <div class="section-inner">
+      <div class="section-tag reveal-fade-up">
+        <span class="section-tag-line"></span>02 &mdash; What We're Building First
+      </div>
+      <h2 class="section-heading reveal-slide-left">One Thing<br>Has To Be<br>Proven</h2>
+
+      <div class="building-layout">
+        <div>
+          <p class="reveal-fade-up">
+            Before any of that can exist, one thing has to be proven: that an AI can run a real game correctly, in real time.
+          </p>
+          <p class="reveal-fade-up" style="--delay: 80ms">
+            We're using a tabletop role-playing game called <strong>Open Adventure</strong> as our test case. Think Dungeons &amp; Dragons. It's free and open-source, so there are no licensing hurdles.
+          </p>
+          <p class="reveal-fade-up" style="--delay: 160ms">
+            It has real rules: combat, spellcasting, character abilities, a 240-term glossary where every mechanic is named and defined. That specificity is exactly what makes it useful as a proving ground.
+          </p>
+          <p class="reveal-fade-up" style="--delay: 240ms">
+            A tabletop RPG has <strong>clear right answers</strong>. If the AI miscalculates a combat roll, you can point to exactly where it went wrong. Clear that bar, and the engine can handle any story system we throw at it later.
+          </p>
+        </div>
+
+        <div class="proof-block reveal-slide-right">
+          <div class="proof-block-label">The Proving Ground</div>
+          <div class="proof-block-stat" data-count-to="240" data-count-suffix="">240</div>
+          <p class="proof-block-caption">named game mechanics in the rulebook</p>
+          <div class="proof-detail">
+            <span class="proof-tag">Open Adventure</span>
+            <p>Free and open-source. No licensing hurdles. Real rules, real right answers — the ideal test case for a real-time AI game engine.</p>
+            <p>If the AI can run this correctly, it can run anything.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: THE GLOSSARY PROBLEM -->
+  <section id="glossary-problem" data-accent="emerald" data-accent-rgb="16,185,129">
+    <div class="section-number" data-count-to="03" id="secnum-3">03</div>
+    <div class="section-inner">
+      <div class="section-tag reveal-fade-up">
+        <span class="section-tag-line"></span>03 &mdash; The Glossary Problem
+      </div>
+      <h2 class="section-heading reveal-slide-left">AI Doesn't<br>Know When<br>It's Wrong</h2>
+
+      <div class="glossary-layout">
+        <div>
+          <p class="glossary-pull reveal-slide-right" data-typewriter>
+            "Feed it a messy rulebook and it fills the gaps with <em>confident-sounding guesses.</em>"
+          </p>
+          <p class="reveal-fade-up" style="margin-top: 40px; font-size: 19px;">
+            The output looks fine. The rules underneath are off. By the time you notice something strange, you're six steps from where the error started.
+          </p>
+          <p class="reveal-fade-up" style="--delay: 80ms; font-size: 19px;">
+            So before the AI ever sees the rulebook, we're cleaning it up. We converted all 16 chapters into structured files and built a machine-readable index of all <strong>445 game terms</strong>: what each one means, and how each one connects to the others. That index is the <strong>term registry</strong>.
+          </p>
+        </div>
+
+        <div>
+          <p class="reveal-fade-up" style="font-size: 19px;">
+            The registry works like a map of the entire game system. When the AI needs to resolve a rule, it walks the map — everything structured, nothing guessed.
+          </p>
+
+          <div class="registry-viz reveal-slide-right">
+            <div class="registry-label">Spellcasting Check — Dependency Chain</div>
+            <div class="registry-chain">
+              <div class="chain-item chain-root">
+                <div class="chain-dot"></div>
+                <span>Spellcasting Check</span>
+              </div>
+              <div class="chain-connector"></div>
+              <div class="chain-item">
+                <div class="chain-dot"></div>
+                <span>Spirit Points</span>
+              </div>
+              <div class="chain-connector"></div>
+              <div class="chain-item">
+                <div class="chain-dot"></div>
+                <span>Action Check</span>
+              </div>
+              <div class="chain-connector"></div>
+              <div class="chain-item">
+                <div class="chain-dot"></div>
+                <span>Difficulty Score</span>
+              </div>
+              <div class="chain-connector"></div>
+              <div class="chain-item">
+                <div class="chain-dot"></div>
+                <span>Range Modifier</span>
+              </div>
+              <div class="chain-connector"></div>
+              <div class="chain-item">
+                <div class="chain-dot"></div>
+                <span>Reality Modifier</span>
+              </div>
+            </div>
+            <p style="font-size: 12px; color: var(--text-dim); margin-top: 20px; margin-bottom: 0;">All pulled in one structured query. No guessing.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: SHERLOCK -->
+  <section id="sherlock" data-accent="amber" data-accent-rgb="245,158,11">
+    <div class="section-number" data-count-to="04" id="secnum-4">04</div>
+    <div class="section-inner">
+      <div class="section-tag reveal-fade-up">
+        <span class="section-tag-line"></span>04 &mdash; Sherlock
+      </div>
+      <h2 class="section-heading reveal-slide-left">An Agent<br>With One Job</h2>
+
+      <div class="sherlock-layout">
+        <div>
+          <p class="reveal-fade-up">
+            445 terms, all written by hand, will have errors. Relationships listed in the wrong direction. Definitions with a missing mechanic. Fields left blank when the author moved on.
+          </p>
+          <p class="reveal-fade-up" style="--delay: 80ms">
+            We built <strong>Sherlock</strong> to find them. It's an AI agent with one job: read the rulebook, check every term against the source text, and flag anything that doesn't hold up.
+          </p>
+          <p class="reveal-fade-up" style="--delay: 160ms">
+            A human reviewer looks at every flag before anything changes. Nothing is applied automatically.
+          </p>
+          <p class="reveal-fade-up" style="--delay: 240ms">
+            We process terms in batches, highest-priority first. The terms that connect to the most other terms go first — because a single error there ripples into every rule interaction that touches it.
+          </p>
+        </div>
+
+        <!-- Hero Data Callout -->
+        <div class="data-hero reveal-slide-right">
+          <div class="data-hero-label">Pipeline Status</div>
+          <div class="data-stats">
+            <div class="data-stat">
+              <div class="data-stat-value" data-count-to="4" data-count-suffix="">4</div>
+              <div class="data-stat-label">Batches Done</div>
+            </div>
+            <div class="data-stat">
+              <div class="data-stat-value">$0<span class="data-stat-unit">.13</span></div>
+              <div class="data-stat-label">Per Term</div>
+            </div>
+            <div class="data-stat data-stat-large">
+              <div class="data-stat-value" data-count-to="60" data-count-prefix="$" data-count-suffix="">$60</div>
+              <div>
+                <div style="font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); margin-bottom: 4px;">Total run cost</div>
+                <div style="font-size: 13px; color: var(--text-muted);">for the full 445-term verification pass</div>
+              </div>
+            </div>
+          </div>
+          <p class="data-hero-note">Pipeline running cleanly. Passing its own quality checks. Human review required before any change is applied.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: WHAT COMES NEXT -->
+  <section id="what-comes-next" data-accent="crimson" data-accent-rgb="239,68,68">
+    <div class="section-number" data-count-to="05" id="secnum-5">05</div>
+    <div class="section-inner">
+      <div class="section-tag reveal-fade-up">
+        <span class="section-tag-line"></span>05 &mdash; What Comes Next
+      </div>
+      <h2 class="section-heading reveal-slide-left">Clear<br>This Bar</h2>
+
+      <div class="next-layout">
+        <div class="phase-marker reveal-fade-up">
+          <div class="phase-label">Current Phase</div>
+          <span class="phase-num">1</span>
+          <div class="phase-title">Verify the foundation.</div>
+          <div class="phase-status">
+            <div class="status-dot"></div>
+            In Progress
+          </div>
+        </div>
+
+        <div>
+          <p class="reveal-fade-up">
+            Once the registry is verified, we hand everything to the AI agent: the rulebook plus the cleaned-up term index. The agent builds its internal understanding of the game — how the rules work, how to track state, how to run a live session.
+          </p>
+          <p class="reveal-fade-up" style="--delay: 80ms">
+            Then we test it.
+          </p>
+
+          <div class="next-steps">
+            <div class="step-item reveal-fade-up" style="--delay: 0ms">
+              <div class="step-num">01</div>
+              <p class="step-text">
+                <strong>A small room.</strong>
+                The AI navigates a simple scene. Descriptions land correctly. The world responds.
+              </p>
+            </div>
+            <div class="step-item reveal-fade-up" style="--delay: 100ms">
+              <div class="step-num">02</div>
+              <p class="step-text">
+                <strong>A combat.</strong>
+                Real rules. Real rolls. Every mechanic executed correctly against the registry.
+              </p>
+            </div>
+            <div class="step-item reveal-fade-up" style="--delay: 200ms">
+              <div class="step-num">03</div>
+              <p class="step-text">
+                <strong>A puzzle.</strong>
+                Logic and player agency. No railroading. The story bends.
+              </p>
+            </div>
+            <div class="step-item reveal-fade-up" style="--delay: 300ms">
+              <div class="step-num">04</div>
+              <p class="step-text">
+                <strong>A player who has no idea.</strong>
+                A session that feels like someone is actually running the game for them. That's the bar.
+              </p>
+            </div>
+          </div>
+
+          <p class="reveal-fade-up" style="margin-top: 48px; font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--text); font-style: italic; line-height: 1.4; --delay: 400ms">
+            Clear that bar, and Phase 2 begins.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="reveal-fade-up">
+    <div class="footer-brand">Storyteller</div>
+    <div class="footer-meta">
+      <p>Current State &mdash; Phase One</p>
+      <p>Internal Document &mdash; 2026</p>
+    </div>
+  </footer>
+
+<script>
+(function () {
+  // ─── REDUCED MOTION CHECK ───
+  const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ─── SECTION CONFIG ───
+  const SECTIONS = [
+    { id: 'how-it-works',    accent: '#a855f7', rgb: [168,  85, 247] },
+    { id: 'building-first',  accent: '#3b82f6', rgb: [59,  130, 246] },
+    { id: 'glossary-problem',accent: '#10b981', rgb: [16,  185, 129] },
+    { id: 'sherlock',        accent: '#f59e0b', rgb: [245, 158,  11] },
+    { id: 'what-comes-next', accent: '#ef4444', rgb: [239,  68,  68] },
+  ];
+
+  // Progress bar section color breakpoints (0–1 per section at 20% each)
+  const PROGRESS_COLORS = [
+    [168, 85, 247],  // violet
+    [59, 130, 246],  // blue
+    [16, 185, 129],  // emerald
+    [245, 158, 11],  // amber
+    [239, 68, 68],   // crimson
+  ];
+
+  function lerpColor(a, b, t) {
+    return [
+      Math.round(a[0] + (b[0] - a[0]) * t),
+      Math.round(a[1] + (b[1] - a[1]) * t),
+      Math.round(a[2] + (b[2] - a[2]) * t),
+    ];
+  }
+
+  // ─── DOM REFS ───
+  const root        = document.documentElement;
+  const body        = document.body;
+  const progressBar = document.getElementById('scroll-progress');
+  const cursorGlow  = document.getElementById('cursor-glow');
+  const sectionTint = document.getElementById('section-tint');
+  const nav         = document.getElementById('main-nav');
+  const hero        = document.getElementById('hero');
+  const heroContent = hero.querySelector('.hero-content');
+  const heroEyebrow = document.getElementById('hero-eyebrow');
+  const heroRule    = document.getElementById('hero-rule');
+  const heroSubtitle= document.getElementById('hero-subtitle');
+  const heroMeta    = document.getElementById('hero-meta');
+  const heroWords   = document.querySelectorAll('.hero-word');
+
+  // ─── PAGE LOAD SEQUENCE ───
+  if (!noMotion) {
+    // Fade in body
+    requestAnimationFrame(() => {
+      body.style.opacity = '1';
+    });
+
+    // Nav slides down at 200ms
+    setTimeout(() => { nav.classList.add('nav-in'); }, 200);
+
+    // Eyebrow at 300ms
+    setTimeout(() => { heroEyebrow.classList.add('hero-eyebrow-in'); }, 300);
+
+    // Hero words stagger from 400ms, 150ms each
+    heroWords.forEach((word, i) => {
+      setTimeout(() => {
+        word.style.opacity = '1';
+        word.style.transform = 'translateY(0)';
+      }, 400 + i * 150);
+    });
+
+    // Rule draws at 750ms
+    setTimeout(() => {
+      heroRule.classList.add('hero-rule-in');
+    }, 750);
+
+    // Subtitle at 800ms
+    setTimeout(() => { heroSubtitle.classList.add('hero-subtitle-in'); }, 800);
+
+    // Meta at 1100ms
+    setTimeout(() => { heroMeta.classList.add('hero-meta-in'); }, 1100);
+  } else {
+    // No motion — everything visible immediately
+    body.style.opacity = '1';
+    heroEyebrow.style.opacity = '1';
+    heroEyebrow.style.transform = 'none';
+    heroSubtitle.style.opacity = '1';
+    heroSubtitle.style.transform = 'none';
+    heroMeta.style.opacity = '1';
+    heroRule.style.width = '60px';
+    document.querySelectorAll('.section-tag-line').forEach(el => {
+      el.style.width = '24px';
+    });
+  }
+
+  // ─── INTERSECTION OBSERVER — SCROLL REVEALS ───
+  if (!noMotion) {
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const delay = el.style.getPropertyValue('--delay') || '0ms';
+          const delayMs = parseInt(delay) || 0;
+          setTimeout(() => {
+            el.classList.add('is-visible');
+          }, delayMs);
+          revealObs.unobserve(el);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+    document.querySelectorAll(
+      '.reveal-fade-up, .reveal-slide-left, .reveal-slide-right, .reveal-scale-up'
+    ).forEach(el => revealObs.observe(el));
+
+    // Section tag line reveals (trigger when tag becomes visible)
+    const tagObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const line = entry.target.querySelector('.section-tag-line');
+          if (line) {
+            setTimeout(() => { line.style.width = '24px'; }, 100);
+          }
+          tagObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.section-tag').forEach(tag => tagObs.observe(tag));
+
+    // Section number pulse + count-up
+    const secNumObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          el.classList.add('section-num-glow');
+          secNumObs.unobserve(el);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.section-number').forEach(el => secNumObs.observe(el));
+  }
+
+  // ─── ACTIVE SECTION OBSERVER ───
+  let currentAccentRgb = [168, 85, 247];
+
+  const sectionEls = SECTIONS.map(s => document.getElementById(s.id)).filter(Boolean);
+
+  const activeSectionObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        const cfg = SECTIONS.find(s => s.id === id);
+        if (cfg) {
+          currentAccentRgb = cfg.rgb;
+          root.style.setProperty('--active-accent', cfg.accent);
+          root.style.setProperty('--active-accent-rgb', cfg.rgb.join(','));
+          root.style.setProperty('--section-tint-r', cfg.rgb[0]);
+          root.style.setProperty('--section-tint-g', cfg.rgb[1]);
+          root.style.setProperty('--section-tint-b', cfg.rgb[2]);
+
+          // Very faint background tint (2-3% opacity)
+          sectionTint.style.opacity = '0.025';
+          sectionTint.style.background = `rgb(${cfg.rgb.join(',')})`;
+
+          // Update nav active link
+          document.querySelectorAll('nav a[data-section]').forEach(a => {
+            a.classList.toggle('nav-active', a.dataset.section === id);
+          });
+        }
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sectionEls.forEach(el => activeSectionObs.observe(el));
+
+  // ─── SCROLL PROGRESS BAR ───
+  let rafScheduled = false;
+  let lastScrollY = 0;
+  let scrollVelocity = 0;
+  let prevScrollY = 0;
+
+  function updateScrollProgress() {
+    const scrollTop = window.scrollY;
+    const docH = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docH > 0 ? Math.min(scrollTop / docH, 1) : 0;
+
+    // Update progress bar width
+    progressBar.style.width = (progress * 100) + '%';
+
+    // Interpolate color through 5 section colors
+    const sectionIndex = progress * (PROGRESS_COLORS.length - 1);
+    const idx = Math.floor(sectionIndex);
+    const t   = sectionIndex - idx;
+    const colorA = PROGRESS_COLORS[Math.min(idx, PROGRESS_COLORS.length - 1)];
+    const colorB = PROGRESS_COLORS[Math.min(idx + 1, PROGRESS_COLORS.length - 1)];
+    const col = lerpColor(colorA, colorB, t);
+    progressBar.style.background = `rgb(${col.join(',')})`;
+
+    // Scroll velocity for motion-blur-feel effect
+    scrollVelocity = scrollTop - prevScrollY;
+    prevScrollY = scrollTop;
+    lastScrollY = scrollTop;
+
+    // Parallax on hero
+    if (!noMotion && heroContent) {
+      const heroH = hero.offsetHeight;
+      if (scrollTop < heroH * 1.5) {
+        heroContent.style.transform = `translateY(${scrollTop * 0.4}px)`;
+      }
+    }
+
+    // Parallax on section numbers (0.6x scroll rate relative to their section top)
+    if (!noMotion) {
+      document.querySelectorAll('.section-number').forEach(el => {
+        const section = el.closest('section');
+        if (!section) return;
+        const sectionTop = section.getBoundingClientRect().top + scrollTop;
+        const offset = (scrollTop - sectionTop) * 0.6;
+        el.style.transform = `translateY(${Math.max(-60, Math.min(60, offset * 0.15))}px)`;
+      });
+    }
+
+    rafScheduled = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!rafScheduled) {
+      rafScheduled = true;
+      requestAnimationFrame(updateScrollProgress);
+    }
+  }, { passive: true });
+
+  // ─── CURSOR GLOW ───
+  if (!noMotion && window.matchMedia('(hover: hover)').matches) {
+    let cursorX = -300, cursorY = -300;
+    let cursorRafScheduled = false;
+
+    document.addEventListener('mousemove', (e) => {
+      cursorX = e.clientX;
+      cursorY = e.clientY;
+      if (!cursorRafScheduled) {
+        cursorRafScheduled = true;
+        requestAnimationFrame(() => {
+          cursorGlow.style.transform = `translate(${cursorX - 100}px, ${cursorY - 100}px)`;
+          cursorRafScheduled = false;
+        });
+      }
+    });
+  }
+
+  // ─── COUNT-UP ANIMATION ───
+  function animateCount(el) {
+    const target  = parseInt(el.dataset.countTo, 10);
+    const prefix  = el.dataset.countPrefix || '';
+    const suffix  = el.dataset.countSuffix || '';
+    // Preserve any child nodes (like the .data-stat-unit span)
+    const unitEl  = el.querySelector('.data-stat-unit');
+    const duration = 1200;
+    const start    = performance.now();
+
+    // Easing: ease-out cubic
+    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+    function tick(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const value    = Math.round(easeOut(progress) * target);
+
+      if (unitEl) {
+        el.childNodes[0].textContent = prefix + value;
+      } else {
+        el.textContent = prefix + value + suffix;
+      }
+
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  if (!noMotion) {
+    const countObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && entry.target.dataset.countTo) {
+          animateCount(entry.target);
+          countObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('[data-count-to]').forEach(el => countObs.observe(el));
+  }
+
+  // ─── TYPEWRITER EFFECT ON PULL QUOTES ───
+  function typewriter(el) {
+    // Capture inner HTML as a text run (preserving the <em> wrapper in glossary-pull)
+    const originalHTML = el.innerHTML;
+    // We'll retype on visible text only, re-inject HTML structure at the end
+    // For simplicity: animate using the textContent, then restore innerHTML
+    const textContent  = el.textContent;
+    const charDelay    = 30; // ms per character
+
+    el.textContent = '';
+    el.style.minHeight = el.offsetHeight + 'px'; // prevent layout jump
+
+    // Add blinking cursor
+    const cursor = document.createElement('span');
+    cursor.className = 'typewriter-cursor';
+    el.appendChild(cursor);
+
+    let i = 0;
+    function typeChar() {
+      if (i < textContent.length) {
+        // Insert before cursor
+        el.insertBefore(document.createTextNode(textContent[i]), cursor);
+        i++;
+        setTimeout(typeChar, charDelay);
+      } else {
+        // Done — restore full HTML (with <em> etc.) and remove cursor
+        el.innerHTML = originalHTML;
+        el.style.minHeight = '';
+      }
+    }
+
+    setTimeout(typeChar, 200);
+  }
+
+  if (!noMotion) {
+    const typeObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && entry.target.dataset.typewriter !== undefined) {
+          typewriter(entry.target);
+          typeObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.4 });
+
+    document.querySelectorAll('[data-typewriter]').forEach(el => typeObs.observe(el));
+  }
+
+  // ─── HERO BACKGROUND GLOW PARALLAX ───
+  // The hero::before and ::after pseudo-elements can't be accessed directly in JS,
+  // so we use a real element approach via CSS variable for the glow shift.
+  if (!noMotion) {
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      root.style.setProperty('--scroll-offset', y + 'px');
+    }, { passive: true });
+  }
+
+  // ─── INITIAL RENDER ───
+  updateScrollProgress();
+
+})();
+</script>
+</body>
+</html>
