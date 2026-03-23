@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Oral Tradition — Storyteller Style Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,400&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #05050f;
+      --deep-indigo: #0f0a2a;
+      --saffron:     #e8a020;
+      --crimson:     #c41e3a;
+      --gold:        #d4a843;
+      --shadow:      #000005;
+      --mist:        #a09080;
+      --jade:        #2a7a5a;
+      --vellum:      #f0e8d0;
+      --text:        #e8e0cc;
+      --text-muted:  #8a7f6e;
+
+      --font-display: 'Yeseva One', Georgia, serif;
+      --font-sub:     'Lora', Georgia, serif;
+      --font-body:    'Source Serif 4', Georgia, serif;
+      --font-label:   'Raleway', sans-serif;
+
+      --max-w: 900px;
+      --gutter: clamp(1.5rem, 5vw, 4rem);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: clamp(16px, 1.1vw, 18px);
+      line-height: 1.85;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* silk sheen overlay — very subtle diagonal shimmer */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 120px,
+        rgba(212, 168, 67, 0.012) 120px,
+        rgba(212, 168, 67, 0.012) 121px
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CURSOR TRAIL CANVAS
+    ═══════════════════════════════════════════════════════════════ */
+    #cursor-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SCROLLBAR
+    ═══════════════════════════════════════════════════════════════ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--deep-indigo); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); opacity: 0.5; border-radius: 3px; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       TYPOGRAPHY PRIMITIVES
+    ═══════════════════════════════════════════════════════════════ */
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--vellum);
+    }
+
+    p { margin-bottom: 1.4em; }
+    p:last-child { margin-bottom: 0; }
+    em { font-style: italic; }
+    strong { color: var(--saffron); font-weight: 600; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       LABEL / EYEBROW
+    ═══════════════════════════════════════════════════════════════ */
+    .label {
+      font-family: var(--font-label);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--saffron);
+      opacity: 0.85;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       LAYOUT
+    ═══════════════════════════════════════════════════════════════ */
+    .section {
+      position: relative;
+      z-index: 1;
+      padding: clamp(4rem, 10vw, 8rem) var(--gutter);
+    }
+
+    .inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SCROLL REVEAL
+    ═══════════════════════════════════════════════════════════════ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.22s; }
+    .reveal-delay-3 { transition-delay: 0.36s; }
+    .reveal-delay-4 { transition-delay: 0.52s; }
+    .reveal-delay-5 { transition-delay: 0.68s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SOUND WAVE DIVIDER
+    ═══════════════════════════════════════════════════════════════ */
+    .wave-divider {
+      width: 100%;
+      overflow: visible;
+      display: block;
+      margin: 3rem auto;
+    }
+    .wave-path {
+      fill: none;
+      stroke: var(--gold);
+      stroke-width: 1.5;
+      opacity: 0.7;
+      stroke-dasharray: 2000;
+      stroke-dashoffset: 2000;
+      transition: stroke-dashoffset 2.2s ease;
+    }
+    .wave-path.drawn {
+      stroke-dashoffset: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       BREATH MARK DIVIDER (Musical notation ′)
+    ═══════════════════════════════════════════════════════════════ */
+    .breath-mark {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      margin: 2.5rem 0;
+    }
+    .breath-mark::before,
+    .breath-mark::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(212, 168, 67, 0.35), transparent);
+    }
+    .breath-mark span {
+      font-family: var(--font-sub);
+      font-style: italic;
+      font-size: 1.4rem;
+      color: var(--gold);
+      opacity: 0.6;
+      user-select: none;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SECTION 1 — HERO
+    ═══════════════════════════════════════════════════════════════ */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      padding: clamp(4rem, 10vw, 8rem) var(--gutter);
+    }
+
+    /* Lantern glow */
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: -10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 55vw;
+      height: 55vw;
+      max-width: 700px;
+      max-height: 700px;
+      background: radial-gradient(
+        ellipse at 50% 30%,
+        rgba(232, 160, 32, 0.14) 0%,
+        rgba(196, 30, 58, 0.07) 35%,
+        transparent 70%
+      );
+      border-radius: 50%;
+      animation: lantern-breathe 4s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes lantern-breathe {
+      0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+      50%       { opacity: 1;   transform: translateX(-50%) scale(1.06); }
+    }
+
+    #hero .inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    #hero .label {
+      margin-bottom: 1.8rem;
+    }
+
+    #hero h1 {
+      font-size: clamp(3.2rem, 8vw, 7rem);
+      color: var(--vellum);
+      letter-spacing: -0.01em;
+      line-height: 1.08;
+      text-shadow: 0 0 80px rgba(232, 160, 32, 0.2), 0 4px 40px rgba(0,0,5,0.8);
+      margin-bottom: 1.2rem;
+    }
+
+    #hero .subtitle {
+      font-family: var(--font-sub);
+      font-style: italic;
+      font-size: clamp(1rem, 2.2vw, 1.35rem);
+      color: var(--mist);
+      max-width: 560px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    /* Hero entrance animation — text rises on breath */
+    #hero .hero-line {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: breath-rise 1.2s ease forwards;
+    }
+    #hero .hero-line:nth-child(1) { animation-delay: 0.2s; }
+    #hero .hero-line:nth-child(2) { animation-delay: 0.55s; }
+    #hero .hero-line:nth-child(3) { animation-delay: 0.9s; }
+    #hero .hero-line:nth-child(4) { animation-delay: 1.2s; }
+
+    @keyframes breath-rise {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: breath-rise 1s ease 2s forwards;
+    }
+    .hero-scroll-hint span {
+      font-family: var(--font-label);
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--mist);
+      opacity: 0.5;
+    }
+    .hero-scroll-hint .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, rgba(212, 168, 67, 0.5), transparent);
+      animation: scroll-drip 2s ease-in-out 2.2s infinite;
+    }
+    @keyframes scroll-drip {
+      0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
+      50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+      51%  { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+      100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SECTION 2 — OVERVIEW BODY COPY
+    ═══════════════════════════════════════════════════════════════ */
+    #overview {
+      background: linear-gradient(180deg, var(--bg) 0%, var(--deep-indigo) 100%);
+    }
+
+    #overview .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      margin-bottom: 2.5rem;
+      color: var(--vellum);
+    }
+
+    #overview .body-copy {
+      font-size: clamp(1rem, 1.4vw, 1.15rem);
+      color: var(--text);
+      max-width: 660px;
+      line-height: 1.95;
+    }
+
+    /* Asymmetric layout — text left, geometric accent right */
+    #overview .two-col {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 800px) {
+      #overview .two-col {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       GEOMETRIC PATTERN PANEL (side accent)
+    ═══════════════════════════════════════════════════════════════ */
+    .geo-panel {
+      position: relative;
+      border: 1px solid rgba(212, 168, 67, 0.18);
+      border-radius: 2px;
+      overflow: hidden;
+      height: 420px;
+      background: var(--deep-indigo);
+    }
+
+    /* Celtic knotwork approximation — interlocking diamond grid */
+    .geo-panel.celtic {
+      background-image:
+        linear-gradient(45deg,  rgba(212, 168, 67, 0.12) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(212, 168, 67, 0.12) 25%, transparent 25%),
+        linear-gradient(45deg,  transparent 75%, rgba(212, 168, 67, 0.12) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(212, 168, 67, 0.12) 75%),
+        linear-gradient(45deg,  rgba(196, 30, 58, 0.06) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(196, 30, 58, 0.06) 25%, transparent 25%);
+      background-size: 28px 28px, 28px 28px, 28px 28px, 28px 28px, 14px 14px, 14px 14px;
+      background-position: 0 0, 0 14px, 14px -14px, -14px 0px, 0 0, 0 7px;
+    }
+
+    /* Geometric shapes assembled on top */
+    .geo-panel .geo-shapes {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .geo-shape {
+      position: absolute;
+      opacity: 0;
+    }
+    .geo-shape.assembled {
+      animation: geo-assemble 0.6s ease forwards;
+    }
+    @keyframes geo-assemble {
+      from { opacity: 0; transform: scale(0.85) rotate(var(--rot, 0deg)); }
+      to   { opacity: 1; transform: scale(1) rotate(var(--rot, 0deg)); }
+    }
+
+    /* Central diamond */
+    .geo-diamond {
+      width: 120px;
+      height: 120px;
+      border: 2px solid rgba(212, 168, 67, 0.7);
+      transform: rotate(45deg);
+      top: 50%;
+      left: 50%;
+      margin-top: -60px;
+      margin-left: -60px;
+      --rot: 45deg;
+    }
+    .geo-diamond::before {
+      content: '';
+      position: absolute;
+      inset: 12px;
+      border: 1px solid rgba(196, 30, 58, 0.5);
+    }
+
+    .geo-circle-outer {
+      width: 200px;
+      height: 200px;
+      border: 1px solid rgba(212, 168, 67, 0.3);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      margin-top: -100px;
+      margin-left: -100px;
+    }
+
+    .geo-circle-inner {
+      width: 240px;
+      height: 240px;
+      border: 1px dashed rgba(212, 168, 67, 0.15);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      margin-top: -120px;
+      margin-left: -120px;
+    }
+
+    .geo-cross-h {
+      width: 200px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(212, 168, 67, 0.4), transparent);
+      top: 50%;
+      left: 50%;
+      margin-left: -100px;
+    }
+    .geo-cross-v {
+      width: 1px;
+      height: 200px;
+      background: linear-gradient(to bottom, transparent, rgba(212, 168, 67, 0.4), transparent);
+      top: 50%;
+      left: 50%;
+      margin-top: -100px;
+    }
+
+    .geo-corner {
+      width: 60px;
+      height: 60px;
+      border: 1px solid rgba(212, 168, 67, 0.35);
+    }
+    .geo-corner.tl { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+    .geo-corner.tr { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+    .geo-corner.bl { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+    .geo-corner.br { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+
+    .geo-label {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-label);
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--mist);
+      opacity: 0.5;
+      white-space: nowrap;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PULL QUOTE
+    ═══════════════════════════════════════════════════════════════ */
+    .pull-quote {
+      position: relative;
+      padding-left: 2.5rem;
+      margin: 3.5rem 0;
+    }
+    .pull-quote .pq-line {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 3px;
+      height: 0;
+      background: linear-gradient(to bottom, var(--crimson), var(--saffron));
+      transition: height 1s ease 0.3s;
+      border-radius: 2px;
+    }
+    .pull-quote.pq-drawn .pq-line {
+      height: 100%;
+    }
+    .pull-quote blockquote {
+      font-family: var(--font-sub);
+      font-style: italic;
+      font-size: clamp(1.1rem, 2vw, 1.4rem);
+      color: var(--vellum);
+      line-height: 1.7;
+      margin-bottom: 0.75rem;
+    }
+    .pull-quote cite {
+      font-family: var(--font-label);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--saffron);
+      opacity: 0.8;
+      font-style: normal;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SECTION 3 — SCHEHERAZADE / ARABIAN NIGHTS
+    ═══════════════════════════════════════════════════════════════ */
+    #scheherazade {
+      background: var(--deep-indigo);
+      border-top: 1px solid rgba(212, 168, 67, 0.08);
+      border-bottom: 1px solid rgba(212, 168, 67, 0.08);
+    }
+
+    #scheherazade .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    #scheherazade .section-header h2 {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      margin-bottom: 0.6rem;
+    }
+
+    #scheherazade .story-text {
+      max-width: 680px;
+      margin: 0 auto;
+      font-size: clamp(1rem, 1.3vw, 1.12rem);
+      line-height: 2;
+      color: var(--text);
+    }
+
+    #scheherazade .story-text p {
+      margin-bottom: 1.6em;
+    }
+
+    #scheherazade .story-text .drop-cap::first-letter {
+      font-family: var(--font-display);
+      font-size: 4.2em;
+      float: left;
+      line-height: 0.72;
+      margin-right: 0.12em;
+      margin-top: 0.08em;
+      color: var(--saffron);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SECTION 4 — WHY THIS WORKS
+    ═══════════════════════════════════════════════════════════════ */
+    #why {
+      background: var(--bg);
+    }
+
+    #why .two-col {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 800px) {
+      #why .two-col {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+    }
+
+    #why h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      margin-bottom: 2rem;
+    }
+
+    #why .reason-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    #why .reason-list li {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    #why .reason-list .marker {
+      width: 6px;
+      height: 6px;
+      background: var(--saffron);
+      border-radius: 50%;
+      margin-top: 0.55em;
+      flex-shrink: 0;
+      box-shadow: 0 0 6px rgba(232, 160, 32, 0.5);
+    }
+
+    #why .reason-list .reason-text {
+      font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+      line-height: 1.8;
+      color: var(--text);
+    }
+
+    #why .reason-list .reason-title {
+      display: block;
+      font-family: var(--font-sub);
+      font-weight: 600;
+      color: var(--vellum);
+      margin-bottom: 0.2em;
+    }
+
+    /* Sound wave panel for why section */
+    .wave-panel {
+      position: relative;
+      height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(212, 168, 67, 0.12);
+      background: var(--deep-indigo);
+      overflow: hidden;
+    }
+
+    .wave-panel .wave-stack {
+      width: 100%;
+      padding: 0 2rem;
+    }
+
+    .wave-panel svg {
+      width: 100%;
+      overflow: visible;
+      margin: 0.5rem 0;
+    }
+
+    .wave-panel .wave-label {
+      font-family: var(--font-label);
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--mist);
+      opacity: 0.4;
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SECTION 5 — SONGLINES / KIM
+    ═══════════════════════════════════════════════════════════════ */
+    #songlines {
+      background: linear-gradient(160deg, var(--deep-indigo) 0%, #0a1420 100%);
+      border-top: 1px solid rgba(42, 122, 90, 0.2);
+    }
+
+    #songlines .section-header {
+      margin-bottom: 3.5rem;
+    }
+
+    #songlines h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--vellum);
+      margin-top: 0.5rem;
+    }
+
+    .story-beat {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .beat-block {
+      position: relative;
+      padding-left: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .beat-block::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.4em;
+      width: 8px;
+      height: 8px;
+      border: 1.5px solid var(--jade);
+      border-radius: 50%;
+      background: transparent;
+    }
+
+    .beat-block p {
+      font-size: clamp(1rem, 1.3vw, 1.1rem);
+      line-height: 1.95;
+      color: var(--text);
+      margin-bottom: 0;
+    }
+
+    .beat-block .beat-label {
+      margin-bottom: 0.5rem;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SECTION 6 — GEOMETRIC PATTERN SHOWCASE
+    ═══════════════════════════════════════════════════════════════ */
+    #patterns {
+      background: var(--bg);
+      padding: clamp(4rem, 10vw, 8rem) 0;
+    }
+
+    #patterns .inner {
+      max-width: 100%;
+      padding: 0 var(--gutter);
+    }
+
+    #patterns .patterns-header {
+      max-width: var(--max-w);
+      margin: 0 auto 4rem;
+    }
+
+    #patterns h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    }
+
+    .pattern-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      max-width: 1100px;
+      margin: 0 auto;
+      border: 1px solid rgba(212, 168, 67, 0.12);
+    }
+
+    @media (max-width: 700px) {
+      .pattern-grid { grid-template-columns: 1fr; }
+    }
+
+    .pattern-tile {
+      height: 280px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(212, 168, 67, 0.08);
+    }
+
+    .pattern-tile .pt-label {
+      position: absolute;
+      bottom: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-label);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--mist);
+      opacity: 0.6;
+      white-space: nowrap;
+      z-index: 2;
+      background: rgba(5, 5, 15, 0.7);
+      padding: 0.3em 0.8em;
+    }
+
+    /* Celtic Knotwork — interlocking diamond grid */
+    .pt-celtic {
+      background-color: var(--deep-indigo);
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 26px,
+          rgba(212, 168, 67, 0.18) 26px,
+          rgba(212, 168, 67, 0.18) 27px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 26px,
+          rgba(212, 168, 67, 0.18) 26px,
+          rgba(212, 168, 67, 0.18) 27px
+        ),
+        repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 18px,
+          rgba(196, 30, 58, 0.1) 18px,
+          rgba(196, 30, 58, 0.1) 19px
+        ),
+        repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 18px,
+          rgba(212, 168, 67, 0.1) 18px,
+          rgba(212, 168, 67, 0.1) 19px
+        );
+    }
+
+    /* Kente-inspired stripe pattern */
+    .pt-kente {
+      background-color: var(--deep-indigo);
+      background-image:
+        repeating-linear-gradient(
+          90deg,
+          transparent 0px,
+          transparent 6px,
+          rgba(232, 160, 32, 0.55) 6px,
+          rgba(232, 160, 32, 0.55) 8px,
+          transparent 8px,
+          transparent 14px,
+          rgba(196, 30, 58, 0.45) 14px,
+          rgba(196, 30, 58, 0.45) 17px,
+          transparent 17px,
+          transparent 24px,
+          rgba(212, 168, 67, 0.35) 24px,
+          rgba(212, 168, 67, 0.35) 26px,
+          transparent 26px,
+          transparent 32px,
+          rgba(42, 122, 90, 0.45) 32px,
+          rgba(42, 122, 90, 0.45) 34px,
+          transparent 34px,
+          transparent 44px
+        ),
+        repeating-linear-gradient(
+          0deg,
+          rgba(232, 160, 32, 0.06) 0px,
+          rgba(232, 160, 32, 0.06) 1px,
+          transparent 1px,
+          transparent 8px
+        );
+    }
+
+    /* Islamic geometric tile */
+    .pt-islamic {
+      background-color: var(--deep-indigo);
+      background-image:
+        repeating-linear-gradient(
+          45deg,
+          rgba(212, 168, 67, 0.14) 0px,
+          rgba(212, 168, 67, 0.14) 1px,
+          transparent 1px,
+          transparent 20px
+        ),
+        repeating-linear-gradient(
+          -45deg,
+          rgba(212, 168, 67, 0.14) 0px,
+          rgba(212, 168, 67, 0.14) 1px,
+          transparent 1px,
+          transparent 20px
+        ),
+        repeating-linear-gradient(
+          0deg,
+          rgba(196, 30, 58, 0.08) 0px,
+          rgba(196, 30, 58, 0.08) 1px,
+          transparent 1px,
+          transparent 20px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          rgba(196, 30, 58, 0.08) 0px,
+          rgba(196, 30, 58, 0.08) 1px,
+          transparent 1px,
+          transparent 20px
+        );
+      background-size: 20px 20px;
+    }
+
+    /* Pattern glow overlay */
+    .pattern-tile::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(5, 5, 15, 0.6) 100%);
+      pointer-events: none;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SECTION 7 — TYPOGRAPHY SHOWCASE
+    ═══════════════════════════════════════════════════════════════ */
+    #type-showcase {
+      background: var(--deep-indigo);
+      border-top: 1px solid rgba(212, 168, 67, 0.08);
+    }
+
+    #type-showcase h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      margin-bottom: 3.5rem;
+    }
+
+    .type-row {
+      padding: 2.5rem 0;
+      border-bottom: 1px solid rgba(212, 168, 67, 0.08);
+    }
+    .type-row:last-of-type { border-bottom: none; }
+
+    .type-meta {
+      margin-bottom: 0.6rem;
+    }
+    .type-meta .type-name {
+      font-family: var(--font-label);
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--saffron);
+      opacity: 0.7;
+    }
+    .type-meta .type-spec {
+      font-family: var(--font-label);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      color: var(--mist);
+      opacity: 0.5;
+      margin-left: 1rem;
+    }
+
+    .type-display {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      color: var(--vellum);
+      line-height: 1.1;
+    }
+
+    .type-sub {
+      font-family: var(--font-sub);
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      color: var(--vellum);
+      font-style: italic;
+      line-height: 1.3;
+    }
+
+    .type-body-example {
+      font-family: var(--font-body);
+      font-size: clamp(1rem, 1.3vw, 1.12rem);
+      color: var(--text);
+      line-height: 1.9;
+      max-width: 580px;
+    }
+
+    .type-label-example {
+      font-family: var(--font-label);
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: var(--saffron);
+    }
+
+    .type-annotation {
+      font-family: var(--font-sub);
+      font-style: italic;
+      font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+      color: var(--gold);
+      transform: rotate(-1.2deg);
+      display: inline-block;
+      margin-top: 0.3rem;
+      opacity: 0.85;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════════════════ */
+    footer {
+      background: var(--shadow);
+      border-top: 1px solid rgba(212, 168, 67, 0.1);
+      padding: 3rem var(--gutter);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    footer .footer-label {
+      margin-bottom: 0.8rem;
+    }
+
+    footer p {
+      font-family: var(--font-label);
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--mist);
+      opacity: 0.4;
+      margin-bottom: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       NAV BAR
+    ═══════════════════════════════════════════════════════════════ */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1rem var(--gutter);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(5,5,15,0.9), transparent);
+      pointer-events: none;
+    }
+
+    nav .nav-mark {
+      font-family: var(--font-label);
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--saffron);
+      opacity: 0.6;
+    }
+
+    nav .nav-title {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      color: var(--vellum);
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CURSOR TRAIL -->
+  <canvas id="cursor-canvas"></canvas>
+
+  <!-- NAV -->
+  <nav>
+    <span class="nav-mark">Storyteller — Style Demo</span>
+    <span class="nav-title">The Oral Tradition</span>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       HERO — The performer steps into the light
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="hero">
+    <div class="inner">
+      <div class="hero-line">
+        <p class="label">Style Concept No. 3</p>
+      </div>
+      <div class="hero-line">
+        <h1>The Oral<br>Tradition</h1>
+      </div>
+      <div class="hero-line">
+        <p class="subtitle">A design language built around the voice, the breath, and the living story</p>
+      </div>
+      <div class="hero-line">
+        <svg class="wave-divider" viewBox="0 0 900 40" height="40" aria-hidden="true">
+          <path class="wave-path" d="
+            M0,20 C25,5 50,35 75,20 C100,5 125,35 150,20
+            C175,5 200,35 225,20 C250,5 275,35 300,20
+            C325,5 350,35 375,20 C400,5 425,35 450,20
+            C475,5 500,35 525,20 C550,5 575,35 600,20
+            C625,5 650,35 675,20 C700,5 725,35 750,20
+            C775,5 800,35 825,20 C850,5 875,35 900,20
+          "/>
+        </svg>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">
+      <span>Scroll to explore</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION 1 — OVERVIEW
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="overview" class="section">
+    <div class="inner">
+      <div class="two-col">
+        <div>
+          <p class="label reveal">Style Overview</p>
+          <h2 class="section-title reveal reveal-delay-1">Before the page,<br>there was the voice.</h2>
+          <div class="body-copy">
+            <p class="reveal reveal-delay-2">Every story was once a performance. Someone stood in firelight, or on a stage, or beneath a lantern, and gave themselves over to the telling. Their voice was the medium. Their body was the interface. Their memory held everything.</p>
+            <p class="reveal reveal-delay-3">This design system is built in honor of that — the griot, the bard, the skald, the storyteller-for-hire who crossed continents with only their voice as a credential. The West African griot who memorized generations of history. Homer reciting the Iliad to a crowd. Shadow puppet wayang performances in Java. The Celtic bard. The Aboriginal songline. Every culture on earth had someone whose job was to hold the stories and give them back.</p>
+            <p class="reveal reveal-delay-4">It is a design language of breath and rhythm, pattern and pause. It says: <em>the story is alive, and so are you.</em></p>
+          </div>
+
+          <div class="pull-quote reveal reveal-delay-5">
+            <div class="pq-line"></div>
+            <blockquote>"The story is not in the book. The story is in the space between the teller and the heard."</blockquote>
+            <cite>— On the Oral Tradition</cite>
+          </div>
+        </div>
+
+        <!-- Geometric accent panel -->
+        <div class="geo-panel celtic reveal reveal-delay-2">
+          <div class="geo-shapes">
+            <div class="geo-shape geo-corner tl"></div>
+            <div class="geo-shape geo-corner tr"></div>
+            <div class="geo-shape geo-corner bl"></div>
+            <div class="geo-shape geo-corner br"></div>
+            <div class="geo-shape geo-circle-inner"></div>
+            <div class="geo-shape geo-circle-outer"></div>
+            <div class="geo-shape geo-cross-h"></div>
+            <div class="geo-shape geo-cross-v"></div>
+            <div class="geo-shape geo-diamond"></div>
+          </div>
+          <span class="geo-label">Oral Tradition — Geometric System</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION 2 — SCHEHERAZADE
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="scheherazade" class="section">
+    <div class="inner">
+      <div class="section-header">
+        <p class="label reveal">Demo Content — Arabian Nights</p>
+        <h2 class="reveal reveal-delay-1">One Thousand and One Nights</h2>
+        <p class="reveal reveal-delay-2" style="font-family: var(--font-sub); font-style: italic; color: var(--mist); margin-top: 0.5rem; font-size: 0.95rem;">Trans. Edward William Lane, 1838–1840 — Public Domain</p>
+      </div>
+
+      <!-- Wave divider — animated -->
+      <div class="reveal">
+        <svg class="wave-divider" viewBox="0 0 900 40" height="40" aria-hidden="true">
+          <path class="wave-path" d="
+            M0,20 C25,5 50,35 75,20 C100,5 125,35 150,20
+            C175,5 200,35 225,20 C250,5 275,35 300,20
+            C325,5 350,35 375,20 C400,5 425,35 450,20
+            C475,5 500,35 525,20 C550,5 575,35 600,20
+            C625,5 650,35 675,20 C700,5 725,35 750,20
+            C775,5 800,35 825,20 C850,5 875,35 900,20
+          "/>
+        </svg>
+      </div>
+
+      <div class="story-text">
+        <p class="drop-cap reveal">In the name of God, the Compassionate, the Merciful! Praise be to God, the Beneficent King, the Creator of the universe, who hath raised the heavens without pillars, and spread out the earth as a bed; and blessings and peace be on the lord of apostles, our lord and our master Muhammad, and his family and companions all!</p>
+
+        <p class="reveal reveal-delay-1">It hath reached me, O auspicious King, that there was, in ancient times, a King of the Kings of the countries of India and China, possessed of troops, and guards, and servants, and domestic dependants; and he had two sons: one of whom was a man of mature age, and the other a youth. Both of them were brave cavaliers; but especially the elder, who inherited the kingdom of his father.</p>
+
+        <div class="breath-mark reveal reveal-delay-2"><span>′</span></div>
+
+        <p class="reveal reveal-delay-2">Shahryár had a wife whom he loved more than all the world, and his greatest happiness was to surround her with splendour, and to give her the finest pleasures of life. But there came a day when he made the great discovery that love does not exist where we think it does, when he was given the chance to doubt his wife's fidelity. Shahryár, his heart hardened by treachery, resolved that henceforth he would call no woman his own.</p>
+
+        <div class="breath-mark reveal reveal-delay-3"><span>′</span></div>
+
+        <p class="reveal reveal-delay-3">Now it came to pass that Shahrázád, the Vizier's daughter, who had read the books of literature and philosophy and the arts, who had studied history, had perused the works of the poets, and had learned by heart a thousand stories and legends about ancient kings and peoples, resolved that she would use the power of her voice — the only weapon she possessed — to save the daughters of her land from the King's decree.</p>
+
+        <div class="pull-quote reveal reveal-delay-4">
+          <div class="pq-line"></div>
+          <blockquote>"O King, I have a tale of wondrous beauty, should it please thy Majesty to hear it." And the King listened, for the voice of Shahrázád was the voice of morning, and he could not resist it.</blockquote>
+          <cite>— The Thousand and One Nights, Framing Story</cite>
+        </div>
+
+        <p class="reveal reveal-delay-4">And so it was that each night, Shahrázád would begin a story, and let it run through the hours of darkness until the first light of dawn appeared on the horizon. At that moment she would cease, the story unfinished, the King's curiosity alive. And the King, unwilling to end the life of a woman whose tongue held the next passage of a story he had not yet heard, would let another day pass. One night became a thousand nights. The voice held death at bay. The story was the shield.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION 3 — WHY THIS WORKS
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="why" class="section">
+    <div class="inner">
+      <div class="two-col">
+
+        <!-- Wave visualization panel -->
+        <div class="wave-panel reveal">
+          <div class="wave-stack">
+            <svg viewBox="0 0 300 24" height="24" aria-hidden="true">
+              <path class="wave-path" stroke="rgba(232,160,32,0.9)" stroke-width="1.8" d="M0,12 C8,2 17,22 25,12 C33,2 42,22 50,12 C58,2 67,22 75,12 C83,2 92,22 100,12 C108,2 117,22 125,12 C133,2 142,22 150,12 C158,2 167,22 175,12 C183,2 192,22 200,12 C208,2 217,22 225,12 C233,2 242,22 250,12 C258,2 267,22 275,12 C283,2 292,22 300,12"/>
+            </svg>
+            <svg viewBox="0 0 300 18" height="18" aria-hidden="true" style="opacity:0.55">
+              <path class="wave-path" stroke="rgba(196,30,58,0.8)" stroke-width="1.2" d="M0,9 C12,0 24,18 36,9 C48,0 60,18 72,9 C84,0 96,18 108,9 C120,0 132,18 144,9 C156,0 168,18 180,9 C192,0 204,18 216,9 C228,0 240,18 252,9 C264,0 276,18 288,9 C294,3 297,15 300,9"/>
+            </svg>
+            <svg viewBox="0 0 300 14" height="14" aria-hidden="true" style="opacity:0.35">
+              <path class="wave-path" stroke="rgba(212,168,67,0.7)" stroke-width="1" d="M0,7 C6,1 12,13 18,7 C24,1 30,13 36,7 C42,1 48,13 54,7 C60,1 66,13 72,7 C78,1 84,13 90,7 C96,1 102,13 108,7 C114,1 120,13 126,7 C132,1 138,13 144,7 C150,1 156,13 162,7 C168,1 174,13 180,7 C186,1 192,13 198,7 C204,1 210,13 216,7 C222,1 228,13 234,7 C240,1 246,13 252,7 C258,1 264,13 270,7 C276,1 282,13 288,7 C294,1 300,13 300,7"/>
+            </svg>
+            <svg viewBox="0 0 300 10" height="10" aria-hidden="true" style="opacity:0.2">
+              <path class="wave-path" stroke="rgba(42,122,90,0.7)" stroke-width="0.8" d="M0,5 C4,1 8,9 12,5 C16,1 20,9 24,5 C28,1 32,9 36,5 C40,1 44,9 48,5 C52,1 56,9 60,5 C64,1 68,9 72,5 C76,1 80,9 84,5 C88,1 92,9 96,5 C100,1 104,9 108,5 C112,1 116,9 120,5 C124,1 128,9 132,5 C136,1 140,9 144,5 C148,1 152,9 156,5 C160,1 164,9 168,5 C172,1 176,9 180,5 C184,1 188,9 192,5 C196,1 200,9 204,5 C208,1 212,9 216,5 C220,1 224,9 228,5 C232,1 236,9 240,5 C244,1 248,9 252,5 C256,1 260,9 264,5 C268,1 272,9 276,5 C280,1 284,9 288,5 C292,1 296,9 300,5"/>
+            </svg>
+            <p class="wave-label">Voice waveform — layered harmonics</p>
+          </div>
+        </div>
+
+        <div>
+          <p class="label reveal">Style Rationale</p>
+          <h2 class="reveal reveal-delay-1">Why This Works<br>for Storyteller</h2>
+          <ul class="reason-list">
+            <li class="reveal reveal-delay-2">
+              <div class="marker"></div>
+              <div class="reason-text">
+                <span class="reason-title">Voice is the interface.</span>
+                Storyteller is voice-native. This aesthetic makes that central — the sound wave isn't decoration, it's a literal representation of how the product works. The medium is the message.
+              </div>
+            </li>
+            <li class="reveal reveal-delay-3">
+              <div class="marker"></div>
+              <div class="reason-text">
+                <span class="reason-title">Universal, not Western.</span>
+                The global oral tradition patterns — Celtic knotwork, kente-inspired stripes, Islamic geometric tiles — signal that stories belong to all of humanity, not just one lineage of storytelling. Storyteller is for everyone.
+              </div>
+            </li>
+            <li class="reveal reveal-delay-4">
+              <div class="marker"></div>
+              <div class="reason-text">
+                <span class="reason-title">Breath mirrors spoken pacing.</span>
+                The animations move like breath: slow, expansive, never snapping. This mirrors the pacing of spoken narrative — the pause before the next chapter, the inhale before the reveal.
+              </div>
+            </li>
+            <li class="reveal reveal-delay-5">
+              <div class="marker"></div>
+              <div class="reason-text">
+                <span class="reason-title">Warmth and ritual, not generic.</span>
+                Saffron and crimson evoke firelight, ceremony, the lantern above the stage. They're warm without being sweet. Ritual without being religious. They say: this moment matters.
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION 4 — THE SONGLINES / KIM
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="songlines" class="section">
+    <div class="inner">
+      <div class="section-header">
+        <p class="label reveal">Demo Content — Story Beats</p>
+        <h2 class="reveal reveal-delay-1">The Road, the Road,<br>the Everlasting Road</h2>
+        <p class="reveal reveal-delay-2" style="font-family: var(--font-sub); font-style: italic; color: var(--mist); margin-top: 0.5rem; font-size: 0.95rem;"><em>Kim</em> by Rudyard Kipling, 1901 — Public Domain. Arranged as story beats.</p>
+      </div>
+
+      <div class="story-beat">
+
+        <!-- Beat 1 -->
+        <div class="beat-block reveal">
+          <p class="label beat-label">Beat I — The Boy</p>
+          <p>He sat, in defiance of municipal orders, astride the gun Zam-Zammah on her brick platform opposite the old Ajaib-Gher — the Wonder House, as the natives call the Lahore Museum. Who hold Zam-Zammah, that "fire-breathing dragon," hold the Punjab, for the great green-bronze piece is always first of the conqueror's loot.</p>
+        </div>
+
+        <div class="reveal">
+          <svg class="wave-divider" viewBox="0 0 900 30" height="30" aria-hidden="true">
+            <path class="wave-path" d="M0,15 C30,3 60,27 90,15 C120,3 150,27 180,15 C210,3 240,27 270,15 C300,3 330,27 360,15 C390,3 420,27 450,15 C480,3 510,27 540,15 C570,3 600,27 630,15 C660,3 690,27 720,15 C750,3 780,27 810,15 C840,3 870,27 900,15"/>
+          </svg>
+        </div>
+
+        <!-- Beat 2 -->
+        <div class="beat-block reveal">
+          <p class="label beat-label">Beat II — The Road Calls</p>
+          <p>Kim was English — though he did not know it. His mother had died of cholera in Ferozepore, his father, a colour-sergeant of an Irish regiment, had died of drink and opium in Lahore. The woman who had looked after him said he was white, though she was half caste. She belonged to the city as Kim belonged to the whole great world.</p>
+        </div>
+
+        <div class="breath-mark reveal"><span>′</span></div>
+
+        <!-- Beat 3 -->
+        <div class="beat-block reveal">
+          <p class="label beat-label">Beat III — The Lama</p>
+          <p>Then came, from nowhere in particular, an old man, yellow-robed, his head shaved — a Tibetan lama from beyond the Himalayas. He walked slowly as one in a dream, for he was not of this world. He sought the River of the Arrow, a holy river that would wash away all sin. And he met Kim on the steps of the Wonder House. That was the beginning of everything.</p>
+        </div>
+
+        <div class="reveal">
+          <svg class="wave-divider" viewBox="0 0 900 30" height="30" aria-hidden="true">
+            <path class="wave-path" d="M0,15 C30,3 60,27 90,15 C120,3 150,27 180,15 C210,3 240,27 270,15 C300,3 330,27 360,15 C390,3 420,27 450,15 C480,3 510,27 540,15 C570,3 600,27 630,15 C660,3 690,27 720,15 C750,3 780,27 810,15 C840,3 870,27 900,15"/>
+          </svg>
+        </div>
+
+        <!-- Beat 4 -->
+        <div class="beat-block reveal">
+          <p class="label beat-label">Beat IV — The Great Game</p>
+          <p>"I go to look for the River," said the lama, "and I need a chela — a disciple — to carry my begging bowl and walk with me on the road." And Kim, who had never stayed anywhere longer than a week, who knew every backstreet and alley of Lahore, who belonged to all of India and none of it, thought: here is a way onto the road. He followed. Thus begins the Great Game, and the long walk, and the story inside the story.</p>
+        </div>
+
+        <div class="pull-quote reveal reveal-delay-1">
+          <div class="pq-line"></div>
+          <blockquote>"The Road and the Wheel are one. All things move. All things return. What you follow is what you become."</blockquote>
+          <cite>— The Lama, <em>Kim</em>, Rudyard Kipling</cite>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION 5 — GEOMETRIC PATTERN SHOWCASE
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="patterns">
+    <div class="inner">
+      <div class="patterns-header">
+        <p class="label reveal">Visual Language</p>
+        <h2 class="reveal reveal-delay-1">The Geometric<br>Design System</h2>
+        <p class="reveal reveal-delay-2" style="font-family: var(--font-body); font-size: 1rem; color: var(--mist); margin-top: 1rem; max-width: 540px; line-height: 1.8;">Pure CSS pattern work. No images. Each pattern draws from a different oral tradition — Celtic knotwork, West African kente weaving, Islamic geometric tiling — reinterpreted in the style's color palette.</p>
+      </div>
+
+      <div class="pattern-grid reveal reveal-delay-2">
+        <div class="pattern-tile pt-celtic">
+          <span class="pt-label">Celtic Knotwork — Interlocking Grid</span>
+        </div>
+        <div class="pattern-tile pt-kente">
+          <span class="pt-label">Kente-Inspired — Woven Stripe</span>
+        </div>
+        <div class="pattern-tile pt-islamic">
+          <span class="pt-label">Islamic Geometric — Diagonal Tile</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SECTION 6 — TYPOGRAPHY SHOWCASE
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="type-showcase" class="section">
+    <div class="inner">
+      <p class="label reveal">Typography System</p>
+      <h2 class="reveal reveal-delay-1">The Full Type System</h2>
+
+      <!-- Yeseva One -->
+      <div class="type-row reveal">
+        <div class="type-meta">
+          <span class="type-name">Display — Yeseva One</span>
+          <span class="type-spec">Headlines, hero text, chapter titles</span>
+        </div>
+        <div class="type-display">Voice, Breath, Story</div>
+      </div>
+
+      <!-- Lora -->
+      <div class="type-row reveal">
+        <div class="type-meta">
+          <span class="type-name">Subheading — Lora Italic</span>
+          <span class="type-spec">Section introductions, pull quotes, lyric passages</span>
+        </div>
+        <div class="type-sub">The story was older than the teller.</div>
+      </div>
+
+      <!-- Source Serif 4 -->
+      <div class="type-row reveal">
+        <div class="type-meta">
+          <span class="type-name">Body — Source Serif 4</span>
+          <span class="type-spec">Long-form reading text, documentation</span>
+        </div>
+        <div class="type-body-example">The oral tradition is not a lesser form of the written. It is older. It preceded paper by millennia. It was the first technology of memory, the first interface between mind and world. In every culture before writing, someone held the archive in their body, in the rhythms of their speech, in the gestures of their hands. The voice was the storage medium. The performance was the retrieval.</div>
+      </div>
+
+      <!-- Raleway -->
+      <div class="type-row reveal">
+        <div class="type-meta">
+          <span class="type-name">Label — Raleway</span>
+          <span class="type-spec">Eyebrow text, navigation, metadata</span>
+        </div>
+        <div class="type-label-example">Style Concept · Oral Tradition · Voice-Native · Living Story</div>
+      </div>
+
+      <!-- Annotation -->
+      <div class="type-row reveal">
+        <div class="type-meta">
+          <span class="type-name">Annotation — Lora Italic, rotated</span>
+          <span class="type-spec">Marginalia, asides, handwritten-feeling notes</span>
+        </div>
+        <div class="type-annotation">…as if written in the margins of a very old book</div>
+      </div>
+
+      <!-- Breath mark example -->
+      <div class="type-row reveal">
+        <div class="type-meta">
+          <span class="type-name">Breath Mark</span>
+          <span class="type-spec">Chapter / beat separator — musical pause notation</span>
+        </div>
+        <div class="breath-mark" style="margin: 0.8rem 0;"><span>′</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-label label">Storyteller — Style Demo</div>
+    <p>The Oral Tradition · Voice, Music, and the Living Story · Style Concept No. 3</p>
+  </footer>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════
+    // INTERSECTION OBSERVER — scroll reveal + wave draw + geo assemble
+    // ═══════════════════════════════════════════════════════════════
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    // Wave draw animation — triggers when wave enters viewport
+    const wavePaths = document.querySelectorAll('.wave-path');
+    const waveObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('drawn');
+          waveObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    wavePaths.forEach(p => {
+      // Measure the actual path length and set dasharray
+      if (!prefersReducedMotion) {
+        try {
+          const len = p.getTotalLength ? p.getTotalLength() : 2000;
+          p.style.strokeDasharray = len;
+          p.style.strokeDashoffset = len;
+        } catch(e) {
+          p.style.strokeDasharray = 2000;
+          p.style.strokeDashoffset = 2000;
+        }
+      } else {
+        p.style.strokeDasharray = 'none';
+        p.style.strokeDashoffset = '0';
+      }
+      waveObserver.observe(p);
+    });
+
+    // Hero wave — draw immediately after page load
+    const heroWave = document.querySelector('#hero .wave-path');
+    if (heroWave && !prefersReducedMotion) {
+      setTimeout(() => heroWave.classList.add('drawn'), 1400);
+    }
+
+    // Geometric shapes — staggered assembly
+    const geoPanel = document.querySelector('.geo-panel');
+    const geoObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const shapes = entry.target.querySelectorAll('.geo-shape');
+          shapes.forEach((shape, i) => {
+            setTimeout(() => {
+              shape.classList.add('assembled');
+            }, i * 120);
+          });
+          geoObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    if (geoPanel) geoObserver.observe(geoPanel);
+
+    // Pull quote vertical line — draw when in view
+    const pullQuotes = document.querySelectorAll('.pull-quote');
+    const pqObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('pq-drawn');
+          pqObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    pullQuotes.forEach(pq => pqObserver.observe(pq));
+
+    // ═══════════════════════════════════════════════════════════════
+    // CURSOR TRAIL — warm glow particles
+    // ═══════════════════════════════════════════════════════════════
+    if (!prefersReducedMotion) {
+      const canvas = document.getElementById('cursor-canvas');
+      const ctx = canvas.getContext('2d');
+      let W = canvas.width = window.innerWidth;
+      let H = canvas.height = window.innerHeight;
+      const particles = [];
+
+      window.addEventListener('resize', () => {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      });
+
+      // Particle constructor
+      function Particle(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 3.5 + 1.5;
+        this.alpha = Math.random() * 0.45 + 0.25;
+        this.decay = Math.random() * 0.018 + 0.01;
+        // Warm glow colors — saffron, gold, crimson
+        const colors = [
+          `rgba(232,160,32,${this.alpha})`,
+          `rgba(212,168,67,${this.alpha})`,
+          `rgba(196,30,58,${this.alpha * 0.7})`,
+        ];
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = -Math.random() * 0.6 - 0.1;
+      }
+
+      Particle.prototype.update = function() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+        this.size *= 0.985;
+      };
+
+      Particle.prototype.draw = function() {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.fillStyle = this.color;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = this.size * 3;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      };
+
+      let lastX = 0, lastY = 0;
+      let frameId;
+
+      document.addEventListener('mousemove', (e) => {
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist > 4) {
+          const count = Math.min(Math.floor(dist / 5), 4);
+          for (let i = 0; i < count; i++) {
+            particles.push(new Particle(
+              e.clientX + (Math.random() - 0.5) * 6,
+              e.clientY + (Math.random() - 0.5) * 6
+            ));
+          }
+          lastX = e.clientX;
+          lastY = e.clientY;
+        }
+      });
+
+      function animate() {
+        ctx.clearRect(0, 0, W, H);
+        for (let i = particles.length - 1; i >= 0; i--) {
+          particles[i].update();
+          if (particles[i].alpha <= 0) {
+            particles.splice(i, 1);
+          } else {
+            particles[i].draw();
+          }
+        }
+        frameId = requestAnimationFrame(animate);
+      }
+      animate();
+    } else {
+      // Hide canvas if reduced motion
+      document.getElementById('cursor-canvas').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
