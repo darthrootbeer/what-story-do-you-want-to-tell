@@ -191,6 +191,23 @@
     }
     .hero-title-cursor.done { animation: none; opacity: 0; }
 
+    .alive-word {
+      display: inline;
+      font-style: italic;
+      transition: text-shadow 1.4s ease, color 1.4s ease;
+    }
+    .alive-word.glow {
+      color: #f5e4b8;
+      text-shadow:
+        0 0 24px rgba(201,169,110,0.8),
+        0 0 60px rgba(201,169,110,0.4),
+        0 0 120px rgba(201,169,110,0.15);
+    }
+    .alive-word.glow-fade {
+      color: var(--text);
+      text-shadow: none;
+    }
+
     .hero-sub {
       font-family: 'DM Serif Display', serif;
       font-style: italic;
@@ -1149,16 +1166,25 @@
         cursor.className = 'hero-title-cursor';
         el.appendChild(cursor);
 
-        // "alive" always starts on a new line — split text there
-        const beforeAlive = 'Stories have always been';
-        const aliveText = 'alive.';
         const aliveStart = fullText.indexOf(slowWord);
         const aliveEnd = aliveStart + slowWord.length;
         let i = 0;
         let brInserted = false;
 
+        // Span to wrap "alive." for glow effect
+        const aliveSpan = document.createElement('span');
+        aliveSpan.className = 'alive-word';
+
         function typeNext() {
           if (i >= fullText.length) {
+            // Glow on, then softly fade after 1.2s
+            setTimeout(() => {
+              aliveSpan.classList.add('glow');
+              setTimeout(() => {
+                aliveSpan.classList.add('glow-fade');
+                aliveSpan.classList.remove('glow');
+              }, 1200);
+            }, 120);
             setTimeout(() => cursor.classList.add('done'), 900);
             return;
           }
@@ -1168,12 +1194,12 @@
             brInserted = true;
             const br = document.createElement('br');
             el.insertBefore(br, cursor);
-            // Now pause before typing "alive"
+            el.insertBefore(aliveSpan, cursor);
             setTimeout(typeNext, pauseBeforeAlive);
             return;
           }
 
-          // Skip the space character before "alive" — br handles the gap
+          // Skip the space before "alive" — br handles the gap
           if (i === aliveStart - 1 && fullText[i] === ' ') {
             i++;
             typeNext();
@@ -1181,13 +1207,17 @@
           }
 
           const char = fullText[i];
-          const textNode = document.createTextNode(char);
-          el.insertBefore(textNode, cursor);
+          const inAlive = (i >= aliveStart && i < aliveEnd);
+          if (inAlive) {
+            aliveSpan.appendChild(document.createTextNode(char));
+          } else {
+            el.insertBefore(document.createTextNode(char), cursor);
+          }
           i++;
 
-          const inAlive = (i > aliveStart && i <= aliveEnd);
-          const speed = inAlive ? slowSpeed : baseSpeed;
-          const jitter = inAlive ? 0 : (Math.random() * variance * 2) - variance;
+          const isAlive = (i > aliveStart && i <= aliveEnd);
+          const speed = isAlive ? slowSpeed : baseSpeed;
+          const jitter = isAlive ? 0 : (Math.random() * variance * 2) - variance;
 
           setTimeout(typeNext, Math.max(20, speed + jitter));
         }
@@ -1196,7 +1226,7 @@
       }, 5000);
       setTimeout(() => {
         document.getElementById('hero-sub').classList.add('visible');
-      }, 13500);
+      }, 12000);
     });
 
     // ── STORIES TALK BACK WORD ANIMATION ──────────────
