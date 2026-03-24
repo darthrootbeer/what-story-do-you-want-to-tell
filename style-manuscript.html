@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Manuscript — Ink &amp; Vellum | Storyteller Style Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=UnifrakturMaguntia&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================================================
+       RESET & CUSTOM PROPERTIES
+    ========================================================= */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --ink:          #1a1008;
+      --ink-faded:    rgba(26, 16, 8, 0.65);
+      --parchment:    #e8d9b5;
+      --parchment-lt: #f2e8cb;
+      --parchment-dk: #c8b88a;
+      --rust:         #8b3a0f;
+      --rust-pale:    rgba(139, 58, 15, 0.18);
+      --rust-faint:   rgba(139, 58, 15, 0.08);
+      --gold:         #c9963c;
+      --gold-pale:    rgba(201, 150, 60, 0.25);
+      --verdigris:    #4a7c59;
+      --wax:          #8b1a1a;
+      --wax-shadow:   #5c0f0f;
+
+      --font-display: 'Cinzel Decorative', 'Palatino Linotype', serif;
+      --font-body:    'IM Fell English', 'Georgia', serif;
+      --font-fraktur: 'UnifrakturMaguntia', 'Georgia', serif;
+      --font-hand:    'Caveat', cursive;
+
+      --col-width: 760px;
+      --margin: clamp(1.25rem, 5vw, 3rem);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* =========================================================
+       PARCHMENT TEXTURE — SVG feTurbulence via body::before
+    ========================================================= */
+    body {
+      background-color: var(--parchment);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: clamp(16px, 2vw, 19px);
+      line-height: 1.85;
+      overflow-x: hidden;
+      position: relative;
+      /* Sepia warmth on the whole page */
+      filter: sepia(12%);
+    }
+
+    /* Full-viewport parchment fiber texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.09;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' seed='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23paper)' opacity='1'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 400px 400px;
+    }
+
+    /* Vignette — darkening at edges to simulate aged parchment curling */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 120% 120% at 50% 50%, transparent 50%, rgba(101, 67, 22, 0.28) 100%),
+        radial-gradient(ellipse 80% 60% at 10% 10%, rgba(80, 45, 10, 0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 90% 90%, rgba(80, 45, 10, 0.12) 0%, transparent 55%);
+    }
+
+    /* =========================================================
+       PAGE LOAD — overexposed fade-in
+    ========================================================= */
+    #page-veil {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--parchment-lt);
+      pointer-events: none;
+      animation: veil-lift 1.4s ease-out forwards 0.2s;
+      opacity: 1;
+    }
+
+    @keyframes veil-lift {
+      0%   { opacity: 1; filter: brightness(1.4); }
+      100% { opacity: 0; filter: brightness(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #page-veil { animation: none; opacity: 0; }
+    }
+
+    /* =========================================================
+       SCROLL PROGRESS BAR
+    ========================================================= */
+    #scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: linear-gradient(to right, var(--rust), var(--gold));
+      z-index: 1001;
+      transition: width 0.1s linear;
+      box-shadow: 0 0 6px rgba(139, 58, 15, 0.5);
+    }
+
+    /* =========================================================
+       NAVIGATION
+    ========================================================= */
+    #site-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: #dbc99a;
+      border-bottom: 2px solid var(--ink);
+      box-shadow: 0 2px 12px rgba(26, 16, 8, 0.18);
+      /* Very subtle parchment texture on nav too */
+    }
+
+    /* Ruled line effect under nav — a second thin ink line */
+    #site-nav::after {
+      content: '';
+      display: block;
+      height: 1px;
+      background: var(--ink-faded);
+      margin: 0 var(--margin);
+    }
+
+    .nav-inner {
+      max-width: var(--col-width);
+      margin: 0 auto;
+      padding: 0.65rem var(--margin);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+      letter-spacing: 0.15em;
+      color: var(--ink);
+      text-decoration: none;
+      text-shadow: 1px 1px 3px rgba(139,58,15,0.25);
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(0.75rem, 2vw, 1.75rem);
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-body);
+      font-variant: small-caps;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      color: var(--ink);
+      text-decoration: none;
+      opacity: 0.75;
+      transition: opacity 0.2s;
+    }
+
+    .nav-links a:hover { opacity: 1; }
+
+    .nav-back {
+      font-family: var(--font-hand);
+      font-size: 0.9rem;
+      color: var(--rust) !important;
+      opacity: 1 !important;
+      white-space: nowrap;
+    }
+
+    /* =========================================================
+       GALLERY CALLOUT BANNER
+    ========================================================= */
+    .gallery-callout {
+      position: relative;
+      z-index: 2;
+      max-width: var(--col-width);
+      margin: 80px auto 0;
+      padding: 0.75rem var(--margin);
+      border-left: 3px solid var(--rust);
+      background: var(--rust-faint);
+    }
+
+    .gallery-callout p {
+      font-family: var(--font-hand);
+      font-size: 1rem;
+      color: var(--rust);
+      line-height: 1.4;
+    }
+
+    .gallery-callout a {
+      color: var(--rust);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* =========================================================
+       MAIN LAYOUT
+    ========================================================= */
+    .page-wrap {
+      position: relative;
+      z-index: 2;
+      max-width: var(--col-width);
+      margin: 0 auto;
+      padding: 0 var(--margin) 8rem;
+    }
+
+    /* Page curl — ::after on a wrapper */
+    .manuscript-body {
+      position: relative;
+    }
+
+    .manuscript-body::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 60px;
+      height: 60px;
+      background:
+        linear-gradient(
+          225deg,
+          var(--parchment-dk) 0%,
+          var(--parchment-dk) 45%,
+          transparent 45%
+        );
+      filter: drop-shadow(-4px -4px 6px rgba(26, 16, 8, 0.35));
+    }
+
+    /* =========================================================
+       TITLE PAGE (HERO)
+    ========================================================= */
+    #title-page {
+      text-align: center;
+      padding: 5rem var(--margin) 3rem;
+      position: relative;
+    }
+
+    /* Ornamental border — layered box-shadows creating a manuscript frame */
+    .title-border {
+      border: 2px solid var(--ink);
+      box-shadow:
+        inset 0 0 0 4px var(--parchment),
+        inset 0 0 0 6px var(--ink-faded),
+        inset 0 0 0 10px var(--parchment),
+        inset 0 0 0 11px var(--rust),
+        4px 4px 0 0 var(--ink),
+        -4px -4px 0 0 var(--ink),
+        4px -4px 0 0 var(--ink),
+        -4px 4px 0 0 var(--ink);
+      padding: 3rem 2rem;
+      margin: 0 auto;
+      max-width: 640px;
+    }
+
+    .title-ornament-top {
+      display: block;
+      font-family: var(--font-fraktur);
+      font-size: 1.8rem;
+      color: var(--rust);
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.3em;
+      opacity: 0.85;
+    }
+
+    .title-main {
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 4vw, 2.4rem);
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      text-shadow:
+        1px 1px 3px rgba(139,58,15,0.4),
+        0 0 8px rgba(139,58,15,0.15);
+      margin-bottom: 0.5rem;
+    }
+
+    .title-sub {
+      font-family: var(--font-display);
+      font-size: clamp(0.65rem, 1.5vw, 0.85rem);
+      letter-spacing: 0.2em;
+      color: var(--rust);
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+    }
+
+    .title-rule {
+      width: 60%;
+      margin: 1.5rem auto;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--ink), transparent);
+    }
+
+    .title-meta {
+      font-family: var(--font-body);
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--ink);
+      opacity: 0.7;
+      line-height: 2;
+    }
+
+    .title-meta strong {
+      font-variant: small-caps;
+      font-style: normal;
+      letter-spacing: 0.1em;
+    }
+
+    /* =========================================================
+       SECTION HEADINGS
+    ========================================================= */
+    .section-label {
+      display: block;
+      font-family: var(--font-body);
+      font-variant: small-caps;
+      font-size: 0.72rem;
+      letter-spacing: 0.4em;
+      color: var(--rust);
+      margin-bottom: 0.4rem;
+      opacity: 0.85;
+    }
+
+    h2.chapter-heading {
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 3vw, 1.7rem);
+      font-weight: 400;
+      line-height: 1.3;
+      color: var(--ink);
+      margin-bottom: 1.6rem;
+      text-shadow:
+        1px 1px 3px rgba(139,58,15,0.4),
+        0 0 8px rgba(139,58,15,0.15);
+    }
+
+    /* =========================================================
+       BODY TEXT & PARAGRAPHS
+    ========================================================= */
+    .prose p {
+      margin-bottom: 1.4em;
+      font-size: 1em;
+      hyphens: auto;
+      /* Enable OpenType ligatures */
+      font-feature-settings: "liga" 1, "kern" 1;
+    }
+
+    .prose p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* =========================================================
+       DROP CAPS
+    ========================================================= */
+    .drop-cap::first-letter {
+      font-family: var(--font-fraktur);
+      font-size: clamp(3.5rem, 8vw, 5rem);
+      line-height: 0.75;
+      float: left;
+      color: var(--rust);
+      margin-right: 0.1em;
+      margin-top: 0.08em;
+      margin-bottom: -0.05em;
+      text-shadow:
+        2px 2px 4px rgba(139,58,15,0.5),
+        1px 1px 0 rgba(139,58,15,0.3),
+        0 0 12px rgba(139,58,15,0.2);
+      /* Ink bleed simulation */
+      filter: blur(0.3px);
+    }
+
+    /* =========================================================
+       MARGINALIA SYSTEM
+    ========================================================= */
+    .marginal-wrap {
+      position: relative;
+    }
+
+    .marginalia {
+      position: absolute;
+      right: -200px;
+      top: 0.5em;
+      width: 170px;
+      font-family: var(--font-hand);
+      font-size: 0.8rem;
+      line-height: 1.4;
+      color: var(--rust);
+      transform: rotate(-2deg);
+      opacity: 0;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      pointer-events: none;
+      /* Bracket pointing left */
+    }
+
+    .marginalia::before {
+      content: '←';
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.15rem;
+      opacity: 0.7;
+    }
+
+    .marginal-wrap:hover .marginalia {
+      opacity: 1;
+      transform: rotate(-2deg) translateX(-6px);
+    }
+
+    /* On narrow screens marginalia become tooltips */
+    @media (max-width: 1100px) {
+      .marginalia {
+        display: none;
+      }
+    }
+
+    /* =========================================================
+       ORNAMENTAL DIVIDERS — pure SVG inline
+    ========================================================= */
+    .ornament {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 3.5rem 0;
+    }
+
+    .ornament svg {
+      overflow: visible;
+      /* Stroke-dasharray animation on scroll entry */
+    }
+
+    .ornament svg path,
+    .ornament svg line {
+      stroke-dasharray: 300;
+      stroke-dashoffset: 300;
+      transition: stroke-dashoffset 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .ornament.revealed svg path,
+    .ornament.revealed svg line {
+      stroke-dashoffset: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ornament svg path,
+      .ornament svg line {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    /* =========================================================
+       WAX SEAL
+    ========================================================= */
+    .wax-seal-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 3rem 0;
+    }
+
+    .wax-seal {
+      position: relative;
+      width: 90px;
+      height: 90px;
+      opacity: 0;
+      transform: scale(1.5) rotate(15deg);
+      transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .wax-seal.revealed {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .wax-seal {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* =========================================================
+       TYPOGRAPHY SPECIMEN
+    ========================================================= */
+    .type-specimen {
+      background: rgba(26, 16, 8, 0.04);
+      border: 1px solid rgba(26, 16, 8, 0.2);
+      border-left: 3px solid var(--rust);
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .specimen-label {
+      font-family: var(--font-body);
+      font-variant: small-caps;
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      color: var(--rust);
+      opacity: 0.8;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .specimen-display {
+      line-height: 1.2;
+    }
+
+    .specimen-display.cinzel {
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 3vw, 1.6rem);
+      color: var(--ink);
+      text-shadow: 1px 1px 2px rgba(139,58,15,0.3);
+    }
+
+    .specimen-display.imfell {
+      font-family: var(--font-body);
+      font-style: italic;
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      color: var(--ink);
+    }
+
+    .specimen-display.fraktur {
+      font-family: var(--font-fraktur);
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      color: var(--rust);
+    }
+
+    .specimen-note {
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      font-style: italic;
+      color: var(--ink);
+      opacity: 0.6;
+      margin-top: 0.4rem;
+    }
+
+    /* =========================================================
+       SCROLL REVEAL — clip-path ink write-on
+    ========================================================= */
+    .ink-reveal {
+      clip-path: inset(0 100% 0 0);
+      animation: none;
+    }
+
+    .ink-reveal.revealed {
+      animation: ink-write 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes ink-write {
+      0%   { clip-path: inset(0 100% 0 0); }
+      100% { clip-path: inset(0 0% 0 0); }
+    }
+
+    /* Heading gets a slightly slower, more deliberate write */
+    .ink-reveal-slow.revealed {
+      animation: ink-write 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    /* Paragraphs stagger */
+    .ink-reveal-fast.revealed {
+      animation: ink-write 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ink-reveal,
+      .ink-reveal-slow,
+      .ink-reveal-fast {
+        clip-path: none !important;
+        animation: none !important;
+      }
+    }
+
+    /* =========================================================
+       DROP CAP BLOOM
+    ========================================================= */
+    .drop-bloom::first-letter {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+
+    .drop-bloom.bloom-done::first-letter {
+      /* CSS can't animate ::first-letter dynamically via class;
+         we handle this via a wrapper approach instead */
+    }
+
+    /* Drop cap wrapper approach — the drop cap letter is extracted into a span by JS */
+    .drop-cap-letter {
+      font-family: var(--font-fraktur);
+      font-size: clamp(3.5rem, 8vw, 5rem);
+      line-height: 0.75;
+      float: left;
+      color: var(--rust);
+      margin-right: 0.1em;
+      margin-top: 0.08em;
+      margin-bottom: -0.05em;
+      text-shadow:
+        2px 2px 4px rgba(139,58,15,0.5),
+        1px 1px 0 rgba(139,58,15,0.3),
+        0 0 12px rgba(139,58,15,0.2);
+      filter: blur(0.3px);
+      display: block;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+
+    .drop-cap-letter.bloomed {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .drop-cap-letter {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+
+    /* =========================================================
+       MANUSCRIPT NOTE SECTION (the selling copy)
+    ========================================================= */
+    .note-section {
+      background: rgba(74, 124, 89, 0.06);
+      border: 1px solid rgba(74, 124, 89, 0.25);
+      border-left: 3px solid var(--verdigris);
+      padding: 1.75rem 2rem;
+      position: relative;
+    }
+
+    .note-section::before {
+      content: '✦ Note on the Text ✦';
+      display: block;
+      font-family: var(--font-body);
+      font-variant: small-caps;
+      font-size: 0.7rem;
+      letter-spacing: 0.4em;
+      color: var(--verdigris);
+      margin-bottom: 1rem;
+    }
+
+    .note-section p {
+      font-style: italic;
+      margin-bottom: 1em;
+    }
+
+    .note-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+    .manuscript-footer {
+      text-align: center;
+      padding-top: 4rem;
+      margin-top: 4rem;
+      border-top: 1px solid var(--ink-faded);
+    }
+
+    .manuscript-footer p {
+      font-family: var(--font-body);
+      font-style: italic;
+      font-size: 0.82rem;
+      color: var(--ink);
+      opacity: 0.55;
+      line-height: 2;
+    }
+
+    /* =========================================================
+       SECTION SPACING
+    ========================================================= */
+    .manuscript-section {
+      padding: 3rem 0;
+    }
+
+    .manuscript-section + .manuscript-section {
+      padding-top: 0;
+    }
+
+    /* =========================================================
+       MOBILE RESPONSIVE
+    ========================================================= */
+    @media (max-width: 820px) {
+      :root {
+        --margin: 1.25rem;
+      }
+
+      .nav-links li:not(:first-child):not(:last-child) {
+        display: none;
+      }
+
+      .title-border {
+        box-shadow:
+          inset 0 0 0 3px var(--parchment),
+          inset 0 0 0 5px var(--ink-faded),
+          inset 0 0 0 8px var(--parchment),
+          inset 0 0 0 9px var(--rust);
+        padding: 2rem 1.25rem;
+      }
+
+      .gallery-callout {
+        margin-top: 72px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Page load veil -->
+  <div id="page-veil" aria-hidden="true"></div>
+
+  <!-- Scroll progress bar -->
+  <div id="scroll-progress" aria-hidden="true"></div>
+
+  <!-- =====================================================
+       NAVIGATION
+  ====================================================== -->
+  <nav id="site-nav" aria-label="Site navigation">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">Storyteller</a>
+      <ul class="nav-links">
+        <li><a href="#letter-i">Letter I</a></li>
+        <li><a href="#letter-ii">Letter II</a></li>
+        <li><a href="#note-on-text">Note</a></li>
+        <li><a href="#typography">Typography</a></li>
+        <li><a href="styles-gallery.html" class="nav-back">← All Styles</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- =====================================================
+       GALLERY CALLOUT
+  ====================================================== -->
+  <div class="gallery-callout" aria-label="Style gallery navigation">
+    <p>← <a href="styles-gallery.html">View all 6 experimental Storyteller style directions</a> — each a distinct aesthetic universe for interactive fiction.</p>
+  </div>
+
+  <!-- =====================================================
+       MAIN MANUSCRIPT BODY
+  ====================================================== -->
+  <div class="page-wrap">
+    <div class="manuscript-body">
+
+      <!-- ===== TITLE PAGE ===== -->
+      <section id="title-page" aria-label="Title page">
+        <div class="title-border ink-reveal ink-reveal-slow">
+          <span class="title-ornament-top" aria-hidden="true">❧ ❦ ❧</span>
+
+          <h1 class="title-main">Frankenstein,</h1>
+          <p class="title-sub">Or, The Modern Prometheus</p>
+
+          <div class="title-rule" aria-hidden="true"></div>
+
+          <div class="title-meta">
+            <strong>By Mary Wollstonecraft Shelley</strong><br>
+            In Three Volumes<br>
+            <br>
+            <em>London: Lackington, Hughes, Harding, Mavor, &amp; Jones</em><br>
+            <em>MDCCCXVIII</em>
+          </div>
+
+          <div class="title-rule" aria-hidden="true"></div>
+
+          <p style="font-family: var(--font-body); font-style: italic; font-size: 0.82rem; opacity: 0.65; margin-top: 0.5rem;">
+            "Did I request thee, Maker, from my clay<br>
+            To mould me Man? Did I solicit thee<br>
+            From darkness to promote me?"<br>
+            — Paradise Lost, x. 743–745
+          </p>
+        </div>
+      </section>
+
+      <!-- Divider -->
+      <div class="ornament" aria-hidden="true">
+        <svg width="320" height="40" viewBox="0 0 320 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Left flourish arm -->
+          <path d="M10,20 C40,20 60,8 80,12 C100,16 110,24 130,22" stroke="#8b3a0f" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <!-- Right flourish arm -->
+          <path d="M310,20 C280,20 260,8 240,12 C220,16 210,24 190,22" stroke="#8b3a0f" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <!-- Center medallion strokes -->
+          <path d="M130,22 C140,20 148,14 160,14 C172,14 180,20 190,22" stroke="#8b3a0f" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          <!-- Center diamond -->
+          <path d="M155,20 L160,14 L165,20 L160,26 Z" fill="#8b3a0f" opacity="0.7"/>
+          <!-- Left curl detail -->
+          <path d="M60,12 C58,6 50,4 44,8 C38,12 40,20 46,20" stroke="#c9963c" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+          <!-- Right curl detail -->
+          <path d="M260,12 C262,6 270,4 276,8 C282,12 280,20 274,20" stroke="#c9963c" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+          <!-- Short center rules -->
+          <line x1="10" y1="20" x2="10" y2="20" stroke="#8b3a0f" stroke-width="2" stroke-linecap="round"/>
+          <line x1="310" y1="20" x2="310" y2="20" stroke="#8b3a0f" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <!-- ===== LETTER THE FIRST ===== -->
+      <section id="letter-i" class="manuscript-section" aria-label="Letter the First">
+        <span class="section-label ink-reveal">Letter the First</span>
+        <h2 class="chapter-heading ink-reveal ink-reveal-slow">
+          To Mrs. Saville, England
+        </h2>
+
+        <div class="prose">
+          <div class="marginal-wrap">
+            <p class="ink-reveal" id="letter1-p1">
+              <span class="drop-cap-letter" aria-hidden="true">Y</span>ou will rejoice to hear that no disaster has accompanied the commencement of an enterprise which you have regarded with such evil forebodings. I arrived here yesterday; and my first task is to assure my dear sister of my welfare, and increasing confidence in the success of my undertaking.
+            </p>
+            <span class="marginalia" role="note" aria-label="Marginalia annotation">Written in haste — the ink still wet from the crossing</span>
+          </div>
+
+          <div class="marginal-wrap">
+            <p class="ink-reveal">
+              I am already far north of London; and as I walk in the streets of Petersburgh, I feel a cold northern breeze play upon my cheeks, which braces my nerves, and fills me with delight. Do you understand this feeling? This breeze, which has travelled from the regions towards which I am advancing, gives me a foretaste of those icy climes. Inspirited by this wind of promise, my day dreams become more fervent and vivid.
+            </p>
+            <span class="marginalia" role="note" aria-label="Marginalia annotation">He speaks of the North as other men speak of Heaven</span>
+          </div>
+
+          <div class="marginal-wrap">
+            <p class="ink-reveal">
+              I try in vain to be persuaded that the pole is the seat of frost and desolation; it ever presents itself to my imagination as the region of beauty and delight. There, Margaret, the sun is for ever visible; its broad disk just skirting the horizon, and diffusing a perpetual splendour. There — for with your leave, my sister, I will put some trust in preceding navigators — there snow and frost are banished; and, sailing over a calm sea, we may be wafted to a land surpassing in wonders and in beauty every region hitherto discovered on the habitable globe.
+            </p>
+            <span class="marginalia" role="note" aria-label="Marginalia annotation">A man undone by his own ambition, yet magnificent in the undoing</span>
+          </div>
+
+          <p class="ink-reveal">
+            Its productions and features may be without example, as the phenomena of the heavenly bodies undoubtedly are in those undiscovered solitudes. What may not be expected in a country of eternal light? I may there discover the wondrous power which attracts the needle; and may regulate a thousand celestial observations, that require only this voyage to render their seeming eccentricities consistent for ever.
+          </p>
+
+          <div class="marginal-wrap">
+            <p class="ink-reveal">
+              I shall satiate my ardent curiosity with the sight of a part of the world never before visited, and may tread a land never before imprinted by the foot of man. These are my enticements, and they are sufficient to conquer all fear of danger or death, and to induce me to commence this laborious voyage with the joy a child feels when he embarks in a little boat, with his holiday mates, on an expedition of discovery up his native river.
+            </p>
+            <span class="marginalia" role="note" aria-label="Marginalia annotation">Joy, he calls it. Joy!</span>
+          </div>
+
+          <p class="ink-reveal">
+            But, supposing all these conjectures to be false, you cannot contest the inestimable benefit which I shall confer on all mankind to the last generation, by discovering a passage near the pole to those countries, to reach which at present so many months are requisite; or by ascertaining the secret of the magnet, which, if at all possible, can only be effected by an undertaking such as mine.
+          </p>
+
+          <p class="ink-reveal" style="font-style: italic; opacity: 0.75; font-size: 0.92em; text-align: right; padding-right: 2rem;">
+            — Your affectionate brother,<br>
+            R. Walton<br>
+            <em style="font-style: normal; font-size: 0.85em; opacity: 0.7;">St. Petersburgh, Dec. 11th, 17—</em>
+          </p>
+        </div>
+      </section>
+
+      <!-- Divider -->
+      <div class="ornament" aria-hidden="true">
+        <svg width="280" height="36" viewBox="0 0 280 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="0" y1="18" x2="100" y2="18" stroke="#1a1008" stroke-width="0.8" opacity="0.5"/>
+          <path d="M100,18 C112,18 118,8 130,10 C142,12 138,24 150,22 C162,20 158,10 170,10 C182,10 178,18 180,18" stroke="#8b3a0f" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+          <line x1="180" y1="18" x2="280" y2="18" stroke="#1a1008" stroke-width="0.8" opacity="0.5"/>
+          <circle cx="140" cy="18" r="3" fill="none" stroke="#c9963c" stroke-width="1"/>
+          <circle cx="140" cy="18" r="1" fill="#c9963c"/>
+        </svg>
+      </div>
+
+      <!-- ===== LETTER THE SECOND ===== -->
+      <section id="letter-ii" class="manuscript-section" aria-label="Letter the Second">
+        <span class="section-label ink-reveal">Letter the Second</span>
+        <h2 class="chapter-heading ink-reveal ink-reveal-slow">
+          To Mrs. Saville, England
+        </h2>
+
+        <div class="prose">
+          <div class="marginal-wrap">
+            <p class="ink-reveal" id="letter2-p1">
+              <span class="drop-cap-letter" aria-hidden="true">H</span>ow slowly the time passes here, encompassed as I am by frost and snow; yet a second step is taken towards my enterprise. I have hired a vessel, and am occupied in collecting my sailors; those whom I have already engaged appear to be men on whom I can depend, and are certainly possessed of dauntless courage.
+            </p>
+            <span class="marginalia" role="note" aria-label="Marginalia annotation">Courage he prizes. Wisdom he does not name.</span>
+          </div>
+
+          <div class="marginal-wrap">
+            <p class="ink-reveal">
+              But I have one want which I have never yet been able to satisfy; and the absence of the object of which I now feel as a most severe evil. I have no friend, Margaret: when I am glowing with the enthusiasm of success, there will be none to participate my joy; if I am assailed by disappointment, no one will endeavour to sustain me in dejection. I shall commit my thoughts to paper, it is true; but that is a poor medium for the communication of feeling.
+            </p>
+            <span class="marginalia" role="note" aria-label="Marginalia annotation">And yet here he commits his thoughts to paper. The contradiction is not lost on him.</span>
+          </div>
+
+          <p class="ink-reveal">
+            I desire the company of a man who could sympathise with me; whose eyes would reply to mine. You may deem me romantic, my dear sister, but I bitterly feel the want of a friend. I have no one near me, gentle yet courageous, possessed of a cultivated as well as of a capacious mind, whose tastes are like my own, to approve or amend my plans.
+          </p>
+
+          <div class="marginal-wrap">
+            <p class="ink-reveal">
+              How would such a friend repair the faults of your poor brother! I am too ardent in execution, and too impatient of difficulties. But it is a still greater evil to me that I am self-educated: for the first fourteen years of my life I ran wild on a common, and read nothing but our uncle Thomas's books of voyages. At that age I became acquainted with the celebrated poets of our own country; but it was only when it had ceased to be in my power to derive its most important benefits from such a conviction, that I perceived the necessity of becoming acquainted with more languages than that of my native country.
+            </p>
+            <span class="marginalia" role="note" aria-label="Marginalia annotation">Self-educated. The proudest and most dangerous of creatures.</span>
+          </div>
+
+          <p class="ink-reveal">
+            Now I am twenty-eight, and am in reality more illiterate than many schoolboys of fifteen. It is true that I have thought more, and that my day dreams are more extended and magnificent; but they want (as the painters call it) keeping; and I greatly need a friend who would have sense enough not to despise me as romantic, and affection enough for me to endeavour to regulate my mind.
+          </p>
+
+          <p class="ink-reveal">
+            Well, these are useless complaints; I shall certainly find no friend on the wide ocean, nor even here in Archangel, among merchants and seamen. Yet some feelings, unallied to the dross of human nature, beat even in these rugged bosoms. My lieutenant, for instance, is a man of wonderful courage and enterprise; he is madly desirous of glory: or rather, to word my phrase more characteristically, of advancement in his profession.
+          </p>
+
+          <p class="ink-reveal" style="font-style: italic; opacity: 0.75; font-size: 0.92em; text-align: right; padding-right: 2rem;">
+            — Your affectionate brother,<br>
+            R. Walton<br>
+            <em style="font-style: normal; font-size: 0.85em; opacity: 0.7;">Archangel, 28th March, 17—</em>
+          </p>
+        </div>
+      </section>
+
+      <!-- Wax seal -->
+      <div class="wax-seal-wrap" aria-hidden="true">
+        <div class="wax-seal" id="wax-seal-1">
+          <svg width="90" height="90" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="wax-grad" cx="40%" cy="35%" r="65%">
+                <stop offset="0%" stop-color="#c02020"/>
+                <stop offset="55%" stop-color="#8b1a1a"/>
+                <stop offset="100%" stop-color="#5c0f0f"/>
+              </radialGradient>
+              <radialGradient id="wax-sheen" cx="35%" cy="30%" r="55%">
+                <stop offset="0%" stop-color="rgba(255,180,180,0.35)"/>
+                <stop offset="100%" stop-color="rgba(255,100,100,0)"/>
+              </radialGradient>
+              <!-- Irregular seal edge filter -->
+              <filter id="seal-rough">
+                <feTurbulence type="turbulence" baseFrequency="0.065" numOctaves="3" seed="5"/>
+                <feDisplacementMap in="SourceGraphic" scale="4"/>
+              </filter>
+            </defs>
+            <!-- Seal body — rough circle via filter -->
+            <circle cx="45" cy="45" r="40" fill="url(#wax-grad)" filter="url(#seal-rough)"/>
+            <!-- Sheen highlight -->
+            <circle cx="45" cy="45" r="40" fill="url(#wax-sheen)" filter="url(#seal-rough)"/>
+            <!-- Outer embossed ring -->
+            <circle cx="45" cy="45" r="36" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+            <circle cx="45" cy="45" r="33" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="1"/>
+            <!-- Monogram S -->
+            <text
+              x="45" y="55"
+              text-anchor="middle"
+              font-family="'Cinzel Decorative', serif"
+              font-size="26"
+              fill="rgba(255,230,220,0.9)"
+              style="filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.6));"
+            >S</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="ornament" aria-hidden="true">
+        <svg width="320" height="40" viewBox="0 0 320 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10,20 C40,20 60,8 80,12 C100,16 110,24 130,22" stroke="#8b3a0f" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <path d="M310,20 C280,20 260,8 240,12 C220,16 210,24 190,22" stroke="#8b3a0f" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <path d="M130,22 C140,20 148,14 160,14 C172,14 180,20 190,22" stroke="#8b3a0f" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          <path d="M155,20 L160,14 L165,20 L160,26 Z" fill="#8b3a0f" opacity="0.7"/>
+          <path d="M60,12 C58,6 50,4 44,8 C38,12 40,20 46,20" stroke="#c9963c" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+          <path d="M260,12 C262,6 270,4 276,8 C282,12 280,20 274,20" stroke="#c9963c" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <!-- ===== NOTE ON THE TEXT ===== -->
+      <section id="note-on-text" class="manuscript-section" aria-label="Note on the text">
+        <span class="section-label ink-reveal">Editorial Note</span>
+        <h2 class="chapter-heading ink-reveal ink-reveal-slow">
+          A Note on the Text &amp; the Aesthetic
+        </h2>
+
+        <div class="note-section ink-reveal">
+          <p>
+            This is the Manuscript aesthetic for Storyteller — the look of a story that has been handled, read, and lived in. Parchment that holds the impression of the quill. Ink that seeped into the fiber of the page. Marginalia left by a reader who could not help themselves.
+          </p>
+          <p>
+            Not a website that looks old. An old thing that happens to contain new content.
+          </p>
+          <p>
+            When Storyteller renders a narrative in this mode, every paragraph is a living artifact. The drop cap announces a beginning. The flourish dividers mark the passage of time. The wax seal closes a chapter with ceremony. Nothing is default; everything is considered.
+          </p>
+          <p>
+            The typefaces are not decorative choices — they are load-bearing. Cinzel Decorative carries the authority of Roman inscriptions. IM Fell English was digitized from type cast in the 1600s; the wobble in the letterforms is not a bug but the ghost of the original iron. UnifrakturMaguntia is used only where a single letter must carry the full weight of tradition — the illuminated initial, the first word of a new chapter.
+          </p>
+          <p>
+            A story told in this aesthetic says: <em>what you are reading is worth preserving.</em>
+          </p>
+        </div>
+      </section>
+
+      <!-- ===== TYPOGRAPHY SPECIMEN ===== -->
+      <section id="typography" class="manuscript-section" aria-label="Typography specimen">
+        <span class="section-label ink-reveal">Typography System</span>
+        <h2 class="chapter-heading ink-reveal ink-reveal-slow">
+          The Three Faces of the Manuscript
+        </h2>
+
+        <div class="prose">
+          <div class="type-specimen ink-reveal">
+            <span class="specimen-label">Cinzel Decorative — Chapter Headings &amp; Titles</span>
+            <p class="specimen-display cinzel">Frankenstein, Or The Modern Prometheus</p>
+            <p class="specimen-display cinzel" style="font-size: 1rem; opacity: 0.7; margin-top: 0.4rem; letter-spacing: 0.15em;">ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
+            <p class="specimen-note">Roman capital letterforms with extreme refinement. Used only for headings, titles, and the nav brand. Never for body text. The authority of stone-cut inscriptions applied to page.</p>
+          </div>
+
+          <div class="type-specimen ink-reveal">
+            <span class="specimen-label">IM Fell English — Body Text &amp; Running Prose</span>
+            <p class="specimen-display imfell">The quick brown fox jumps over the lazy dog. Walton sailed north into the permanent twilight, carrying nothing but ambition and a journal.</p>
+            <p class="specimen-display imfell" style="margin-top: 0.6rem;">
+              <em>Italic variant — used for asides, dates, signatures, and quoted speech. The slight irregularity in stroke weight is the original iron type showing through the digital facsimile.</em>
+            </p>
+            <p class="specimen-note">Digitized from type cast in the English Commonwealth period. Small-caps, ligatures, and old-style numerals active. The imperfection is the point.</p>
+          </div>
+
+          <div class="type-specimen ink-reveal">
+            <span class="specimen-label">UnifrakturMaguntia — Drop Caps &amp; Illuminated Initials Only</span>
+            <p class="specimen-display fraktur">A B C D E F G H I J K L M</p>
+            <p class="specimen-display fraktur" style="opacity: 0.65;">N O P Q R S T U V W X Y Z</p>
+            <p class="specimen-note">Fraktur blackletter. A single character used as a drop cap — never strings of text. The visual weight of one Fraktur letter signals "a chapter begins here." More than one letter would tip from ceremony into costume.</p>
+          </div>
+
+          <div class="type-specimen ink-reveal" style="border-left-color: var(--verdigris);">
+            <span class="specimen-label" style="color: var(--verdigris);">Caveat — Marginalia &amp; Handwritten Notes</span>
+            <p class="specimen-display" style="font-family: 'Caveat', cursive; font-size: 1.3rem; color: var(--rust); transform: rotate(-1.5deg); display: inline-block; margin-top: 0.3rem;">He speaks of the North as other men speak of Heaven — hover a paragraph to see more.</p>
+            <p class="specimen-note">Appears only in marginalia annotations. Never in the primary reading flow. On wide viewports: hover any paragraph to reveal a handwritten note in the margin.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Final wax seal -->
+      <div class="wax-seal-wrap" aria-hidden="true">
+        <div class="wax-seal" id="wax-seal-2">
+          <svg width="90" height="90" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="wax-grad-2" cx="40%" cy="35%" r="65%">
+                <stop offset="0%" stop-color="#c02020"/>
+                <stop offset="55%" stop-color="#8b1a1a"/>
+                <stop offset="100%" stop-color="#5c0f0f"/>
+              </radialGradient>
+              <radialGradient id="wax-sheen-2" cx="35%" cy="30%" r="55%">
+                <stop offset="0%" stop-color="rgba(255,180,180,0.35)"/>
+                <stop offset="100%" stop-color="rgba(255,100,100,0)"/>
+              </radialGradient>
+              <filter id="seal-rough-2">
+                <feTurbulence type="turbulence" baseFrequency="0.065" numOctaves="3" seed="9"/>
+                <feDisplacementMap in="SourceGraphic" scale="4"/>
+              </filter>
+            </defs>
+            <circle cx="45" cy="45" r="40" fill="url(#wax-grad-2)" filter="url(#seal-rough-2)"/>
+            <circle cx="45" cy="45" r="40" fill="url(#wax-sheen-2)" filter="url(#seal-rough-2)"/>
+            <circle cx="45" cy="45" r="36" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+            <circle cx="45" cy="45" r="33" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="1"/>
+            <text
+              x="45" y="55"
+              text-anchor="middle"
+              font-family="'Cinzel Decorative', serif"
+              font-size="26"
+              fill="rgba(255,230,220,0.9)"
+              style="filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.6));"
+            >S</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="manuscript-footer" aria-label="Page footer">
+        <p>
+          Frankenstein, or The Modern Prometheus — Mary Wollstonecraft Shelley, 1818<br>
+          <em>Public domain text. First edition. Three volumes.</em>
+        </p>
+        <p style="margin-top: 1rem;">
+          Manuscript aesthetic concept for <strong>Storyteller</strong> — a voice-first, AI-driven interactive storytelling platform.<br>
+          <a href="styles-gallery.html" style="color: var(--rust); text-decoration: underline; text-underline-offset: 3px;">← View all experimental style directions</a>
+        </p>
+      </footer>
+
+    </div><!-- /.manuscript-body -->
+  </div><!-- /.page-wrap -->
+
+
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
+  <script>
+    'use strict';
+
+    /* -------------------------------------------------------
+       SCROLL PROGRESS BAR
+    ------------------------------------------------------- */
+    const progressBar = document.getElementById('scroll-progress');
+
+    function updateProgress() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressBar.style.width = pct + '%';
+    }
+
+    window.addEventListener('scroll', updateProgress, { passive: true });
+
+    /* -------------------------------------------------------
+       DROP CAP BLOOM — extract first letter into span
+    ------------------------------------------------------- */
+    function initDropCaps() {
+      const firstLetters = document.querySelectorAll('.drop-cap-letter');
+      // On page load, trigger bloom after a short delay
+      firstLetters.forEach((el, i) => {
+        const delay = 800 + i * 400;
+        setTimeout(() => {
+          el.classList.add('bloomed');
+        }, delay);
+      });
+    }
+
+    /* -------------------------------------------------------
+       INTERSECTION OBSERVER — ink write-on + ornament unfurl + wax seal stamp
+    ------------------------------------------------------- */
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function initRevealObserver() {
+      if (prefersReduced) {
+        // Skip animations — just show everything
+        document.querySelectorAll('.ink-reveal, .ink-reveal-slow, .ink-reveal-fast').forEach(el => {
+          el.style.clipPath = 'none';
+        });
+        document.querySelectorAll('.ornament').forEach(el => el.classList.add('revealed'));
+        document.querySelectorAll('.wax-seal').forEach(el => el.classList.add('revealed'));
+        return;
+      }
+
+      const revealOpts = {
+        root: null,
+        rootMargin: '0px 0px -60px 0px',
+        threshold: 0.1
+      };
+
+      // Ink write-on for text elements
+      const inkObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            // Stagger paragraph reveals slightly
+            const delay = el.dataset.delay || 0;
+            setTimeout(() => {
+              el.classList.add('revealed');
+            }, parseInt(delay));
+            inkObserver.unobserve(el);
+          }
+        });
+      }, revealOpts);
+
+      document.querySelectorAll('.ink-reveal, .ink-reveal-slow, .ink-reveal-fast').forEach((el, i) => {
+        // Stagger sibling paragraphs within prose sections
+        if (el.tagName === 'P') {
+          el.dataset.delay = (i % 6) * 80;
+        }
+        inkObserver.observe(el);
+      });
+
+      // Ornament unfurl
+      const ornamentObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            ornamentObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.5 });
+
+      document.querySelectorAll('.ornament').forEach(el => ornamentObserver.observe(el));
+
+      // Wax seal stamp
+      const sealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            setTimeout(() => {
+              entry.target.classList.add('revealed');
+            }, 150);
+            sealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.6 });
+
+      document.querySelectorAll('.wax-seal').forEach(el => sealObserver.observe(el));
+    }
+
+    /* -------------------------------------------------------
+       TITLE PAGE — immediate reveal (above fold)
+    ------------------------------------------------------- */
+    function initTitlePage() {
+      if (prefersReduced) return;
+      const titleBorder = document.querySelector('.title-border');
+      if (titleBorder) {
+        setTimeout(() => {
+          titleBorder.classList.add('revealed');
+        }, 600);
+      }
+    }
+
+    /* -------------------------------------------------------
+       MARGINALIA — 4 cycling annotation strings
+    ------------------------------------------------------- */
+    // Already baked into HTML — no JS needed beyond CSS :hover
+
+    /* -------------------------------------------------------
+       SECTION LABEL + HEADING — tiny stagger fix
+       Make sure section labels and headings which are siblings
+       reveal in sequence
+    ------------------------------------------------------- */
+    function staggerSectionHeadings() {
+      if (prefersReduced) return;
+      document.querySelectorAll('.manuscript-section').forEach(section => {
+        const label = section.querySelector('.section-label');
+        const heading = section.querySelector('.chapter-heading');
+        if (label && heading) {
+          // Label reveals first, heading slightly after
+          heading.dataset.delay = '200';
+        }
+      });
+    }
+
+    /* -------------------------------------------------------
+       INIT
+    ------------------------------------------------------- */
+    document.addEventListener('DOMContentLoaded', () => {
+      initDropCaps();
+      staggerSectionHeadings();
+      initRevealObserver();
+      initTitlePage();
+      updateProgress();
+    });
+  </script>
+
+</body>
+</html>

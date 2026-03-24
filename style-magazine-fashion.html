@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Storyteller — The Narrative Quarterly — No. 001</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,700;1,300;1,700&family=Cormorant+SC:wght@300;500&family=Raleway:wght@100;300&display=swap" rel="stylesheet">
+
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────────────────────── */
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #ffffff;
+      --gold: #b8962e;
+      --rule: #ddd;
+      --bar-height: 32px;
+    }
+
+    html {
+      font-size: 13px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--white);
+      color: var(--black);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 300;
+      line-height: 2.0;
+      opacity: 0;
+      transition: opacity 800ms ease;
+      overflow-x: hidden;
+    }
+
+    body.loaded {
+      opacity: 1;
+    }
+
+    /* ─── Issue Bar (Fixed Top) ────────────────────────────────────────────────── */
+
+    .issue-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--bar-height);
+      background: var(--white);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.3s ease;
+    }
+
+    .issue-bar.scrolled {
+      border-bottom-color: var(--black);
+    }
+
+    .issue-bar-brand {
+      font-family: 'Cormorant SC', serif;
+      font-weight: 300;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--black);
+      text-decoration: none;
+      text-transform: uppercase;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .issue-bar-left,
+    .issue-bar-right {
+      font-family: 'Raleway', sans-serif;
+      font-weight: 100;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--black);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .issue-bar-right {
+      opacity: 0.5;
+    }
+
+    /* Scroll progress — the bar's bottom border grows */
+    .issue-bar::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      height: 1px;
+      width: 0%;
+      background: var(--black);
+      transition: width 0.1s linear;
+    }
+
+    /* Gallery link */
+    .gallery-link {
+      position: fixed;
+      top: calc(var(--bar-height) + 14px);
+      left: 40px;
+      font-family: 'Raleway', sans-serif;
+      font-weight: 100;
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      color: var(--black);
+      text-decoration: none;
+      text-transform: uppercase;
+      z-index: 99;
+      opacity: 0.45;
+      transition: opacity 0.2s ease;
+    }
+
+    .gallery-link:hover {
+      opacity: 1;
+    }
+
+    /* ─── Shared Section Structure ────────────────────────────────────────────── */
+
+    section {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .content-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 60px;
+    }
+
+    /* Thin rule — used twice */
+    .thin-rule {
+      display: block;
+      width: 40%;
+      height: 1px;
+      background: var(--black);
+      margin: 0 auto;
+    }
+
+    /* Folio — bottom of each section */
+    .folio {
+      text-align: center;
+      font-family: 'Cormorant SC', serif;
+      font-weight: 300;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--black);
+      opacity: 0.4;
+      padding-bottom: 60px;
+    }
+
+    /* Vertical label */
+    .vertical-label {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%) rotate(180deg);
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-family: 'Cormorant SC', serif;
+      font-weight: 300;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.8s ease 0.8s;
+    }
+
+    .vertical-label.visible {
+      opacity: 1;
+    }
+
+    /* Rotated credits sidebar */
+    .credits-sidebar {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%) rotate(90deg);
+      transform-origin: right center;
+      font-family: 'Raleway', sans-serif;
+      font-weight: 100;
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      color: var(--black);
+      opacity: 0.35;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+
+    /* Subheads */
+    .subhead {
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--black);
+      display: block;
+    }
+
+    /* ─── Section 1: Cover / Hero ─────────────────────────────────────────────── */
+
+    .section-cover {
+      min-height: 100vh;
+      padding-top: var(--bar-height);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      background: var(--white);
+    }
+
+    .cover-pre-space {
+      height: 30vh;
+    }
+
+    .cover-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--black);
+      text-align: center;
+    }
+
+    .cover-post-space {
+      height: 20vh;
+    }
+
+    .cover-issue {
+      font-family: 'Raleway', sans-serif;
+      font-weight: 100;
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      color: var(--black);
+      text-align: center;
+      opacity: 0.6;
+    }
+
+    .cover-bottom-space {
+      height: 20vh;
+    }
+
+    /* ─── Section 2: The Profile ──────────────────────────────────────────────── */
+
+    .section-profile {
+      padding: 120px 0 0;
+      background: var(--white);
+    }
+
+    .oversized-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 700;
+      font-size: clamp(80px, 14vw, 200px);
+      line-height: 0.85;
+      white-space: nowrap;
+      overflow: visible;
+      color: var(--black);
+      display: block;
+      padding-left: 60px;
+      transform: translateX(10%);
+      opacity: 0;
+      transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
+      will-change: transform, opacity;
+    }
+
+    .oversized-heading.visible {
+      transform: translateX(-5%);
+      opacity: 1;
+    }
+
+    .profile-body {
+      padding: 80px 0 100px;
+    }
+
+    .profile-body p {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 13px;
+      line-height: 2.0;
+      color: var(--black);
+      margin-bottom: 2em;
+      max-width: 620px;
+    }
+
+    .profile-body p.indent {
+      text-indent: 2em;
+    }
+
+    .profile-byline {
+      display: block;
+      font-family: 'Raleway', sans-serif;
+      font-weight: 100;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--black);
+      opacity: 0.5;
+      margin-bottom: 60px;
+    }
+
+    /* Gold accent — first use */
+    .gold {
+      color: var(--gold);
+    }
+
+    /* ─── Section 3: The Feature (2-column) ──────────────────────────────────── */
+
+    .section-feature {
+      padding: 120px 0 80px;
+      background: var(--white);
+    }
+
+    .feature-heading-span {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(32px, 5vw, 52px);
+      line-height: 1.2;
+      color: var(--black);
+      display: block;
+      margin-bottom: 60px;
+      column-span: all;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+
+    .feature-heading-span.visible {
+      opacity: 1;
+    }
+
+    .feature-label {
+      display: block;
+      font-family: 'Raleway', sans-serif;
+      font-weight: 100;
+      font-size: 9px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--black);
+      opacity: 0.4;
+      margin-bottom: 20px;
+      column-span: all;
+    }
+
+    .columns-wrapper {
+      column-count: 2;
+      column-gap: 60px;
+      column-rule: 1px solid var(--rule);
+      opacity: 0;
+      transition: opacity 1.4s ease;
+    }
+
+    .columns-wrapper.visible {
+      opacity: 1;
+    }
+
+    .columns-wrapper p {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 13px;
+      line-height: 2.0;
+      color: var(--black);
+      margin-bottom: 1.8em;
+      orphans: 3;
+      widows: 3;
+    }
+
+    .columns-wrapper p.indent {
+      text-indent: 2em;
+    }
+
+    /* ─── Section 4: Pull Quote (full-bleed black) ────────────────────────────── */
+
+    .section-quote {
+      background: #000000;
+      padding: 160px 60px;
+      opacity: 0;
+      transition: opacity 2s ease;
+    }
+
+    .section-quote.visible {
+      opacity: 1;
+    }
+
+    .pull-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.6;
+      color: var(--white);
+      text-align: center;
+      max-width: 780px;
+      margin: 0 auto;
+      letter-spacing: -0.01em;
+    }
+
+    .pull-quote-attr {
+      display: block;
+      text-align: center;
+      font-family: 'Raleway', sans-serif;
+      font-weight: 100;
+      font-size: 9px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--white);
+      opacity: 0.3;
+      margin-top: 60px;
+    }
+
+    /* ─── Section 5: The Italic Money Shot ───────────────────────────────────── */
+
+    .section-money {
+      padding: 160px 0 120px;
+      background: var(--white);
+    }
+
+    .money-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(32px, 5.5vw, 60px);
+      line-height: 1.35;
+      color: var(--black);
+      letter-spacing: -0.02em;
+      max-width: 100%;
+      transform: scale(1.04);
+      opacity: 0;
+      transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.5s ease;
+    }
+
+    .money-quote.visible {
+      transform: scale(1.0);
+      opacity: 1;
+    }
+
+    /* ─── Section 6: The Credits ──────────────────────────────────────────────── */
+
+    .section-credits {
+      padding: 120px 0 100px;
+      background: var(--white);
+    }
+
+    .credits-heading {
+      font-family: 'Cormorant SC', serif;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--black);
+      display: block;
+      margin-bottom: 80px;
+    }
+
+    .credits-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px 80px;
+      margin-bottom: 100px;
+    }
+
+    .credit-item {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .credit-role {
+      font-family: 'Raleway', sans-serif;
+      font-weight: 100;
+      font-size: 9px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--black);
+      opacity: 0.5;
+    }
+
+    .credit-specimen-large {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 700;
+      font-size: clamp(40px, 6vw, 80px);
+      line-height: 0.9;
+      color: var(--black);
+      letter-spacing: -0.01em;
+    }
+
+    .credit-specimen-italic {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(32px, 4.5vw, 60px);
+      line-height: 1.0;
+      color: var(--black);
+    }
+
+    .credit-specimen-sc {
+      font-family: 'Cormorant SC', serif;
+      font-weight: 300;
+      font-size: clamp(20px, 3vw, 36px);
+      line-height: 1.2;
+      letter-spacing: 0.1em;
+      color: var(--black);
+    }
+
+    .credit-specimen-light {
+      font-family: 'Raleway', sans-serif;
+      font-weight: 100;
+      font-size: clamp(24px, 3.5vw, 48px);
+      line-height: 1.1;
+      letter-spacing: 0.1em;
+      color: var(--black);
+    }
+
+    .credit-specimen-gold {
+      font-family: 'Cormorant SC', serif;
+      font-weight: 500;
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    .credit-description {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 11px;
+      line-height: 1.8;
+      color: var(--black);
+      opacity: 0.5;
+    }
+
+    /* Full credits block */
+    .credits-block {
+      margin-top: 80px;
+      padding-top: 40px;
+      border-top: 1px solid #eee;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 40px;
+    }
+
+    .credits-block span {
+      font-family: 'Raleway', sans-serif;
+      font-weight: 100;
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--black);
+      opacity: 0.4;
+    }
+
+    /* ─── Section 7: The Close ────────────────────────────────────────────────── */
+
+    .section-close {
+      padding: 160px 0;
+      background: var(--white);
+      text-align: center;
+      min-height: 60vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-sentence {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(16px, 2vw, 22px);
+      color: var(--black);
+      letter-spacing: 0.02em;
+      line-height: 1.8;
+      max-width: 500px;
+      margin-bottom: 160px;
+    }
+
+    .close-mark {
+      font-family: 'Cormorant SC', serif;
+      font-weight: 300;
+      font-size: 9px;
+      letter-spacing: 0.4em;
+      color: var(--black);
+      opacity: 0.3;
+      text-transform: uppercase;
+    }
+
+    /* ─── Spacing utilities ──────────────────────────────────────────────────── */
+
+    .space-sm  { height: 40px;  display: block; }
+    .space-md  { height: 80px;  display: block; }
+    .space-lg  { height: 120px; display: block; }
+    .space-xl  { height: 200px; display: block; }
+
+    /* ─── Responsive ─────────────────────────────────────────────────────────── */
+
+    @media (max-width: 768px) {
+      .issue-bar {
+        padding: 0 20px;
+      }
+
+      .issue-bar-left {
+        display: none;
+      }
+
+      .gallery-link {
+        left: 20px;
+      }
+
+      .content-inner {
+        padding: 0 32px;
+      }
+
+      .oversized-heading {
+        padding-left: 32px;
+        font-size: clamp(64px, 18vw, 120px);
+      }
+
+      .columns-wrapper {
+        column-count: 1;
+        column-rule: none;
+      }
+
+      .credits-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .vertical-label {
+        display: none;
+      }
+
+      .credits-sidebar {
+        display: none;
+      }
+
+      .section-quote {
+        padding: 100px 32px;
+      }
+
+      .section-money {
+        padding: 100px 0 80px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .issue-bar-right {
+        display: none;
+      }
+
+      .cover-pre-space { height: 20vh; }
+      .cover-post-space { height: 14vh; }
+
+      .section-profile { padding-top: 80px; }
+      .section-feature { padding-top: 80px; }
+
+      .oversized-heading {
+        font-size: clamp(52px, 20vw, 96px);
+      }
+    }
+
+    /* ─── Reduced Motion ─────────────────────────────────────────────────────── */
+
+    @media (prefers-reduced-motion: reduce) {
+      body {
+        opacity: 1;
+        transition: none;
+      }
+
+      .oversized-heading {
+        transform: translateX(-5%);
+        opacity: 1;
+        transition: none;
+      }
+
+      .columns-wrapper,
+      .feature-heading-span,
+      .section-quote,
+      .money-quote {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+
+      .vertical-label {
+        opacity: 1;
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Issue Bar ─────────────────────────────────────────────────────────── -->
+  <header class="issue-bar" id="issueBar">
+    <a href="styles-gallery.html" class="issue-bar-left">← All Styles</a>
+    <a href="#" class="issue-bar-brand">Storyteller — The Narrative Quarterly — No. 001</a>
+    <span class="issue-bar-right">Spring 2026</span>
+  </header>
+
+  <!-- Gallery Link -->
+  <a href="styles-gallery.html" class="gallery-link">← View All Experimental Styles</a>
+
+
+  <!-- ─── Section 1: Cover ──────────────────────────────────────────────────── -->
+  <section class="section-cover" aria-label="Cover">
+    <span class="cover-pre-space"></span>
+    <h1 class="cover-title">Storyteller</h1>
+    <span class="cover-post-space"></span>
+    <p class="cover-issue">No. 001 — Spring 2026</p>
+    <span class="cover-bottom-space"></span>
+
+    <span class="thin-rule"></span>
+    <span class="space-lg"></span>
+    <span class="folio">— 01 —</span>
+  </section>
+
+
+  <!-- ─── Section 2: The Profile ───────────────────────────────────────────── -->
+  <section class="section-profile" aria-label="The Profile" id="section-profile">
+    <span class="vertical-label js-vertical" id="label-profile">Profile</span>
+    <span class="credits-sidebar">Art Direction — Storyteller Creative / Typography — Bespoke / Season — Spring 2026</span>
+
+    <!-- Oversized clipped heading -->
+    <h2 class="oversized-heading js-clip-heading" aria-label="Narrative">Narrative</h2>
+
+    <span class="space-md"></span>
+
+    <div class="content-inner">
+      <span class="profile-byline">A Retrospective — By the Editors</span>
+
+      <div class="profile-body">
+        <p>There was a time when the story needed no medium. It needed only a mouth, an ear, and the dark between them. The oral tradition — now extinct in any form that would be recognizable to its originators — moved through generations the way a hand moves along a wall in the dark: by feel, by necessity, by the understanding that something solid exists even when it cannot be seen.</p>
+
+        <p class="indent">Storytelling as we have known it since the codex, since the printing press, since the screen, is not storytelling in that older sense. It is something else: preserved narrative, crystallized, fixed in amber. The reader arrives after the fact. The act of telling has already occurred. What remains is its <span class="gold">residue</span>.</p>
+
+        <p class="indent">The handwork of the narrative — that quality of craft that could only exist in the moment of transmission, that registered the teller's hesitation and the listener's hunger in real time — was lost each time the distance between voice and ear grew longer. By the time the novel arrived, fully formed and magnificent, that handwork had been sublimated into something extraordinary and something lesser simultaneously. The story survived. The telling did not.</p>
+
+        <p class="indent">This is the retrospective we are conducting. Not of storytelling's decline — there is no decline, there is only transformation — but of what was left behind. Of the quality that went missing when we stopped being in the room together, and what it might mean to recover it.</p>
+      </div>
+
+      <span class="space-sm"></span>
+      <span class="thin-rule"></span>
+      <span class="space-lg"></span>
+      <span class="folio">— 02 —</span>
+    </div>
+  </section>
+
+
+  <!-- ─── Section 3: The Feature (2-column) ────────────────────────────────── -->
+  <section class="section-feature" aria-label="The Feature" id="section-feature">
+    <span class="vertical-label js-vertical" id="label-feature">Feature</span>
+
+    <div class="content-inner">
+      <span class="feature-label">The Feature — What Storyteller Does</span>
+
+      <h2 class="feature-heading-span js-fade" id="feature-heading">
+        The Voice<br>Returns to<br>the Room
+      </h2>
+
+      <div class="columns-wrapper js-columns" id="feature-columns">
+        <p>Storyteller is not software in the sense that the industry has come to use that word. It is not a productivity tool, nor a content platform, nor an experience delivery system. It is an attempt — serious, considered, and perhaps audacious — to return the handwork to narrative. To put the teller back in the telling.</p>
+
+        <p class="indent">The premise is deceptively simple. A story should respond to its listener. Not by choosing from a menu of branches, not by polling preferences — but by attending. By reading the room, even when the room is a single person sitting alone. The old storyteller did this without thinking: accelerating through the parts that lost attention, dwelling on the moments that held it, changing the shape of the narrative in real time to serve the person across the fire.</p>
+
+        <p class="indent">What Storyteller proposes is that this responsiveness — lost when we fixed narrative in print and recovered only partially by interactive fiction's blunter instruments — can be achieved again. Not by approximation, but by design. By building a system whose fundamental architecture assumes that the story and the listener are in conversation.</p>
+
+        <p class="indent">The technical achievement, if it works as intended, will be invisible. This is the mark of the form. The old storytellers were not admired for their memory, though their memory was extraordinary. They were admired for making you forget that you were being told something — for making the narrative feel like weather, like something that was simply happening to you rather than being delivered.</p>
+
+        <p class="indent">Seamlessness is not a design value in the superficial sense. It is a philosophical position. The story must never break. The Guide — Storyteller's term for the corrective intelligence that operates in the margins of experience — exists to ensure that the narrative maintains its integrity without interrupting its flow. Magic by default, correction in the negative space between moments.</p>
+
+        <p>This is the ambition. What you are reading is its prospectus.</p>
+      </div>
+
+      <span class="space-md"></span>
+      <span class="thin-rule"></span>
+      <span class="space-lg"></span>
+      <span class="folio">— 03 —</span>
+    </div>
+  </section>
+
+
+  <!-- ─── Section 4: The Quote (full-bleed black) ──────────────────────────── -->
+  <section class="section-quote js-quote" id="section-quote" aria-label="Pull Quote">
+    <blockquote class="pull-quote">
+      "The counsel woven into the fabric of real life<br>
+      is wisdom. The art is dying. Fewer and fewer people<br>
+      have the gift of it. And the reason is not difficult<br>
+      to name: it is experience, becoming uncommunicable."
+    </blockquote>
+    <span class="pull-quote-attr">After Benjamin — Recovered for the Present Tense</span>
+    <span class="space-sm"></span>
+    <span class="folio" style="color: rgba(255,255,255,0.2);">— 04 —</span>
+  </section>
+
+
+  <!-- ─── Section 5: The Money Shot (oversized italic) ─────────────────────── -->
+  <section class="section-money" aria-label="Editorial" id="section-money">
+    <div class="content-inner">
+      <blockquote class="money-quote js-money" id="money-quote">
+        The story was always<br>
+        the technology.<br>
+        We only forgot to<br>
+        <em style="color: var(--gold);">notice.</em>
+      </blockquote>
+
+      <span class="space-xl"></span>
+      <span class="folio">— 05 —</span>
+    </div>
+  </section>
+
+
+  <!-- ─── Section 6: The Credits ───────────────────────────────────────────── -->
+  <section class="section-credits" aria-label="Credits" id="section-credits">
+    <span class="vertical-label js-vertical" id="label-credits">Credits</span>
+    <span class="credits-sidebar">Typography Specimens — Storyteller Identity / Fonts — Google Fonts / Year — 2026</span>
+
+    <div class="content-inner">
+      <span class="credits-heading">Typography — A Specimen</span>
+
+      <div class="credits-grid">
+
+        <div class="credit-item">
+          <span class="credit-role">Display — Cormorant Garamond 700</span>
+          <span class="credit-specimen-large">ABCDE</span>
+          <span class="credit-description">The workhorse. High contrast, fashion-forward serifs with extreme thick-thin stroke variation. Weight 700 for display; 300 for body and pull text.</span>
+        </div>
+
+        <div class="credit-item">
+          <span class="credit-role">Italic — Cormorant Garamond 300 Italic</span>
+          <span class="credit-specimen-italic">The telling</span>
+          <span class="credit-description">Light italic for pull quotes and long-form reading. Negative tracking at large sizes. Letter-spacing: −0.02em.</span>
+        </div>
+
+        <div class="credit-item">
+          <span class="credit-role">Labels — Cormorant SC 300</span>
+          <span class="credit-specimen-sc">Storyteller</span>
+          <span class="credit-description">Small caps for credits, folios, section labels, and any text that must carry authority without volume.</span>
+        </div>
+
+        <div class="credit-item">
+          <span class="credit-role">Sans — Raleway 100</span>
+          <span class="credit-specimen-light">STORYTELLER</span>
+          <span class="credit-description">Ultra-light sans at 9–11px for metadata, credits, captions, and the issue bar. Weight 100 is the essential weight.</span>
+        </div>
+
+      </div>
+
+      <!-- Gold specimen — 3rd of 4 gold uses -->
+      <div style="text-align: center; padding: 40px 0;">
+        <span class="credit-specimen-gold">— Accent: #b8962e — Used Exactly Here —</span>
+      </div>
+
+      <div class="credits-block">
+        <span>Art Direction — Storyteller Creative</span>
+        <span>Typography — Bespoke</span>
+        <span>Season — Spring 2026</span>
+        <span>Format — Digital Editorial</span>
+        <span>Issue — No. 001</span>
+        <span>Voice — The Editors</span>
+        <span>Subject — Narrative Itself</span>
+        <span>After Benjamin — 1936</span>
+        <span>Fonts — Cormorant Garamond / Cormorant SC / Raleway</span>
+        <span>Colour — #0a0a0a / #ffffff / <span style="color: var(--gold);">#b8962e</span></span>
+      </div>
+
+      <span class="space-lg"></span>
+      <span class="folio">— 06 —</span>
+    </div>
+  </section>
+
+
+  <!-- ─── Section 7: The Close ─────────────────────────────────────────────── -->
+  <section class="section-close" aria-label="Close">
+    <p class="close-sentence">
+      The story begins when someone decides to tell it.
+    </p>
+    <span class="close-mark">Storyteller — No. 001 — Spring 2026 — End</span>
+  </section>
+
+
+  <!-- ─── Scripts ──────────────────────────────────────────────────────────── -->
+  <script>
+    // ── Page entrance fade ──────────────────────────────────────────────────
+    window.addEventListener('load', () => {
+      document.body.classList.add('loaded');
+    });
+
+    // ── Issue bar: scroll border + progress ─────────────────────────────────
+    const issueBar = document.getElementById('issueBar');
+
+    function updateBar() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+
+      // Toggle scrolled class for border
+      if (scrollTop > 10) {
+        issueBar.classList.add('scrolled');
+      } else {
+        issueBar.classList.remove('scrolled');
+      }
+
+      // Grow the ::after pseudo-element by setting a CSS custom property
+      issueBar.style.setProperty('--progress', progress + '%');
+    }
+
+    // Inject a dynamic style for the progress pseudo-element
+    const progressStyle = document.createElement('style');
+    progressStyle.textContent = `
+      .issue-bar::after {
+        width: var(--progress, 0%);
+      }
+    `;
+    document.head.appendChild(progressStyle);
+
+    window.addEventListener('scroll', updateBar, { passive: true });
+    updateBar();
+
+    // ── Intersection Observer for all reveal elements ───────────────────────
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!prefersReducedMotion) {
+      const observerOptions = {
+        threshold: 0.12,
+        rootMargin: '0px 0px -60px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            // Don't unobserve vertical labels — they re-hide on scroll-out
+            if (!entry.target.classList.contains('js-vertical')) {
+              observer.unobserve(entry.target);
+            }
+          } else {
+            // Vertical labels fade out when section leaves view
+            if (entry.target.classList.contains('js-vertical')) {
+              entry.target.classList.remove('visible');
+            }
+          }
+        });
+      }, observerOptions);
+
+      // Clip headings
+      document.querySelectorAll('.js-clip-heading').forEach(el => observer.observe(el));
+
+      // Column section
+      document.querySelectorAll('.js-columns').forEach(el => observer.observe(el));
+
+      // Feature heading
+      document.querySelectorAll('.feature-heading-span.js-fade').forEach(el => observer.observe(el));
+
+      // Black quote section
+      document.querySelectorAll('.js-quote').forEach(el => observer.observe(el));
+
+      // Money quote
+      document.querySelectorAll('.js-money').forEach(el => observer.observe(el));
+
+      // Vertical labels
+      document.querySelectorAll('.js-vertical').forEach(el => observer.observe(el));
+
+    } else {
+      // Reduced motion: show everything immediately
+      document.querySelectorAll(
+        '.js-clip-heading, .js-columns, .feature-heading-span, .js-quote, .js-money, .js-vertical'
+      ).forEach(el => el.classList.add('visible'));
+    }
+  </script>
+</body>
+</html>
