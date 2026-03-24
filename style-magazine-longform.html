@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Storyteller — The Man Who Taught a Machine to Listen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lato:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+
+  <style>
+    /* ─── Reset & Custom Properties ────────────────────────────────────────────── */
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --paper:      #faf8f4;
+      --ink:        #1c1c1c;
+      --burgundy:   #6b1c2e;
+      --warm-grey:  #8a8070;
+      --rule:       #c8c0b0;
+      --rule-light: #e0dbd2;
+      --bar-height: 40px;
+
+      --font-display:  'Playfair Display', Georgia, serif;
+      --font-body:     'Lora', Georgia, serif;
+      --font-masthead: 'Libre Baskerville', Georgia, serif;
+      --font-sans:     'Lato', Helvetica, sans-serif;
+    }
+
+    html {
+      font-size: 18px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-weight: 400;
+      line-height: 1.8;
+      overflow-x: hidden;
+      opacity: 0;
+      transition: opacity 600ms ease;
+    }
+
+    body.loaded {
+      opacity: 1;
+    }
+
+    /* ─── Running Header (Fixed Top Bar) ───────────────────────────────────────── */
+
+    .running-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--bar-height);
+      background: var(--paper);
+      border-bottom: 1px solid var(--rule);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .running-header.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .rh-brand {
+      font-family: var(--font-masthead);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--ink);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .rh-fleuron {
+      font-size: 18px;
+      color: var(--burgundy);
+      line-height: 1;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .rh-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .rh-section {
+      font-family: var(--font-sans);
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--warm-grey);
+      text-transform: uppercase;
+    }
+
+    .rh-back {
+      font-family: var(--font-sans);
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--burgundy);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .rh-back:hover {
+      text-decoration: underline;
+    }
+
+    /* ─── Page Wrapper ──────────────────────────────────────────────────────────── */
+
+    .page {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 80px 40px 120px;
+    }
+
+    /* ─── Masthead ──────────────────────────────────────────────────────────────── */
+
+    .masthead {
+      text-align: center;
+      padding: 60px 0 48px;
+      margin-bottom: 64px;
+    }
+
+    .masthead-rule {
+      border: none;
+      border-top: 1.5px solid var(--ink);
+      margin: 0 auto 16px;
+      width: 100%;
+    }
+
+    .masthead-rule.bottom {
+      margin-top: 16px;
+      margin-bottom: 0;
+    }
+
+    .masthead-title {
+      font-family: var(--font-masthead);
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      color: var(--ink);
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .masthead-subtitle {
+      font-family: var(--font-sans);
+      font-weight: 300;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: var(--warm-grey);
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+
+    /* ─── Article Header Block ──────────────────────────────────────────────────── */
+
+    .article-header {
+      margin-bottom: 48px;
+    }
+
+    .kicker {
+      font-family: var(--font-sans);
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      color: var(--burgundy);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 14px;
+    }
+
+    .article-headline {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 6vw, 52px);
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--ink);
+      margin-bottom: 10px;
+    }
+
+    .article-deck {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: clamp(17px, 2.5vw, 20px);
+      font-weight: 400;
+      color: var(--warm-grey);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .byline-block {
+      padding: 0;
+    }
+
+    .byline-rule {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin-bottom: 10px;
+    }
+
+    .byline-name {
+      font-family: var(--font-sans);
+      font-weight: 300;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      color: var(--ink);
+    }
+
+    .byline-meta {
+      font-family: var(--font-sans);
+      font-weight: 300;
+      font-style: italic;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      color: var(--warm-grey);
+      margin-top: 4px;
+    }
+
+    /* ─── Body Text ─────────────────────────────────────────────────────────────── */
+
+    .article-body p {
+      font-family: var(--font-body);
+      font-size: 18px;
+      line-height: 1.85;
+      color: var(--ink);
+      margin-bottom: 1.4em;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .article-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ─── Drop Cap ──────────────────────────────────────────────────────────────── */
+
+    .drop-cap-para {
+      position: relative;
+    }
+
+    .drop-cap {
+      float: left;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 5.4em;
+      line-height: 0.78;
+      color: var(--burgundy);
+      margin-right: 10px;
+      margin-top: 6px;
+      margin-bottom: -4px;
+      text-shadow: 2px 2px 4px rgba(107, 28, 46, 0.20);
+      /* bloom animation target */
+      transform-origin: bottom left;
+    }
+
+    /* ─── Dingbat Section Break ─────────────────────────────────────────────────── */
+
+    .dingbat-break {
+      text-align: center;
+      margin: 52px 0;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .dingbat-break .star {
+      font-size: 12px;
+      color: var(--warm-grey);
+      opacity: 0;
+    }
+
+    /* ─── Pull Quote ────────────────────────────────────────────────────────────── */
+
+    .pull-quote {
+      text-align: center;
+      margin: 56px 0;
+      padding: 0;
+      opacity: 0;
+    }
+
+    .pull-quote-rule {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin-bottom: 28px;
+    }
+
+    .pull-quote-rule.bottom {
+      margin-top: 28px;
+      margin-bottom: 0;
+    }
+
+    .pull-quote-mark {
+      font-family: var(--font-display);
+      font-size: 72px;
+      line-height: 0.3;
+      color: var(--rule);
+      display: block;
+      margin-bottom: 20px;
+      user-select: none;
+    }
+
+    .pull-quote-text {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: clamp(22px, 4vw, 28px);
+      line-height: 1.45;
+      color: var(--ink);
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    .pull-quote-attribution {
+      font-family: var(--font-sans);
+      font-weight: 300;
+      font-style: italic;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--warm-grey);
+      margin-top: 14px;
+      text-transform: uppercase;
+    }
+
+    /* ─── Sidebar ───────────────────────────────────────────────────────────────── */
+
+    .sidebar-float {
+      float: right;
+      width: 200px;
+      margin: 6px 0 28px 36px;
+      padding-left: 20px;
+      border-left: 2px solid var(--burgundy);
+    }
+
+    .sidebar-stat {
+      font-family: var(--font-display);
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--burgundy);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-label {
+      font-family: var(--font-sans);
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--warm-grey);
+      text-transform: uppercase;
+      line-height: 1.5;
+    }
+
+    .sidebar-fact {
+      font-family: var(--font-body);
+      font-style: italic;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--warm-grey);
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--rule-light);
+    }
+
+    /* ─── Section Heading ───────────────────────────────────────────────────────── */
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--warm-grey);
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    /* ─── Photo Caption ─────────────────────────────────────────────────────────── */
+
+    .caption {
+      font-family: var(--font-sans);
+      font-weight: 300;
+      font-size: 11px;
+      color: var(--warm-grey);
+      line-height: 1.6;
+      margin-top: 10px;
+    }
+
+    /* ─── Continued Line ────────────────────────────────────────────────────────── */
+
+    .continued {
+      font-family: var(--font-sans);
+      font-weight: 300;
+      font-style: italic;
+      font-size: 11px;
+      color: var(--warm-grey);
+      letter-spacing: 0.04em;
+      margin-top: 36px;
+      display: block;
+    }
+
+    /* ─── Article Ender ─────────────────────────────────────────────────────────── */
+
+    .article-ender {
+      text-align: center;
+      margin-top: 56px;
+      font-size: 16px;
+      color: var(--burgundy);
+      opacity: 0;
+      transform: scale(0);
+      transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+
+    .article-ender.revealed {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ─── Section Anchors ───────────────────────────────────────────────────────── */
+
+    .article-section {
+      margin-bottom: 16px;
+    }
+
+    /* ─── Paragraph Reveal ──────────────────────────────────────────────────────── */
+
+    .reveal-para {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .reveal-para.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── Drop Cap Bloom ────────────────────────────────────────────────────────── */
+
+    .drop-cap-para .drop-cap {
+      opacity: 0;
+      transform: scale(0.85);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .drop-cap-para.revealed .drop-cap {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ─── Sidebar Float Reveal ──────────────────────────────────────────────────── */
+
+    .sidebar-float {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .sidebar-float.revealed {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ─── Dingbat Reveal ────────────────────────────────────────────────────────── */
+
+    .dingbat-break .star {
+      transition: opacity 0.3s ease;
+    }
+
+    /* ─── Page Footer ───────────────────────────────────────────────────────────── */
+
+    .page-footer {
+      text-align: center;
+      padding-top: 80px;
+      margin-top: 80px;
+      border-top: 1px solid var(--rule);
+    }
+
+    .page-footer-text {
+      font-family: var(--font-sans);
+      font-weight: 300;
+      font-style: italic;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--warm-grey);
+    }
+
+    .page-footer a {
+      color: var(--burgundy);
+      text-decoration: none;
+    }
+
+    .page-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* ─── Mobile ────────────────────────────────────────────────────────────────── */
+
+    @media (max-width: 600px) {
+      html {
+        font-size: 16px;
+      }
+
+      .page {
+        padding: 48px 24px 80px;
+      }
+
+      .masthead {
+        padding: 40px 0 32px;
+        margin-bottom: 48px;
+      }
+
+      .masthead-title {
+        font-size: 24px;
+        letter-spacing: 0.12em;
+      }
+
+      .running-header {
+        padding: 0 20px;
+      }
+
+      .rh-section {
+        display: none;
+      }
+
+      .sidebar-float {
+        float: none;
+        width: 100%;
+        margin: 0 0 32px 0;
+        transform: none;
+        /* override the slide-in direction on mobile */
+      }
+
+      .drop-cap {
+        font-size: 4.2em;
+      }
+
+      .pull-quote-text {
+        font-size: 20px;
+      }
+    }
+
+    /* ─── Reduced Motion ────────────────────────────────────────────────────────── */
+
+    @media (prefers-reduced-motion: reduce) {
+      body {
+        opacity: 1;
+        transition: none;
+      }
+
+      .reveal-para,
+      .drop-cap-para .drop-cap,
+      .sidebar-float,
+      .pull-quote,
+      .dingbat-break .star,
+      .article-ender {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+
+      .running-header {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ─── Running Header ──────────────────────────────────────────────────────── -->
+  <header class="running-header" id="runningHeader" role="banner" aria-label="Publication navigation">
+    <a href="styles-gallery.html" class="rh-brand">The Storyteller</a>
+    <span class="rh-fleuron" aria-hidden="true">❧</span>
+    <div class="rh-right">
+      <span class="rh-section" id="rhSection">A Quarterly Feature</span>
+      <a href="styles-gallery.html" class="rh-back">← All Styles</a>
+    </div>
+  </header>
+
+  <!-- ─── Page ─────────────────────────────────────────────────────────────────── -->
+  <main class="page">
+
+    <!-- ─── Masthead ─────────────────────────────────────────────────────────── -->
+    <div class="masthead" id="masthead">
+      <hr class="masthead-rule">
+      <h1 class="masthead-title">The Storyteller</h1>
+      <p class="masthead-subtitle">Fiction &amp; Narrative Technology &nbsp;—&nbsp; Spring 2026</p>
+      <hr class="masthead-rule bottom">
+    </div>
+
+    <!-- ─── Article Header ───────────────────────────────────────────────────── -->
+    <div class="article-header">
+      <span class="kicker">A Quarterly Feature</span>
+      <h2 class="article-headline">The Man Who Taught a Machine to Listen</h2>
+      <p class="article-deck">Ben Goddard has spent two years trying to make an artificial intelligence understand narrative. He is starting to think it might work.</p>
+      <div class="byline-block">
+        <hr class="byline-rule">
+        <p class="byline-name">By the Editors</p>
+        <p class="byline-meta">Spring 2026 &nbsp;·&nbsp; Estimated reading time: 14 minutes</p>
+      </div>
+    </div>
+
+    <!-- ─── Section 1: The Opening Scene ─────────────────────────────────────── -->
+    <article class="article-section" data-section="The Opening Scene" id="section-opening">
+
+      <div class="article-body">
+
+        <p class="drop-cap-para reveal-para">
+          <span class="drop-cap" aria-hidden="true">O</span>n a Thursday morning in early spring, Ben Goddard is staring at a terminal window. The coffee beside him has gone cold. The window is filled with the kind of text that looks, to an uninitiated eye, like the aftermath of a system crash — cascading JSON objects, token counts, cost summaries rendered in monospace — but Goddard reads it the way a beekeeper reads a hive: not for individual words, but for the health of something larger. "Thirteen cents," he says, half to himself. "That's a good run."
+        </p>
+
+        <p class="reveal-para">The project is called Sherlock, and it is, at its simplest, a pipeline. You feed it a term from a glossary — <em>narrator</em>, say, or <em>story package</em> or <em>the play engine</em> — and it returns a structured definition: usage notes, canonical context, cross-references, the kind of careful lexicographical work that would take a human editor an afternoon and costs the pipeline, per term, roughly the same as a gumball. There are four hundred and forty-five terms in the queue. Goddard is building a controlled vocabulary for a product that does not yet exist, in a language that he and his co-founder are still inventing, at a pace that he finds both exhilarating and faintly absurd.</p>
+
+        <p class="reveal-para">The product — when it exists — will be called Storyteller. The pitch is deceptively simple: an AI that tells you a story the way a gifted dungeon master would, adapting in real time to your choices, your pace, your appetite for danger. Not a chatbot. Not a game. Something that has not quite been built before. Goddard knows this because he has spent two years looking for it, and it is not there.</p>
+
+      </div>
+
+      <span class="continued">Continued on page 2</span>
+
+    </article>
+
+    <!-- ─── Dingbat Break ─────────────────────────────────────────────────────── -->
+    <div class="dingbat-break" aria-hidden="true">
+      <span class="star">✦</span>
+      <span class="star">✦</span>
+      <span class="star">✦</span>
+    </div>
+
+    <!-- ─── Section 2: The Problem With Stories ──────────────────────────────── -->
+    <article class="article-section" data-section="The Problem With Stories" id="section-problem">
+      <span class="kicker">Narrative Technology</span>
+
+      <div class="article-body">
+
+        <p class="reveal-para">The problem with stories, when you try to teach them to a machine, is that they are made of holes. Not gaps in the text, but structured absences — the silences between lines of dialogue where character is implied, the white space after a chapter break where time passes, the reader's willing suspension of everything they know to be true about physics, mortality, and the behavior of dragons. Literature depends on this negative space the way music depends on rests. A large language model, trained to fill space with plausible text, has a constitutional aversion to emptiness. Left alone, it will happily paper over every silence. The result is prose that is fluent, earnest, and completely airless.</p>
+
+        <p class="reveal-para">Goddard came to this problem not as an engineer but as a player — specifically, as someone who had spent years around tabletop role-playing games and found himself increasingly frustrated by the gap between what those games promised and what they typically delivered. The promise: a living world that reacts to you, shaped by your choices, narrated by someone who has internalized the rules so thoroughly that the rules disappear. The delivery: a manual, some dice, and a friend who may or may not remember what you decided about your character's backstory three sessions ago.</p>
+
+        <!-- Pull Quote -->
+        <div class="pull-quote reveal-para" role="complementary" aria-label="Pull quote">
+          <hr class="pull-quote-rule">
+          <span class="pull-quote-mark" aria-hidden="true">&ldquo;</span>
+          <p class="pull-quote-text">The goal is not to replace the imagination. It is to remove everything that gets in the way of it.</p>
+          <p class="pull-quote-attribution">— Ben Goddard, on the design of Storyteller</p>
+          <hr class="pull-quote-rule bottom">
+        </div>
+
+        <p class="reveal-para">The existing solutions — AI dungeon-master tools, narrative chatbots, interactive fiction engines — all solve slightly the wrong problem. They are impressive, in the way that a very good autocomplete is impressive: they produce output that resembles what you asked for. But resemblance is not the same as experience. A story that feels like a story, Goddard argues, has to know when to slow down. It has to know when you are not ready for the next thing. It has to hold the silence.</p>
+
+        <p class="reveal-para">He has been thinking about this distinction for long enough that it has accumulated a vocabulary. His Obsidian vault — the sprawling knowledge base where the design lives — contains a controlled glossary of more than four hundred terms, each one a small argument about what the product is and is not. The glossary is not documentation. It is closer to a constitution.</p>
+
+      </div>
+
+      <span class="continued">Continued on page 3</span>
+
+    </article>
+
+    <!-- ─── Dingbat Break ─────────────────────────────────────────────────────── -->
+    <div class="dingbat-break" aria-hidden="true">
+      <span class="star">✦</span>
+      <span class="star">✦</span>
+      <span class="star">✦</span>
+    </div>
+
+    <!-- ─── Section 3: The Machine That Remembers ────────────────────────────── -->
+    <article class="article-section" data-section="The Machine That Remembers" id="section-machine">
+      <span class="kicker">In Conversation With the Machine</span>
+
+      <div class="article-body">
+
+        <!-- Sidebar -->
+        <aside class="sidebar-float" role="complementary" aria-label="Statistics sidebar">
+          <div class="sidebar-stat">445</div>
+          <div class="sidebar-label">Terms in the current glossary queue</div>
+          <p class="sidebar-fact">At $0.13 per term, the complete Sherlock run would cost roughly $58 — less than a hardcover rulebook.</p>
+        </aside>
+
+        <p class="reveal-para">The Sherlock pipeline began as a proof of concept and has become something closer to a methodology. The idea: use Claude — Anthropic's large language model — not to generate narrative, but to generate the metadata that makes narrative possible. Each run takes a raw term from the queue, contextualizes it against the project's design principles, and returns a structured definition with canonical usage notes, related concepts, and explicit guidance on what the term is <em>not</em> — the negative space, articulated.</p>
+
+        <p class="reveal-para">The discipline required to run it well has been clarifying. "Every time I have to write a definition," Goddard says, "I find out whether I actually understand what I mean. Most of the time I don't, not completely. The pipeline makes that obvious very fast." A term that seemed settled — <em>the Guide</em>, say, or <em>the Narrator</em> — turns out, under the pressure of definition, to contain unresolved questions about agency, about tone, about where the product ends and the player's imagination begins. The glossary does not resolve these questions. It names them precisely enough that they can be argued about seriously.</p>
+
+        <p class="reveal-para">His co-founder, Matt Eberle, arrived in the project during what both of them refer to as the pre-onboarding phase — a period when the documentation was extensive enough that getting a second person up to speed required a structured curriculum. The founding letter that introduced Eberle to the full scope of the project ran to several thousand words. It was, by any measure, a thorough document. It also contained a six-hundred-word appendix on the specific meaning of the word <em>storytime</em>.</p>
+
+        <p class="reveal-para">This is not, Goddard is at pains to point out, pedantry. It is precision. When you are building a product whose primary interface is language, the language you use to describe the product shapes what it becomes. A team that cannot agree on what to call the thing that narrates the story will eventually build two different things and call them both by the same name. The glossary is infrastructure. The $58 to complete it is not a cost. It is a rounding error on the cost of ambiguity.</p>
+
+        <div style="clear: both;"></div>
+
+      </div>
+
+    </article>
+
+    <!-- ─── Dingbat Break ─────────────────────────────────────────────────────── -->
+    <div class="dingbat-break" aria-hidden="true">
+      <span class="star">✦</span>
+      <span class="star">✦</span>
+      <span class="star">✦</span>
+    </div>
+
+    <!-- ─── Section 4: What It Feels Like ────────────────────────────────────── -->
+    <article class="article-section" data-section="What It Feels Like" id="section-feel">
+      <span class="kicker">The Experience</span>
+
+      <div class="article-body">
+
+        <p class="drop-cap-para reveal-para">
+          <span class="drop-cap" aria-hidden="true">T</span>here is a moment in a well-run tabletop campaign — every experienced player knows it — when you stop thinking about the rules. The dice are still there, the character sheet is still in front of you, but you have crossed some threshold of absorption where the fictional world has become more present than the room you are sitting in. Goddard calls this threshold <em>storytime</em>, and the entire design of the Storyteller system is organized around the question of how to reach it and how to stay there.
+        </p>
+
+        <p class="reveal-para">The Narrator — the system's name for the AI voice that drives the experience — is designed around a single constraint: it never breaks storytime to manage itself. Administrative questions, rule clarifications, character bookkeeping — all of this is routed through a separate interface layer called the Guide. The Guide is the human face of the system, the voice that says <em>are you ready to continue</em> or <em>here is what you have in your inventory</em>. It is the usher, not the performer. The Narrator never steps out of character to be an usher. This distinction, which sounds trivial in the abstract, is the entire product.</p>
+
+        <!-- Pull Quote -->
+        <div class="pull-quote reveal-para" role="complementary" aria-label="Pull quote">
+          <hr class="pull-quote-rule">
+          <span class="pull-quote-mark" aria-hidden="true">&ldquo;</span>
+          <p class="pull-quote-text">The Narrator never breaks storytime. Not to correct itself, not to explain itself, not to apologize. Magic by default.</p>
+          <p class="pull-quote-attribution">— Core design principle, Storyteller V3 documentation</p>
+          <hr class="pull-quote-rule bottom">
+        </div>
+
+        <p class="reveal-para">The Play Engine — the system that manages the mechanical state of a session — exists entirely below the surface. Players do not see it. When you say <em>I try to pick the lock</em>, the Play Engine evaluates the attempt against your character's skill profile, the difficulty of the lock, the state of the world. The Narrator receives the result and incorporates it into the next beat of the story. The lock yields, or it doesn't. The Narrator tells you which. The machinery is invisible. The story continues.</p>
+
+        <p class="reveal-para">Whether this will work — whether the experience will actually cross the threshold into something that feels like storytime — is the question that the proof of concept will answer. Goddard is precise about what proof of concept means in this context: not a polished demo, not a product pitch, but a single complete session that demonstrates the loop. A player sits down. Something happens. The player cares about what happens next. The Narrator holds the silence correctly. Session over. That is the test.</p>
+
+        <p class="caption">— The Narrator adapts to each player's pace, building a model of their preferences over time. Early sessions favor orientation; later sessions assume fluency.</p>
+
+      </div>
+
+      <span class="continued">Continued on page 4</span>
+
+    </article>
+
+    <!-- ─── Dingbat Break ─────────────────────────────────────────────────────── -->
+    <div class="dingbat-break" aria-hidden="true">
+      <span class="star">✦</span>
+      <span class="star">✦</span>
+      <span class="star">✦</span>
+    </div>
+
+    <!-- ─── Section 5: The Long Game ─────────────────────────────────────────── -->
+    <article class="article-section" data-section="The Long Game" id="section-longGame">
+      <span class="kicker">The Long Game</span>
+
+      <div class="article-body">
+
+        <p class="reveal-para">Late in the afternoon, when the terminal window has been closed and the coffee has been replaced with something stronger, Goddard talks about what the project is actually for. The answer is not, precisely, a product. It is closer to a demonstration.</p>
+
+        <p class="reveal-para">"The thing I want to prove," he says, "is that AI can be generous. That it can give you something and then get out of the way." Most of the discourse around AI and creativity, he notes, is organized around replacement — the machine instead of the human, the algorithm as author. Storyteller is built around a different premise: the machine as the condition of possibility. The Narrator creates the world. The player inhabits it. The story belongs to neither of them, and to both.</p>
+
+        <p class="reveal-para">The technical architecture to support this is, at present, largely theoretical. The V3 documentation — the sprawling system design that lives in the vault — describes a platform of considerable ambition: pluggable story packages, a creator-facing authoring environment called the Create Engine, a novel format called TOME that packages narrative content the way an ebook packages text. These are not features on a roadmap. They are, for now, named possibilities. The naming is not nothing. The four hundred and forty-five terms are doing their work.</p>
+
+        <p class="reveal-para">What is concrete, today, is smaller and more specific: the pipeline runs, the glossary grows, the definitions accumulate their negative space. Eberle is onboarded. The system has a co-founder. The proof of concept has a target. Goddard closes the terminal window and opens a new one. Thirteen cents a term, four hundred and forty-five terms to go, the whole strange architecture of the thing hanging in the air between what has been named and what has been built.</p>
+
+        <p class="reveal-para">The coffee is cold again. He does not notice.</p>
+
+        <div class="article-ender" role="presentation" aria-label="End of article" id="articleEnder">&#9632;</div>
+
+      </div>
+
+    </article>
+
+    <!-- ─── Page Footer ───────────────────────────────────────────────────────── -->
+    <footer class="page-footer">
+      <p class="page-footer-text">
+        <em>Continued in the next issue — or, rather:</em> &nbsp;
+        <a href="styles-gallery.html">← Return to all style directions</a>
+      </p>
+    </footer>
+
+  </main><!-- /page -->
+
+  <!-- ─── JavaScript ────────────────────────────────────────────────────────────── -->
+  <script>
+    (function () {
+      'use strict';
+
+      // ── Respect prefers-reduced-motion ──────────────────────────────────────────
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // ── Page load fade-in ────────────────────────────────────────────────────────
+      document.body.classList.add('loaded');
+
+      // ── Masthead slide-down ──────────────────────────────────────────────────────
+      if (!reducedMotion) {
+        const masthead = document.querySelector('.masthead');
+        if (masthead) {
+          masthead.style.transform = 'translateY(-20px)';
+          masthead.style.opacity = '0';
+          masthead.style.transition = 'transform 700ms cubic-bezier(0.22, 1, 0.36, 1), opacity 600ms ease';
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              masthead.style.transform = 'translateY(0)';
+              masthead.style.opacity = '1';
+            });
+          });
+        }
+      }
+
+      // ── Running header visibility + section name ─────────────────────────────────
+      const runningHeader = document.getElementById('runningHeader');
+      const mastheadEl = document.getElementById('masthead');
+      const rhSection = document.getElementById('rhSection');
+      let headerVisible = false;
+
+      function updateRunningHeader() {
+        if (!mastheadEl) return;
+        const mastheadBottom = mastheadEl.getBoundingClientRect().bottom;
+        const shouldBeVisible = mastheadBottom < -100;
+
+        if (shouldBeVisible !== headerVisible) {
+          headerVisible = shouldBeVisible;
+          if (shouldBeVisible) {
+            runningHeader.classList.add('visible');
+          } else {
+            runningHeader.classList.remove('visible');
+          }
+        }
+      }
+
+      window.addEventListener('scroll', updateRunningHeader, { passive: true });
+
+      // ── Section name via IntersectionObserver ────────────────────────────────────
+      const sectionEls = document.querySelectorAll('.article-section[data-section]');
+      let currentSection = '';
+
+      const sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const name = entry.target.dataset.section;
+            if (name && name !== currentSection) {
+              currentSection = name;
+              rhSection.textContent = name;
+            }
+          }
+        });
+      }, {
+        rootMargin: '-20% 0px -60% 0px',
+        threshold: 0
+      });
+
+      sectionEls.forEach(el => sectionObserver.observe(el));
+
+      // ── Scroll reveal: paragraphs, drop caps, pull quotes, sidebar ───────────────
+      const revealEls = document.querySelectorAll(
+        '.reveal-para, .pull-quote, .sidebar-float'
+      );
+
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, {
+        rootMargin: '0px 0px -60px 0px',
+        threshold: 0.05
+      });
+
+      if (!reducedMotion) {
+        revealEls.forEach(el => revealObserver.observe(el));
+      } else {
+        revealEls.forEach(el => el.classList.add('revealed'));
+      }
+
+      // ── Dingbat stagger ──────────────────────────────────────────────────────────
+      const dingbatGroups = document.querySelectorAll('.dingbat-break');
+
+      const dingbatObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const stars = entry.target.querySelectorAll('.star');
+            if (!reducedMotion) {
+              stars.forEach((star, i) => {
+                setTimeout(() => {
+                  star.style.opacity = '1';
+                }, i * 200);
+              });
+            } else {
+              stars.forEach(star => { star.style.opacity = '1'; });
+            }
+            dingbatObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.5 });
+
+      dingbatGroups.forEach(el => dingbatObserver.observe(el));
+
+      // ── Article ender ■ ──────────────────────────────────────────────────────────
+      const ender = document.getElementById('articleEnder');
+      if (ender) {
+        const enderObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              ender.classList.add('revealed');
+              enderObserver.unobserve(ender);
+            }
+          });
+        }, { threshold: 0.8 });
+        enderObserver.observe(ender);
+      }
+
+      // ── Pull quote: no movement, just fade ───────────────────────────────────────
+      // (handled by .pull-quote.revealed via .reveal-para class — opacity only via CSS
+      //  since .pull-quote doesn't have translateY, just opacity:0 base state)
+
+    }());
+  </script>
+
+</body>
+</html>

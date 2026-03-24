@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Storyteller — The Daily — FINAL EDITION</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;700&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ─── Reset ─────────────────────────────────────────────────────────────────── */
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --newsprint:   #f8f6f2;
+      --ink:         #111111;
+      --red:         #e8001a;
+      --deck:        #555555;
+      --rule-heavy:  #111111;
+      --rule-col:    #aaaaaa;
+      --white:       #ffffff;
+      --bar-h:       40px;
+    }
+
+    html {
+      font-size: 14px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--newsprint);
+      color: var(--ink);
+      font-family: 'Merriweather', Georgia, serif;
+      font-weight: 400;
+      line-height: 1.6;
+      overflow-x: hidden;
+      padding-top: var(--bar-h);
+    }
+
+    /* ─── Breaking Banner (Fixed Nav) ──────────────────────────────────────────── */
+
+    .breaking-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--bar-h);
+      background: var(--red);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      gap: 0;
+    }
+
+    .breaking-bar__brand {
+      flex-shrink: 0;
+      padding: 0 16px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      color: var(--white);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      border-right: 1px solid rgba(255,255,255,0.3);
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .breaking-bar__ticker-wrap {
+      flex: 1;
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .breaking-bar__ticker {
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      font-family: 'Oswald', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      animation: ticker 28s linear infinite;
+      will-change: transform;
+    }
+
+    .breaking-bar__ticker span {
+      margin: 0 32px;
+    }
+
+    .breaking-bar__ticker .sep {
+      color: rgba(255,255,255,0.4);
+      margin: 0 8px;
+      font-weight: 400;
+    }
+
+    .breaking-bar__back {
+      flex-shrink: 0;
+      padding: 0 16px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      border-left: 1px solid rgba(255,255,255,0.3);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .breaking-bar__back:hover {
+      background: rgba(0,0,0,0.15);
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(100vw); }
+      to   { transform: translateX(-100%); }
+    }
+
+    /* ─── Wrapper ───────────────────────────────────────────────────────────────── */
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+    }
+
+    /* ─── Masthead / Flag ───────────────────────────────────────────────────────── */
+
+    .masthead {
+      background: var(--ink);
+      margin: 0 -20px;
+      padding: 0 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transform: translateY(-100%);
+      opacity: 0;
+      animation: masthead-drop 700ms cubic-bezier(0.22,1,0.36,1) 100ms forwards;
+    }
+
+    @keyframes masthead-drop {
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .masthead__ears-row {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0 4px;
+    }
+
+    .masthead__ear {
+      font-family: 'Oswald', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .masthead__flag {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(60px, 10vw, 120px);
+      color: var(--white);
+      letter-spacing: 0.05em;
+      line-height: 0.9;
+      text-align: center;
+      padding: 8px 0 10px;
+    }
+
+    .masthead__dateline {
+      width: 100%;
+      text-align: center;
+      font-family: 'Oswald', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 0 8px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* ─── Front Page ────────────────────────────────────────────────────────────── */
+
+    .front-page {
+      padding: 24px 0 0;
+      border-bottom: 3px solid var(--ink);
+      margin-bottom: 32px;
+    }
+
+    .screamer {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 9vw, 110px);
+      color: var(--red);
+      line-height: 0.9;
+      letter-spacing: 0.01em;
+      margin-bottom: 16px;
+      transform: translateY(-30px);
+      opacity: 0;
+      animation: screamer-stamp 600ms cubic-bezier(0.22,1,0.36,1) 600ms forwards;
+    }
+
+    @keyframes screamer-stamp {
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .screamer__deck {
+      font-family: 'Oswald', sans-serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--deck);
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .screamer__byline {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: var(--deck);
+      letter-spacing: 0.04em;
+      margin-bottom: 20px;
+    }
+
+    /* ─── Rule System ───────────────────────────────────────────────────────────── */
+
+    .rule-heavy {
+      border: none;
+      border-top: 3px solid var(--rule-heavy);
+      margin: 0 0 8px;
+    }
+
+    .rule-thin {
+      border: none;
+      border-top: 1px solid var(--rule-heavy);
+      margin: 0 0 8px;
+    }
+
+    .rule-col {
+      border: none;
+      border-top: 1px solid var(--rule-col);
+      margin: 8px 0;
+    }
+
+    /* ─── Labels ────────────────────────────────────────────────────────────────── */
+
+    .label {
+      display: inline-block;
+      font-family: 'Oswald', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .label-exclusive {
+      color: var(--red);
+      border: 1px solid var(--red);
+    }
+
+    .label-developing {
+      color: var(--red);
+      border: 1px solid var(--red);
+    }
+
+    .label-breaking {
+      background: var(--red);
+      color: var(--white);
+      border: 1px solid var(--red);
+    }
+
+    /* ─── Wire Slug ─────────────────────────────────────────────────────────────── */
+
+    .wire-slug {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: var(--red);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    /* ─── 3-Column Grid ─────────────────────────────────────────────────────────── */
+
+    .col-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+      column-gap: 0;
+    }
+
+    .col-3 > .col {
+      padding: 0 20px;
+      border-right: 1px solid var(--rule-col);
+    }
+
+    .col-3 > .col:first-child {
+      padding-left: 0;
+    }
+
+    .col-3 > .col:last-child {
+      border-right: none;
+      padding-right: 0;
+    }
+
+    .col-lead {
+      font-family: 'Oswald', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .col p {
+      font-size: 13px;
+      line-height: 1.65;
+      margin-bottom: 10px;
+    }
+
+    .col p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ─── Section Headers ───────────────────────────────────────────────────────── */
+
+    .section-header {
+      text-align: center;
+      padding: 16px 0 12px;
+      border-top: 3px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+      margin-bottom: 24px;
+    }
+
+    .section-header__kicker {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--deck);
+      margin-bottom: 4px;
+    }
+
+    .section-header__title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      letter-spacing: 0.06em;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    /* ─── Story Headline (stacked) ──────────────────────────────────────────────── */
+
+    .headline-stack {
+      padding: 16px 0;
+    }
+
+    .headline-stack__item {
+      padding: 10px 0;
+      border-bottom: 2px solid var(--ink);
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .headline-stack__item.visible {
+      animation: col-reveal 0.4s ease forwards;
+    }
+
+    .headline-stack__item:last-child {
+      border-bottom: none;
+    }
+
+    .hl-1 { font-family: 'Bebas Neue', sans-serif; font-size: 60px; line-height: 0.92; color: var(--ink); letter-spacing: 0.01em; }
+    .hl-2 { font-family: 'Bebas Neue', sans-serif; font-size: 40px; line-height: 0.92; color: var(--ink); letter-spacing: 0.01em; }
+    .hl-3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 0.95; color: var(--ink); letter-spacing: 0.01em; }
+    .hl-4 { font-family: 'Bebas Neue', sans-serif; font-size: 20px; line-height: 1.0; color: var(--ink); letter-spacing: 0.01em; }
+
+    .hl-red { color: var(--red); }
+
+    /* ─── 2-Column Spread ───────────────────────────────────────────────────────── */
+
+    .spread {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 32px;
+      padding: 24px 0;
+    }
+
+    .spread__main {}
+
+    .spread__sidebar {
+      border-left: 1px solid var(--rule-col);
+      padding-left: 24px;
+    }
+
+    .spread__teaser {
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--rule-col);
+    }
+
+    .spread__teaser:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .teaser-hl {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      line-height: 0.95;
+      margin-bottom: 6px;
+    }
+
+    .teaser-body {
+      font-size: 11px;
+      line-height: 1.55;
+      margin-bottom: 6px;
+    }
+
+    .teaser-page {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: var(--red);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ─── Photo Placeholder ─────────────────────────────────────────────────────── */
+
+    .photo-block {
+      margin: 16px 0;
+    }
+
+    .photo-block__image {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .photo-block__image-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 14px;
+      color: rgba(255,255,255,0.15);
+      letter-spacing: 0.2em;
+    }
+
+    .photo-block__caption {
+      font-family: 'Merriweather', serif;
+      font-style: italic;
+      font-size: 11px;
+      color: var(--ink);
+      line-height: 1.5;
+      padding: 6px 0 2px;
+      border-top: 1px solid var(--rule-heavy);
+    }
+
+    .photo-block__credit {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: var(--deck);
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── Fact Box ──────────────────────────────────────────────────────────────── */
+
+    .fact-box {
+      border: 3px solid var(--ink);
+      padding: 16px;
+      margin: 24px 0;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    .fact-box.visible {
+      animation: col-reveal 0.5s ease forwards;
+    }
+
+    .fact-box__header {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      color: var(--red);
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+
+    .fact-box__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .fact-box__stat {
+      text-align: center;
+    }
+
+    .fact-box__number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      line-height: 1;
+      color: var(--ink);
+      display: block;
+    }
+
+    .fact-box__label {
+      font-family: 'Oswald', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--deck);
+      display: block;
+    }
+
+    /* ─── Correction Box ────────────────────────────────────────────────────────── */
+
+    .correction {
+      border: 1px solid var(--rule-col);
+      padding: 10px 14px;
+      margin: 20px 0;
+      background: rgba(0,0,0,0.03);
+    }
+
+    .correction__header {
+      font-family: 'Oswald', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .correction__text {
+      font-family: 'Merriweather', serif;
+      font-style: italic;
+      font-size: 10px;
+      line-height: 1.6;
+      color: var(--deck);
+    }
+
+    /* ─── Back Page ─────────────────────────────────────────────────────────────── */
+
+    .back-page {
+      border-top: 3px solid var(--ink);
+      padding-top: 32px;
+      margin-top: 40px;
+    }
+
+    .classifieds {
+      column-count: 4;
+      column-gap: 20px;
+      column-rule: 1px solid var(--rule-col);
+      margin-top: 20px;
+    }
+
+    .classified__item {
+      break-inside: avoid;
+      margin-bottom: 14px;
+    }
+
+    .classified__head {
+      font-family: 'Oswald', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 2px;
+      margin-bottom: 4px;
+    }
+
+    .classified__body {
+      font-family: 'Merriweather', serif;
+      font-size: 9.5px;
+      line-height: 1.55;
+    }
+
+    /* ─── Final Thoughts ────────────────────────────────────────────────────────── */
+
+    .final-column {
+      max-width: 480px;
+    }
+
+    .final-column__head {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 42px;
+      color: var(--red);
+      line-height: 0.9;
+      margin-bottom: 14px;
+    }
+
+    .final-column p {
+      font-size: 13px;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    .final-column__sig {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: var(--deck);
+      margin-top: 16px;
+    }
+
+    /* ─── Typography Specimen ───────────────────────────────────────────────────── */
+
+    .type-specimen {
+      border-top: 2px solid var(--rule-col);
+      padding-top: 20px;
+      margin-top: 32px;
+    }
+
+    .type-specimen__head {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--deck);
+      margin-bottom: 16px;
+    }
+
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--rule-col);
+    }
+
+    .type-row:last-child {
+      border-bottom: none;
+    }
+
+    .type-row__meta {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px;
+      color: var(--deck);
+      width: 120px;
+      flex-shrink: 0;
+      line-height: 1.4;
+    }
+
+    .type-row__sample {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ─── Scroll Reveal ─────────────────────────────────────────────────────────── */
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    .reveal.visible {
+      animation: col-reveal 0.4s ease forwards;
+    }
+
+    @keyframes col-reveal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Label Flash ───────────────────────────────────────────────────────────── */
+
+    .label.flash {
+      animation: label-flash 200ms ease 3;
+    }
+
+    @keyframes label-flash {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.5; }
+    }
+
+    /* ─── Utilities ─────────────────────────────────────────────────────────────── */
+
+    .mt-8  { margin-top: 8px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .mb-8  { margin-bottom: 8px; }
+    .mb-16 { margin-bottom: 16px; }
+    .mb-24 { margin-bottom: 24px; }
+
+    /* ─── Mobile ────────────────────────────────────────────────────────────────── */
+
+    @media (max-width: 720px) {
+      .col-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .col-3 > .col {
+        padding: 0 0 20px;
+        border-right: none;
+        border-bottom: 1px solid var(--rule-col);
+      }
+
+      .col-3 > .col:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      .spread {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      .spread__sidebar {
+        border-left: none;
+        border-top: 1px solid var(--rule-col);
+        padding-left: 0;
+        padding-top: 24px;
+      }
+
+      .classifieds {
+        column-count: 2;
+      }
+
+      .hl-1 { font-size: 44px; }
+      .hl-2 { font-size: 32px; }
+
+      .fact-box__number {
+        font-size: 36px;
+      }
+
+      .screamer {
+        font-size: clamp(40px, 12vw, 80px);
+      }
+
+      .masthead__flag {
+        font-size: clamp(48px, 14vw, 90px);
+      }
+
+      .breaking-bar__brand {
+        font-size: 16px;
+        padding: 0 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .classifieds {
+        column-count: 1;
+      }
+
+      .fact-box__grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* ─── Reduced Motion ────────────────────────────────────────────────────────── */
+
+    @media (prefers-reduced-motion: reduce) {
+      .breaking-bar__ticker {
+        animation: none;
+        transform: none;
+        position: static;
+        white-space: normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .masthead {
+        transform: none;
+        opacity: 1;
+        animation: none;
+      }
+
+      .screamer {
+        transform: none;
+        opacity: 1;
+        animation: none;
+      }
+
+      .headline-stack__item,
+      .fact-box,
+      .reveal {
+        opacity: 1;
+        transform: none;
+        animation: none;
+      }
+
+      .label.flash {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       BREAKING BANNER — Fixed Nav
+  ════════════════════════════════════════════════════════════════════════════ -->
+
+  <nav class="breaking-bar" role="navigation" aria-label="Breaking news ticker">
+    <div class="breaking-bar__brand">⚡ STORYTELLER DAILY</div>
+    <div class="breaking-bar__ticker-wrap" aria-hidden="true">
+      <div class="breaking-bar__ticker" id="ticker">
+        <span>⚡ BREAKING: SHERLOCK PIPELINE COMPLETES BATCH 4 — 445 TERMS INDEXED</span>
+        <span class="sep">◆</span>
+        <span>NARRATOR SYSTEM ACHIEVES FULL SESSION MEMORY — EXPERTS BAFFLED</span>
+        <span class="sep">◆</span>
+        <span>STORYTELLER VAULT REACHES 184 FILES — NO SIGNS OF SLOWING</span>
+        <span class="sep">◆</span>
+        <span>ALL EXPERIMENTAL STYLES — FULL COVERAGE AT STYLES-GALLERY.HTML</span>
+        <span class="sep">◆</span>
+        <span>CO-FOUNDER ONBOARDING COMPLETE — PHASE TWO BEGINS</span>
+        <span class="sep">◆</span>
+        <span>PLAY ENGINE CONFIRMED: REAL-TIME STORY ADAPTATION DECLARED "WORKING"</span>
+        <span class="sep">◆</span>
+        <span>TOME FORMAT SPEC APPROVED — SOURCES SAY IMPLEMENTATION "IMMINENT"</span>
+        <span class="sep">◆</span>
+      </div>
+    </div>
+    <a class="breaking-bar__back" href="styles-gallery.html">← ALL STYLES</a>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       PAGE WRAPPER
+  ════════════════════════════════════════════════════════════════════════════ -->
+
+  <div class="page">
+
+    <!-- ═══════════════════════════════════════════════════
+         MASTHEAD / FLAG
+    ════════════════════════════════════════════════════ -->
+
+    <header class="masthead" aria-label="Newspaper masthead">
+      <div class="masthead__ears-row">
+        <span class="masthead__ear">FINAL EDITION</span>
+        <span class="masthead__ear">25¢</span>
+      </div>
+      <div class="masthead__flag">THE STORYTELLER</div>
+      <div class="masthead__dateline">NEW YORK, MONDAY MARCH 23, 2026 &mdash; VOL. 1 NO. 1 &mdash; ESTABLISHED 2026 &mdash; "ALL THE NEWS THAT FITS A STORY"</div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════
+         FRONT PAGE — Screamer + Lead Story
+    ════════════════════════════════════════════════════ -->
+
+    <section class="front-page" aria-label="Front page">
+      <hr class="rule-heavy mt-16">
+
+      <h1 class="screamer">AI LEARNS TO TELL STORIES:<br>EXPERTS STUNNED</h1>
+
+      <p class="screamer__deck">Local startup's machine remembers everything you've ever told it — and it plays to win</p>
+      <p class="screamer__byline">BY STAFF REPORTER — STORYTELLER NEWS SERVICE — MARCH 23, 2026</p>
+
+      <hr class="rule-thin">
+
+      <div class="col-3 mt-16">
+        <div class="col">
+          <span class="wire-slug">STORYTELLER WIRE SERVICE — MARCH 23 — URGENT</span>
+          <p class="col-lead"><span class="label label-breaking">BREAKING</span> A new artificial intelligence system developed by Mechanical Muse can now hold the thread of your entire story — across sessions, across sessions, across time itself.</p>
+          <p>The system, known internally as the Narrator, does not summarize. It does not forget. Every name you gave a character, every door you chose not to open, every alliance you broke — it is all there. Every time.</p>
+          <p>Rivals in the space have described the development as "alarming." Industry observers used the word "unfair." The Storyteller team used one word: "obvious."</p>
+          <p>"Of course it should remember everything," said a source close to the project who declined to be named because they were standing right next to the terminal. "That's the whole point."</p>
+        </div>
+        <div class="col">
+          <div class="photo-block">
+            <div class="photo-block__image" aria-hidden="true">
+              <span class="photo-block__image-label">PHOTO</span>
+            </div>
+            <p class="photo-block__caption">ABOVE: The Storyteller terminal at Mechanical Muse headquarters — where stories are born, second by second</p>
+            <p class="photo-block__credit">PHOTO: STORYTELLER NEWS SERVICE / FILE</p>
+          </div>
+          <p>The Narrator runs beneath a six-section vault system that has now cataloged 184 files of design intent, architectural decisions, and what one insider described as "the most aggressively documented dream I have ever seen."</p>
+          <p>The Guide — a companion system built to handle corrections without interrupting the story — was confirmed operational this quarter. Sources would not elaborate on what constitutes an "interruption."</p>
+        </div>
+        <div class="col">
+          <span class="wire-slug">STORYTELLER WIRE SERVICE — MARCH 23 — BULLETIN</span>
+          <p class="col-lead"><span class="label label-exclusive">EXCLUSIVE</span> The Create Engine, the system that generates Story Packages for authors, is currently described as "specified but not yet built." The Daily is told this is considered a feature, not a bug.</p>
+          <p>"Specification is half the battle," said a person familiar with the project's documentation. "Most teams ship code that nobody specified. We have specifications that nobody has shipped yet. We are ahead."</p>
+          <p>The Play Engine — the real-time narrative adaptation layer — has been confirmed as architecturally planned. The TOME format, which governs how all story content is structured and transported between systems, has received full spec approval.</p>
+
+          <div class="correction mt-16">
+            <div class="correction__header">CORRECTION</div>
+            <p class="correction__text">An earlier edition stated the Narrator was "just a chatbot." We regret the error. The Narrator is a context-aware, session-persistent narrative intelligence system with full player history recall. The reporter responsible has been reassigned to the classifieds section.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         INSIDE: THE SCOOP — 3-Column
+    ════════════════════════════════════════════════════ -->
+
+    <section aria-label="Inside section: The Scoop">
+      <div class="section-header reveal">
+        <div class="section-header__kicker">Inside — Page 2</div>
+        <div class="section-header__title">THE SCOOP</div>
+      </div>
+
+      <div class="col-3">
+        <div class="col reveal">
+          <span class="wire-slug">STORYTELLER WIRE — MARCH 23 — DEVELOPMENT</span>
+          <p class="col-lead"><span class="label label-developing">DEVELOPING</span> The Sherlock Pipeline — a dedicated batch-processing system for vocabulary extraction — completed its fourth batch this week, indexing 445 terms from the game design canon.</p>
+          <p>Each term costs thirteen cents to process. Each term, once processed, becomes part of the controlled vocabulary that governs how the Narrator, the Guide, and all future systems understand the language of adventure.</p>
+          <p>The queue currently holds 445 additional terms. The pipeline is described as "hungry."</p>
+          <hr class="rule-col">
+          <p class="col-lead">The Player Experience Division</p>
+          <p>Sources confirm that the platform has identified four distinct player archetypes. The Wanderer. The Tactician. The Performer. The Archivist. Each archetype requires a different mode of narrative intelligence. The Narrator adapts to all four. Simultaneously.</p>
+          <p>How it achieves this without visible seams remains undisclosed. We are told to "just trust it."</p>
+        </div>
+        <div class="col reveal">
+          <p class="col-lead">The Vault: 184 Files and Growing</p>
+          <p>The Storyteller documentation vault — a six-section knowledge architecture maintained in Obsidian — now contains 184 catalogued files. Sections cover Vision, Player, Author, Systems, Business, and Reference.</p>
+          <p>The vault operates on a lens-based, hub-and-spoke content model. Every major concept has a canonical home. No concept lives in two places. No redundancy is tolerated. The team describes this as "discipline." Observers describe it as "impressive."</p>
+          <span class="wire-slug mt-8">STORYTELLER WIRE — MARCH 23 — CONFIRMED</span>
+          <p>Cross-cutting concepts — terms and systems that appear in more than one section — are handled under Option C policy. Each lives in the Systems section. Every other section gets a three-to-five sentence overlay. Wikilinks handle the rest.</p>
+          <p>Known cross-cutting concepts include: The Narrator, The Guide, The DJ, The Pathfinder, the Play Engine, the Create Engine, the TOME format, Story Packages, Storytime, and the UCS. Sources say this list "will grow."</p>
+
+          <div class="photo-block mt-16">
+            <div class="photo-block__image" style="aspect-ratio: 3/2;" aria-hidden="true">
+              <span class="photo-block__image-label">DIAGRAM</span>
+            </div>
+            <p class="photo-block__caption">ABOVE: Six-section vault architecture, hub-and-spoke model. Vision at top; Reference at base. Cross-cutting systems indicated by multi-directional arrows.</p>
+            <p class="photo-block__credit">GRAPHIC: STORYTELLER NEWS SERVICE / VISUAL DESK</p>
+          </div>
+        </div>
+        <div class="col reveal">
+          <p class="col-lead"><span class="label label-exclusive">EXCLUSIVE</span> The DJ, the Pathfinder, and the Unnamed Systems</p>
+          <p>Two sub-systems of the Play Engine — the DJ and the Pathfinder — have been confirmed by sources with direct access to the specification documents. The DJ governs story pacing, tone, and the emotional arc of a session. The Pathfinder manages narrative branching logic.</p>
+          <p>Neither is built. Both are, by all accounts, described in enough detail that building them is "merely an engineering problem." The distinction between specification and implementation continues to be treated as significant at Mechanical Muse.</p>
+          <hr class="rule-col">
+          <p class="col-lead">On the Record: The Core Principle</p>
+          <p>When asked to summarize the platform's design philosophy in a single sentence, the project's documentation returned the following, verbatim:</p>
+          <p><em>"Magic by default. The Guide as the human interface for corrections. Storytime is never broken to do it."</em></p>
+          <p>Requests for elaboration were declined. The sentence, it was explained, is sufficient.</p>
+          <span class="wire-slug mt-8">STORYTELLER WIRE — MARCH 23 — SEE ALSO</span>
+          <p>For full architectural documentation, see the Systems section. For player experience overlays, see the Player section. For the design philosophy in full, see Vision. All sections are cross-linked. Everything connects to everything.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         THE SPREAD — 2-Column + Teasers
+    ════════════════════════════════════════════════════ -->
+
+    <section aria-label="Inside spread">
+      <div class="section-header reveal">
+        <div class="section-header__kicker">Special Report — Page 3</div>
+        <div class="section-header__title">THE SPREAD</div>
+      </div>
+
+      <div class="spread">
+        <div class="spread__main reveal">
+          <h2 class="hl-2 mb-8"><span class="label label-developing">DEVELOPING</span><br>THE GUIDE SPEAKS:<br>HOW CORRECTIONS WORK WITHOUT BREAKING THE SPELL</h2>
+          <hr class="rule-thin mb-16">
+
+          <span class="wire-slug">STORYTELLER WIRE SERVICE — MARCH 23 — SPECIAL REPORT</span>
+          <p class="col-lead">The most dangerous moment in any interactive story is not the dragon. It is the moment the system gets something wrong and a human has to fix it.</p>
+          <p>Every competitor in the AI storytelling space handles this moment the same way: they stop the story. A dialog box appears. A correction is made. The story, stunned and embarrassed, resumes. The spell is broken. Players leave.</p>
+          <p>Mechanical Muse has named this problem and built a system around it. The Guide is a behind-the-scenes conversational layer that intercepts player corrections before they reach the Narrator. It absorbs the correction. It updates the record. It feeds the correction back into the story without the story ever knowing it happened.</p>
+          <p>Storytime is never broken to do it. This is the rule. It is not aspirational. It is architectural.</p>
+
+          <div class="photo-block mt-16 mb-16">
+            <div class="photo-block__image" style="aspect-ratio: 16/7;" aria-hidden="true">
+              <span class="photo-block__image-label">DIAGRAM: GUIDE FLOW</span>
+            </div>
+            <p class="photo-block__caption">ABOVE: The Guide intercept architecture — player input enters left, correction is absorbed by Guide layer (center), adjusted context returns to Narrator (right) without session interruption</p>
+            <p class="photo-block__credit">GRAPHIC: STORYTELLER VISUAL DESK / FILE DIAGRAM</p>
+          </div>
+
+          <p>The Guide can handle: name corrections ("I said his name was Marcus, not Marco"), setting corrections ("This is a spaceship, not a castle"), continuity corrections ("She was already dead by then"), and what one spec document calls "vibe corrections" — adjustments to the emotional tone of the story without stopping to explain why.</p>
+          <p>Vibe corrections are, sources say, the hardest. They are also the most important. The system is designed to sense them before they are explicitly stated. Whether it does this reliably in production is, as of press time, a matter of ongoing specification.</p>
+          <p><strong>The design principle is simple, and it is total:</strong> the player should never feel like they are correcting a computer. They should feel like they are telling a very attentive collaborator something new about the world. The world updates. The story continues. Nobody notices the seam.</p>
+        </div>
+
+        <div class="spread__sidebar">
+          <div class="spread__teaser reveal">
+            <h3 class="teaser-hl hl-red">STORY PACKAGES: WHAT AUTHORS WILL BUILD</h3>
+            <hr class="rule-thin mb-8">
+            <p class="teaser-body">The Create Engine will allow authors to build Story Packages — self-contained narrative modules in TOME format. Each package contains characters, arcs, worlds, and the rules of the story's physics.</p>
+            <p class="teaser-body">Authors set the stage. The Narrator runs the show. The player never sees the seam between authored intent and live improvisation.</p>
+            <span class="teaser-page">FULL STORY — PAGE 4</span>
+          </div>
+
+          <div class="spread__teaser reveal">
+            <h3 class="teaser-hl">PLUG-INS: THE OPEN ECOSYSTEM QUESTION</h3>
+            <hr class="rule-thin mb-8">
+            <p class="teaser-body">The Storyteller architecture includes a plug-in system for extending story capabilities beyond the base platform. Third-party story modules, custom rule systems, and licensed IP integrations are all in scope.</p>
+            <p class="teaser-body">Governance of the plug-in ecosystem remains, as of this writing, an open question. The team has noted this. The question has been documented. Progress is expected.</p>
+            <span class="teaser-page">FULL STORY — PAGE 5</span>
+          </div>
+
+          <div class="spread__teaser reveal">
+            <h3 class="teaser-hl">ALL STYLES: THE FULL PORTFOLIO</h3>
+            <hr class="rule-thin mb-8">
+            <p class="teaser-body">The Storyteller visual identity is not one style. It is a gallery of possible worlds — each one a different answer to the question of how a story could be told, if you really meant it.</p>
+            <p class="teaser-body">From Gutenberg pulp to neon Tokyo, from eternal library to primordial fire. Every style tested. Every style documented. Every style dangerous in the right hands.</p>
+            <span class="teaser-page"><a href="styles-gallery.html" style="color: var(--red); text-decoration: none;">SEE FULL GALLERY — STYLES-GALLERY.HTML</a></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         THE NUMBERS — Fact Box + Stacked Headlines
+    ════════════════════════════════════════════════════ -->
+
+    <section aria-label="The Numbers section">
+      <div class="section-header reveal">
+        <div class="section-header__kicker">Data Desk — Page 4</div>
+        <div class="section-header__title">THE NUMBERS</div>
+      </div>
+
+      <div class="col-3">
+        <div class="col">
+          <div class="fact-box" id="fact-box" aria-label="Statistics fact box">
+            <div class="fact-box__header">THE NUMBERS</div>
+            <div class="fact-box__grid">
+              <div class="fact-box__stat">
+                <span class="fact-box__number" data-target="445">0</span>
+                <span class="fact-box__label">Terms Indexed</span>
+              </div>
+              <div class="fact-box__stat">
+                <span class="fact-box__number" data-prefix="$" data-target="0.13" data-decimal="2">$0.00</span>
+                <span class="fact-box__label">Per Term</span>
+              </div>
+              <div class="fact-box__stat">
+                <span class="fact-box__number" data-target="4">0</span>
+                <span class="fact-box__label">Batches Done</span>
+              </div>
+              <div class="fact-box__stat">
+                <span class="fact-box__number" data-target="184">0</span>
+                <span class="fact-box__label">Vault Files</span>
+              </div>
+              <div class="fact-box__stat">
+                <span class="fact-box__number" data-target="6">0</span>
+                <span class="fact-box__label">Vault Sections</span>
+              </div>
+              <div class="fact-box__stat">
+                <span class="fact-box__number" data-target="11">0</span>
+                <span class="fact-box__label">Core Systems</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="correction">
+            <div class="correction__header">EDITOR'S NOTE</div>
+            <p class="correction__text">The number of vault files changes daily. The Daily cannot be held responsible for documentation velocity at Mechanical Muse. All figures accurate at press time. Press time: 7:00AM. Do not ask what time it is now.</p>
+          </div>
+        </div>
+
+        <div class="col" style="grid-column: span 2;">
+          <div class="headline-stack" id="hl-stack">
+            <div class="headline-stack__item">
+              <span class="label label-breaking">BREAKING</span>
+              <div class="hl-1">NARRATOR REMEMBERS EVERY DOOR YOU DIDN'T OPEN</div>
+            </div>
+            <div class="headline-stack__item">
+              <span class="label label-developing">DEVELOPING</span>
+              <div class="hl-2 hl-red">445 TERMS INDEXED — QUEUE STILL FULL</div>
+            </div>
+            <div class="headline-stack__item">
+              <span class="label label-exclusive">EXCLUSIVE</span>
+              <div class="hl-3">STORYTIME CANNOT BE BROKEN: DESIGN PRINCIPLE NOW ARCHITECTURE</div>
+            </div>
+            <div class="headline-stack__item">
+              <div class="hl-3">SIX SECTIONS. ONE VAULT. ZERO REDUNDANCY.</div>
+            </div>
+            <div class="headline-stack__item">
+              <div class="hl-4">PLAY ENGINE SPEC COMPLETE — IMPLEMENTATION "MERELY AN ENGINEERING PROBLEM"</div>
+            </div>
+            <div class="headline-stack__item">
+              <div class="hl-4">ALL EXPERIMENTAL STYLES — SEE STYLES-GALLERY.HTML — FULL COVERAGE</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         BACK PAGE — Final Thoughts + Classifieds
+    ════════════════════════════════════════════════════ -->
+
+    <section class="back-page" aria-label="Back page">
+      <div class="section-header reveal">
+        <div class="section-header__kicker">Back Page — Final Edition</div>
+        <div class="section-header__title">FINAL THOUGHTS</div>
+      </div>
+
+      <div class="col-3">
+        <div class="col" style="grid-column: span 2;">
+          <div class="final-column reveal">
+            <h2 class="final-column__head">A STORY<br>IS NOT<br>A PRODUCT</h2>
+            <hr class="rule-thin mb-16">
+            <p>Every company that has tried to build AI-powered interactive fiction has made the same mistake. They have built a product that tells stories. They have not built something that cares whether the story lands.</p>
+            <p>The Narrator cares. The architecture cares. The six-section vault, the cross-cutting concept policy, the Guide intercept layer, the TOME format, the player archetype model — all of it is infrastructure built in service of a single moment: the moment a player feels, in their gut, that the world they are in is real.</p>
+            <p>That moment cannot be optimized. It cannot be A/B tested. It can only be designed for, with patience, with specificity, and with a level of documentation density that should alarm any reasonable investor.</p>
+            <p>Mechanical Muse is not reasonable. That is, the Daily has concluded, the point.</p>
+            <p class="final-column__sig">— THE EDITORS, STORYTELLER DAILY — MARCH 23, 2026 — FINAL EDITION</p>
+          </div>
+        </div>
+
+        <div class="col reveal">
+          <p class="col-lead">By the Numbers: This Edition</p>
+          <p>Words written: Too many. Words needed: Exactly this many. Corrections issued: One. Corrections needed: Zero, in retrospect. Systems specified: Eleven. Systems built: Some of them.</p>
+          <hr class="rule-col">
+          <span class="wire-slug">EDITORIAL — MARCH 23</span>
+          <p>The Daily will return when there is more to report. Given the pace at which Mechanical Muse generates documentation, this is expected to be soon.</p>
+          <p>Subscriptions: 25 cents. Back issues: Not available. The story only goes forward.</p>
+        </div>
+      </div>
+
+      <!-- Classifieds -->
+      <hr class="rule-heavy mt-24 mb-16">
+      <div class="section-header" style="border-top: none; padding-top: 0;">
+        <div class="section-header__kicker">Typography & Design Specimen</div>
+        <div class="section-header__title">CLASSIFIEDS</div>
+      </div>
+
+      <div class="classifieds">
+        <div class="classified__item">
+          <div class="classified__head">FOR SALE</div>
+          <p class="classified__body">One (1) interactive story engine. Fully specified. Not yet built. Priced accordingly. Serious inquiries only. Contact: Mechanical Muse, wherever that is.</p>
+        </div>
+        <div class="classified__item">
+          <div class="classified__head">HELP WANTED</div>
+          <p class="classified__body">Seeking engineers who understand the difference between "specified" and "built" and find this distinction motivating rather than discouraging. Previous narrative AI experience not required. Strong opinions about story structure required.</p>
+        </div>
+        <div class="classified__item">
+          <div class="classified__head">LOST &amp; FOUND</div>
+          <p class="classified__body">LOST: One implementation timeline. Last seen Q4 2025. If found, do not return. It was wrong anyway. FOUND: Architectural clarity. Unclaimed. Contact the vault.</p>
+        </div>
+        <div class="classified__item">
+          <div class="classified__head">ANNOUNCEMENTS</div>
+          <p class="classified__body">Co-founder onboarding complete as of March 2026. Phase Two has begun. The Daily has been informed but not briefed on what Phase Two contains. We are confident it will be documented.</p>
+        </div>
+        <div class="classified__item">
+          <div class="classified__head">LEGAL NOTICES</div>
+          <p class="classified__body">The Narrator is not a chatbot. This notice constitutes a legal correction of all prior characterizations. The Guide is not a popup. The Play Engine is not a random event table. Thank you for your compliance.</p>
+        </div>
+        <div class="classified__item">
+          <div class="classified__head">PERSONALS</div>
+          <p class="classified__body">Seeking: Stories that don't know they're stories yet. Must be comfortable with full session memory, dynamic pacing, and being remembered in ways you didn't expect. Must not be allergic to magic.</p>
+        </div>
+        <div class="classified__item">
+          <div class="classified__head">STYLES GALLERY</div>
+          <p class="classified__body">All experimental design directions available at styles-gallery.html. Thirteen styles. One question. What story do you want to tell?</p>
+        </div>
+        <div class="classified__item">
+          <div class="classified__head">IN MEMORIAM</div>
+          <p class="classified__body">The Open Questions List, retired March 2026. 184 questions asked. Questions answered: many. Questions remaining: see Todoist. Survived by the Decision Log and a well-documented vault.</p>
+        </div>
+      </div>
+
+      <!-- Type Specimen -->
+      <div class="type-specimen reveal">
+        <div class="type-specimen__head">TYPE SPECIMEN — FONTS IN USE — THIS EDITION</div>
+
+        <div class="type-row">
+          <div class="type-row__meta">Bebas Neue<br>Screamer / Headline<br>Google Fonts CDN</div>
+          <div class="type-row__sample" style="font-family:'Bebas Neue',sans-serif; font-size:32px; line-height:1; letter-spacing:0.03em; color:var(--ink);">THE QUICK BROWN NARRATOR JUMPS OVER THE LAZY STORY</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta">Oswald 700<br>Labels / Decks<br>Google Fonts CDN</div>
+          <div class="type-row__sample" style="font-family:'Oswald',sans-serif; font-weight:700; font-size:18px; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink);">LOCAL STARTUP CHANGES EVERYTHING — AGAIN — IN BREAKING DEVELOPMENT</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta">Oswald 400<br>Deck / Secondary<br>Google Fonts CDN</div>
+          <div class="type-row__sample" style="font-family:'Oswald',sans-serif; font-weight:400; font-size:16px; color:var(--deck);">The machine remembers everything you've ever told it — and it plays to win</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta">Merriweather 400<br>Body Text<br>Google Fonts CDN</div>
+          <div class="type-row__sample" style="font-family:'Merriweather',serif; font-weight:400; font-size:13px; line-height:1.65; color:var(--ink);">Every name you gave a character, every door you chose not to open, every alliance you broke — it is all there. Every time.</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta">Merriweather 700 italic<br>Lead / Emphasis<br>Google Fonts CDN</div>
+          <div class="type-row__sample" style="font-family:'Merriweather',serif; font-weight:700; font-style:italic; font-size:13px; color:var(--ink);">"Magic by default. The Guide as the human interface for corrections. Storytime is never broken to do it."</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta">Space Mono 400<br>Wire Slugs / Credits<br>Google Fonts CDN</div>
+          <div class="type-row__sample" style="font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.06em; color:var(--red); text-transform:uppercase;">STORYTELLER WIRE SERVICE — MARCH 23, 2026 — URGENT — BULLETIN — CONFIRMED</div>
+        </div>
+      </div>
+
+    </section>
+  </div><!-- /.page -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       SCRIPTS
+  ════════════════════════════════════════════════════════════════════════════ -->
+
+  <script>
+    // ─── Reduced motion check ─────────────────────────────────────────────────
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ─── Scroll reveal (columns, sections, spread) ───────────────────────────
+    const revealEls = document.querySelectorAll('.reveal, .spread__teaser');
+
+    if (!prefersReduced && 'IntersectionObserver' in window) {
+      const revealObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+      revealEls.forEach(el => revealObs.observe(el));
+    } else {
+      revealEls.forEach(el => {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      });
+    }
+
+    // ─── Label flash on entry ────────────────────────────────────────────────
+    const labels = document.querySelectorAll('.label-exclusive, .label-developing, .label-breaking');
+
+    if (!prefersReduced && 'IntersectionObserver' in window) {
+      const labelObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('flash');
+            labelObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 1.0 });
+
+      labels.forEach(el => labelObs.observe(el));
+    }
+
+    // ─── Stacked headlines stagger ───────────────────────────────────────────
+    const hlItems = document.querySelectorAll('.headline-stack__item');
+
+    if (!prefersReduced && 'IntersectionObserver' in window) {
+      const hlObs = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          hlItems.forEach((item, i) => {
+            setTimeout(() => {
+              item.style.animationDelay = '0ms';
+              item.classList.add('visible');
+            }, i * 80);
+          });
+          hlObs.disconnect();
+        }
+      }, { threshold: 0.1 });
+
+      const stack = document.getElementById('hl-stack');
+      if (stack) hlObs.observe(stack);
+    } else {
+      hlItems.forEach(el => {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      });
+    }
+
+    // ─── Fact box count-up ───────────────────────────────────────────────────
+    const factBox = document.getElementById('fact-box');
+    const statEls = factBox ? factBox.querySelectorAll('[data-target]') : [];
+    let countUpDone = false;
+
+    function easeOut(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    function countUp(el, target, duration, prefix, decimal) {
+      const start = performance.now();
+      const isDecimal = decimal > 0;
+
+      function frame(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = easeOut(progress);
+        const value = isDecimal
+          ? (eased * target).toFixed(decimal)
+          : Math.round(eased * target);
+        el.textContent = (prefix || '') + value;
+        if (progress < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    if (!prefersReduced && factBox && 'IntersectionObserver' in window) {
+      const factObs = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !countUpDone) {
+          countUpDone = true;
+          factBox.classList.add('visible');
+          statEls.forEach(el => {
+            const target = parseFloat(el.dataset.target);
+            const prefix = el.dataset.prefix || '';
+            const decimal = parseInt(el.dataset.decimal || '0', 10);
+            countUp(el, target, 1200, prefix, decimal);
+          });
+          factObs.disconnect();
+        }
+      }, { threshold: 0.4 });
+
+      factObs.observe(factBox);
+    } else {
+      if (factBox) factBox.classList.add('visible');
+      statEls.forEach(el => {
+        const prefix = el.dataset.prefix || '';
+        const decimal = parseInt(el.dataset.decimal || '0', 10);
+        const target = parseFloat(el.dataset.target);
+        el.textContent = prefix + (decimal > 0 ? target.toFixed(decimal) : target);
+      });
+    }
+
+    // ─── Duplicate ticker content for seamless loop ──────────────────────────
+    // CSS animation translates from 100vw to -100%, so the ticker needs
+    // enough content to fill the gap. We duplicate it once.
+    const ticker = document.getElementById('ticker');
+    if (ticker) {
+      ticker.innerHTML += ticker.innerHTML;
+    }
+  </script>
+</body>
+</html>
