@@ -1149,15 +1149,37 @@
         cursor.className = 'hero-title-cursor';
         el.appendChild(cursor);
 
+        // "alive" always starts on a new line — split text there
+        const beforeAlive = 'Stories have always been';
+        const aliveText = 'alive.';
         const aliveStart = fullText.indexOf(slowWord);
         const aliveEnd = aliveStart + slowWord.length;
         let i = 0;
+        let brInserted = false;
 
         function typeNext() {
           if (i >= fullText.length) {
             setTimeout(() => cursor.classList.add('done'), 900);
             return;
           }
+
+          // Insert <br> just before "alive" (skip the space, line break replaces it)
+          if (i === aliveStart && !brInserted) {
+            brInserted = true;
+            const br = document.createElement('br');
+            el.insertBefore(br, cursor);
+            // Now pause before typing "alive"
+            setTimeout(typeNext, pauseBeforeAlive);
+            return;
+          }
+
+          // Skip the space character before "alive" — br handles the gap
+          if (i === aliveStart - 1 && fullText[i] === ' ') {
+            i++;
+            typeNext();
+            return;
+          }
+
           const char = fullText[i];
           const textNode = document.createTextNode(char);
           el.insertBefore(textNode, cursor);
@@ -1166,10 +1188,8 @@
           const inAlive = (i > aliveStart && i <= aliveEnd);
           const speed = inAlive ? slowSpeed : baseSpeed;
           const jitter = inAlive ? 0 : (Math.random() * variance * 2) - variance;
-          // Pause AFTER typing the last char before "alive" (the space at aliveStart)
-          const extra = (i === aliveStart) ? pauseBeforeAlive : 0;
 
-          setTimeout(typeNext, Math.max(20, speed + jitter + extra));
+          setTimeout(typeNext, Math.max(20, speed + jitter));
         }
 
         typeNext();
