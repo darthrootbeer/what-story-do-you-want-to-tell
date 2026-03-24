@@ -351,6 +351,18 @@
       background: none;
     }
 
+    nav li.nav-back a {
+      font-size: 12px;
+      color: var(--text-muted) !important;
+      opacity: 0.6;
+      letter-spacing: 0.05em;
+    }
+    nav li.nav-back a:hover {
+      opacity: 1;
+      background: none;
+      color: var(--text) !important;
+    }
+
     nav li.nav-companion a {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 13px;
@@ -1334,15 +1346,16 @@
   <!-- NAV -->
   <nav id="main-nav">
     <ul>
-      <li class="nav-brand"><a href="#">Storyteller</a></li>
+      <li class="nav-brand"><a href="phase-1-vision.html">Storyteller</a></li>
       <li class="nav-divider"></li>
+      <li class="nav-back"><a href="phase-1-vision.html">&larr; Back</a></li>
       <li><a href="#how-it-works" data-section="how-it-works">How It Works</a></li>
       <li><a href="#building-first" data-section="building-first">Building First</a></li>
       <li><a href="#glossary-problem" data-section="glossary-problem">Glossary</a></li>
       <li><a href="#sherlock" data-section="sherlock">Sherlock</a></li>
       <li><a href="#what-comes-next" data-section="what-comes-next">What's Next</a></li>
       <li class="nav-divider"></li>
-      <li class="nav-companion"><a href="phase-1-technical.html">Full Article &rarr;</a></li>
+      <li class="nav-companion"><a href="phase-1-technical.html">Tell me everything &rarr;</a></li>
     </ul>
   </nav>
 
@@ -1665,7 +1678,7 @@
     <div class="footer-brand">Storyteller</div>
     <div class="footer-meta">
       <p>Current State &mdash; Phase One</p>
-      <p>Internal Document &mdash; 2026</p>
+      <p><a href="phase-1-vision.html" style="color:inherit;opacity:0.6;text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">&larr; Back to start</a> &nbsp;&mdash;&nbsp; <a href="phase-1-technical.html" style="color:inherit;opacity:0.6;text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">Tell me everything &rarr;</a></p>
     </div>
   </footer>
 

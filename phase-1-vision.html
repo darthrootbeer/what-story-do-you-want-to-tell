@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Storyteller — Stories Talk Back</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #07070d;
+      --bg-raised: #0e0e18;
+      --text: #e8e4dc;
+      --text-muted: #7a7898;
+      --gold: #c9a96e;
+      --gold-dim: rgba(201, 169, 110, 0.15);
+      --gold-glow: rgba(201, 169, 110, 0.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Lora', serif;
+      font-size: 18px;
+      line-height: 1.75;
+      overflow-x: hidden;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    body.loaded { opacity: 1; }
+
+    /* ── STARFIELD ─────────────────────────────────── */
+    #starfield {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── CURSOR GLOW ───────────────────────────────── */
+    #cursor-glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,169,110,0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s;
+    }
+
+    /* ── NAV ───────────────────────────────────────── */
+    #nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(7,7,13,0.9) 0%, transparent 100%);
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.8s ease 0.5s, transform 0.8s ease 0.5s;
+    }
+    #nav.visible { opacity: 1; transform: translateY(0); }
+
+    .nav-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+
+    /* ── SECTIONS ──────────────────────────────────── */
+    section {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── BEAT 1: THE OLD MAGIC ─────────────────────── */
+    #beat-1 {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url("Pasted image 20260317202650.png");
+      background-size: cover;
+      background-position: center 40%;
+      filter: brightness(0.52) saturate(0.7);
+      transform: scale(1.05);
+      transition: transform 20s ease;
+      z-index: 0;
+    }
+    #beat-1:hover .hero-bg { transform: scale(1.0); }
+
+    .hero-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 20%, rgba(7,7,13,0.7) 70%, rgba(7,7,13,0.97) 100%);
+      z-index: 1;
+    }
+    .hero-vignette-bottom {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 40%;
+      background: linear-gradient(to bottom, transparent, var(--bg));
+      z-index: 2;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      padding: 0 24px;
+      max-width: 700px;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 1s ease 1s, transform 1s ease 1s;
+      margin-bottom: 28px;
+      display: block;
+    }
+    .hero-eyebrow.visible { opacity: 1; transform: translateY(0); }
+
+    .hero-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(52px, 8vw, 96px);
+      font-weight: 400;
+      line-height: 1.1;
+      color: var(--text);
+      opacity: 0;
+      margin-bottom: 28px;
+      min-height: 1.2em;
+    }
+    .hero-title.typing { opacity: 1; }
+
+    .hero-title-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 0.85em;
+      background: var(--gold);
+      vertical-align: middle;
+      margin-left: 2px;
+      opacity: 0;
+      animation: cursorBlink 0.8s ease-in-out infinite;
+    }
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 0; }
+    }
+    .hero-title-cursor.done { animation: none; opacity: 0; }
+
+    .hero-sub {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: clamp(18px, 2.5vw, 24px);
+      color: var(--text-muted);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 1s ease 2.2s, transform 1s ease 2.2s;
+    }
+    .hero-sub.visible { opacity: 1; transform: translateY(0); }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 1s ease 3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .scroll-hint.visible { opacity: 0.4; }
+    .scroll-line {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 0.8; transform: scaleY(1.1); }
+    }
+
+    /* ── BEAT 2: THE GAP ───────────────────────────── */
+    #beat-2 {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 24px;
+    }
+
+    .gap-inner {
+      max-width: 760px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .gap-text {}
+
+    .section-tag {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1);
+    }
+    .section-tag::before {
+      content: '';
+      display: block;
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+      flex-shrink: 0;
+    }
+    .section-tag.is-visible { opacity: 1; transform: translateX(0); }
+
+    .gap-heading {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(32px, 4vw, 48px);
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 24px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease 0.1s, transform 0.8s cubic-bezier(0.22,1,0.36,1) 0.1s;
+    }
+    .gap-heading.is-visible { opacity: 1; transform: translateY(0); }
+
+    .gap-body {
+      font-size: 17px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+    }
+    .gap-body.is-visible { opacity: 1; transform: translateY(0); }
+
+    .gap-image-wrap {
+      position: relative;
+      opacity: 0;
+      transform: scale(0.97);
+      transition: opacity 2.8s ease 0.6s, transform 3s cubic-bezier(0.16,1,0.3,1) 0.6s;
+    }
+    .gap-image-wrap.is-visible { opacity: 1; transform: scale(1); }
+    .gap-image-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border: 1px solid rgba(201,169,110,0.15);
+      border-radius: 4px;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .gap-image-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 50%, rgba(7,7,13,0.6) 100%);
+      border-radius: 4px;
+      z-index: 2;
+    }
+    .gap-image {
+      width: 100%;
+      display: block;
+      border-radius: 4px;
+      filter: saturate(0.7) brightness(1.25);
+    }
+
+    /* ── BEAT 3: NOT THAT ──────────────────────────── */
+    #beat-3 {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 24px;
+      background: linear-gradient(to bottom, var(--bg), #050509, var(--bg));
+    }
+
+    .not-inner {
+      max-width: 620px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .not-list {
+      list-style: none;
+      margin-bottom: 64px;
+    }
+
+    .not-item {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(24px, 3.5vw, 36px);
+      color: var(--text-muted);
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      position: relative;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22,1,0.36,1);
+    }
+    .not-item.is-visible { opacity: 1; transform: translateY(0); }
+    .not-item:first-child { border-top: 1px solid rgba(255,255,255,0.04); }
+
+    .strikethrough-text {
+      position: relative;
+      display: inline;
+    }
+    .strikethrough-text::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      /* 0.54em sits right through the x-height of DM Serif Display */
+      top: 0.85em;
+      width: 0;
+      height: 4px;
+      background: linear-gradient(
+        to right,
+        rgba(201,169,110,0.7) 0%,
+        rgba(201,169,110,1) 30%,
+        rgba(201,169,110,0.95) 70%,
+        rgba(201,169,110,0.5) 100%
+      );
+      border-radius: 2px;
+      transform: rotate(-0.8deg);
+      transform-origin: left center;
+      transition: width 3s cubic-bezier(0.4, 0, 0.2, 1) 0.5s;
+    }
+    .not-item.struck .strikethrough-text::after {
+      width: 100%;
+    }
+
+    .not-char {
+      opacity: 0;
+      transition: opacity 0.04s ease;
+    }
+    .not-char.shown { opacity: 1; }
+
+    .not-fade {
+      font-style: italic;
+      opacity: 0.45;
+    }
+
+    .not-turn {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: clamp(20px, 2.8vw, 28px);
+      color: var(--gold);
+    }
+
+    .not-turn-word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 1.2s ease, transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+      margin-right: 0.25em;
+    }
+    .not-turn-word.is-visible { opacity: 1; transform: translateY(0); }
+
+    /* ── BEAT 4: STORIES TALK BACK ─────────────────── */
+    #beat-4 {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 80px 24px;
+    }
+
+    .stb-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url("Pasted image 20260318055214.png");
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.2) saturate(0.5);
+      z-index: 0;
+    }
+    .stb-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(7,7,13,0.3) 0%, rgba(7,7,13,0.85) 100%);
+      z-index: 1;
+    }
+
+    .stb-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 900px;
+    }
+
+    .stb-tagline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 14vw, 180px);
+      letter-spacing: 0.05em;
+      line-height: 0.9;
+      color: var(--text);
+      display: block;
+      margin-bottom: 48px;
+    }
+
+    .stb-word {
+      display: inline-block;
+      margin-right: 0.18em;
+      opacity: 0;
+      filter: blur(18px);
+      text-shadow: none;
+      transition:
+        opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1),
+        filter 1.8s cubic-bezier(0.16, 1, 0.3, 1),
+        text-shadow 1.8s ease;
+      cursor: default;
+    }
+    .stb-word.is-visible {
+      opacity: 1;
+      filter: blur(0px);
+      text-shadow:
+        0 0 80px rgba(201,169,110,0.25),
+        0 0 160px rgba(201,169,110,0.1);
+    }
+
+    #stb-tagline {
+      position: relative;
+    }
+
+    .stb-word.is-visible {
+      transition:
+        opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1),
+        filter 1.8s cubic-bezier(0.16, 1, 0.3, 1),
+        text-shadow 1.8s ease,
+        transform 3s cubic-bezier(0.16, 1, 0.3, 1),
+        color 3s ease;
+    }
+    .stb-word.is-visible:hover {
+      transform: translateY(-3px) scale(1.04);
+      color: #f0d898;
+      text-shadow:
+        0 0 16px rgba(201,169,110,0.7),
+        0 0 48px rgba(201,169,110,0.3);
+      transition:
+        transform 0s,
+        color 0s,
+        text-shadow 0s;
+    }
+
+    .stb-desc {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: clamp(18px, 2.5vw, 26px);
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.65;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .stb-desc.is-visible { opacity: 1; transform: translateY(0); }
+
+    .stb-desc em {
+      color: var(--gold);
+      font-style: italic;
+    }
+
+    /* ── BEAT 5: VIGNETTES ─────────────────────────── */
+    #beat-5 {
+      padding: 140px 24px;
+    }
+
+    .vignettes-header {
+      text-align: center;
+      max-width: 560px;
+      margin: 0 auto 80px;
+    }
+
+    .vignettes-heading {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(28px, 4vw, 40px);
+      color: var(--text);
+      line-height: 1.3;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22,1,0.36,1);
+    }
+    .vignettes-heading.is-visible { opacity: 1; transform: translateY(0); }
+
+    .vignettes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .vignette-card {
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      opacity: 0;
+      transform: scale(0.96);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1);
+    }
+    .vignette-card.is-visible { opacity: 1; transform: scale(1); }
+
+    .vignette-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom,
+        transparent 30%,
+        rgba(7,7,13,0.5) 60%,
+        rgba(7,7,13,0.95) 100%);
+      z-index: 1;
+      transition: background 0.5s ease;
+    }
+    .vignette-card:hover::after {
+      background: linear-gradient(to bottom,
+        transparent 20%,
+        rgba(7,7,13,0.3) 55%,
+        rgba(7,7,13,0.9) 100%);
+    }
+
+    .vignette-img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      filter: saturate(0.5) brightness(0.65);
+      transform: scale(1.03);
+      transition: transform 6s ease, filter 0.6s ease;
+    }
+    .vignette-card:hover .vignette-img {
+      transform: scale(1.08);
+      filter: saturate(0.9) brightness(1.15);
+    }
+
+    .vignette-text {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 32px 28px;
+      z-index: 2;
+    }
+
+    .vignette-number {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      opacity: 0.7;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .vignette-quote {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: clamp(16px, 1.8vw, 20px);
+      line-height: 1.45;
+      color: var(--text);
+    }
+
+    /* ── BEAT 6: THE ASK ───────────────────────────── */
+    #beat-6 {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 140px 24px;
+      text-align: center;
+      position: relative;
+    }
+
+    .ask-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url("Pasted image 20260317202546.png");
+      background-size: cover;
+      background-position: center top;
+      filter: brightness(0.22) saturate(0.4);
+      z-index: 0;
+    }
+    .ask-vignette {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(7,7,13,0.7) 0%, transparent 25%, transparent 75%, rgba(7,7,13,0.9) 100%),
+        radial-gradient(ellipse at center, transparent 30%, rgba(7,7,13,0.75) 100%);
+      z-index: 1;
+    }
+
+    .ask-content {
+      position: relative;
+      z-index: 2;
+      max-width: 580px;
+    }
+
+    .ask-quill {
+      width: 48px;
+      height: auto;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 1s ease, transform 1s ease;
+      margin-bottom: 40px;
+      filter: invert(1) sepia(1) saturate(0.5) brightness(0.7);
+    }
+    .ask-quill.is-visible { opacity: 0.5; transform: translateY(0); }
+
+    .ask-heading {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 24px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.9s ease 0.2s, transform 0.9s cubic-bezier(0.22,1,0.36,1) 0.2s;
+    }
+    .ask-heading.is-visible { opacity: 1; transform: translateY(0); }
+
+    .ask-sub {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: 17px;
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: 48px;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s;
+    }
+    .ask-sub.is-visible { opacity: 1; transform: translateY(0); }
+
+    .ask-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--bg);
+      background: var(--gold);
+      padding: 14px 32px;
+      border-radius: 2px;
+      text-decoration: none;
+      transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+      opacity: 0;
+      transform: translateY(10px) scale(0.97);
+      transition: opacity 0.7s ease 0.6s, transform 0.7s ease 0.6s, background 0.3s, box-shadow 0.3s;
+      margin-bottom: 20px;
+    }
+    .ask-cta.is-visible { opacity: 1; transform: translateY(0) scale(1); }
+    .ask-cta:hover {
+      background: #dfc080;
+      box-shadow: 0 0 40px rgba(201,169,110,0.3);
+      transform: translateY(-2px) scale(1.02);
+    }
+    .ask-cta svg {
+      width: 14px;
+      height: 14px;
+      opacity: 0.7;
+    }
+
+    .ask-note {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      opacity: 0;
+      transition: opacity 0.6s ease 0.8s;
+    }
+    .ask-note.is-visible { opacity: 0.55; }
+
+    .ask-reads {
+      display: block;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--text);
+      opacity: 0.55;
+      font-style: italic;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── FOOTER ────────────────────────────────────── */
+    footer {
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .footer-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      opacity: 0.5;
+    }
+
+    /* ── GO DEEPER CARDS ───────────────────────────── */
+    #go-deeper {
+      position: relative;
+      z-index: 2;
+      padding: 80px 24px 100px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .go-deeper-label {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 48px;
+      opacity: 0;
+      transition: opacity 0.7s ease;
+    }
+    .go-deeper-label.is-visible { opacity: 0.5; }
+
+    .go-deeper-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .deeper-card {
+      display: block;
+      padding: 36px 32px;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 4px;
+      text-decoration: none;
+      background: rgba(255,255,255,0.02);
+      transition: border-color 0.3s, background 0.3s, transform 0.3s;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1), border-color 0.3s, background 0.3s;
+    }
+    .deeper-card.is-visible { opacity: 1; transform: translateY(0); }
+    .deeper-card:hover {
+      border-color: rgba(201,169,110,0.3);
+      background: rgba(201,169,110,0.04);
+      transform: translateY(-2px);
+    }
+
+    .deeper-card-label {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.7;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .deeper-card-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 24px;
+      color: var(--text);
+      display: block;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .deeper-card-desc {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 20px;
+    }
+
+    .deeper-card-arrow {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      opacity: 0.6;
+      transition: opacity 0.2s, transform 0.2s;
+      display: inline-block;
+    }
+    .deeper-card:hover .deeper-card-arrow {
+      opacity: 1;
+      transform: translateX(4px);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .footer-links a {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      opacity: 0.5;
+      transition: opacity 0.3s, color 0.3s;
+    }
+    .footer-links a:hover { opacity: 1; color: var(--gold); }
+
+    /* ── RESPONSIVE ────────────────────────────────── */
+    @media (max-width: 768px) {
+      #nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+
+      .gap-inner {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+      .gap-image-wrap { order: -1; }
+
+      .vignettes-grid {
+        grid-template-columns: 1fr;
+        gap: 2px;
+      }
+      .vignette-img { aspect-ratio: 4/3; }
+
+      .go-deeper-grid { grid-template-columns: 1fr; }
+
+      footer {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .vignettes-grid { grid-template-columns: 1fr 1fr; }
+      .vignette-card:last-child { grid-column: 1 / -1; }
+      .vignette-card:last-child .vignette-img { aspect-ratio: 16/6; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Starfield canvas -->
+  <canvas id="starfield"></canvas>
+
+
+  <!-- Cursor glow -->
+  <div id="cursor-glow"></div>
+
+  <!-- Nav -->
+  <nav id="nav">
+    <span class="nav-brand">Storyteller</span>
+  </nav>
+
+  <!-- ── BEAT 1: THE OLD MAGIC ──────────────────────── -->
+  <section id="beat-1">
+    <div class="hero-bg"></div>
+    <div class="hero-vignette"></div>
+    <div class="hero-vignette-bottom"></div>
+
+    <div class="hero-content">
+      <span class="hero-eyebrow" id="hero-eyebrow">An early look at something new</span>
+      <h1 class="hero-title" id="hero-title">Stories have always been alive.</h1>
+      <p class="hero-sub" id="hero-sub">We just forgot they could hear us.</p>
+    </div>
+
+    <div class="scroll-hint" id="scroll-hint">
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ── BEAT 2: THE GAP ─────────────────────────────── -->
+  <section id="beat-2">
+    <div class="gap-inner">
+      <div class="gap-text">
+        <div class="section-tag reveal-tag">Until Now</div>
+        <h2 class="gap-heading reveal-heading">Stories have never talked back.</h2>
+        <p class="gap-body reveal-body">Every story you've ever loved — every book, every film, every campfire tale — moved in one direction. It spoke. You listened. And when it ended, it ended the same way for everyone.</p>
+      </div>
+      <div class="gap-image-wrap reveal-image">
+        <img class="gap-image" src="Pasted image 20260317202546.png" alt="The book with that magical embrace" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BEAT 3: NOT THAT ────────────────────────────── -->
+  <section id="beat-3">
+    <div class="not-inner">
+      <div class="section-tag reveal-tag" style="justify-content:center; margin-bottom: 48px;">What it isn't</div>
+      <ul class="not-list">
+        <li class="not-item" data-delay="0"><span class="strikethrough-text">An audiobook <em class="not-fade">you listen to.</em></span></li>
+        <li class="not-item" data-delay="900"><span class="strikethrough-text">A video game <em class="not-fade">you click through.</em></span></li>
+        <li class="not-item" data-delay="1800"><span class="strikethrough-text">A chatbot <em class="not-fade">you type at.</em></span></li>
+        <li class="not-item" data-delay="2700"><span class="strikethrough-text">A podcast <em class="not-fade">someone else made.</em></span></li>
+      </ul>
+      <p class="not-turn">
+        <span class="not-turn-word">Something</span>
+        <span class="not-turn-word">else</span>
+        <span class="not-turn-word">entirely.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ── BEAT 4: STORIES TALK BACK ──────────────────── -->
+  <section id="beat-4">
+    <div class="stb-bg"></div>
+    <div class="stb-vignette"></div>
+    <div class="stb-content">
+      <span class="stb-tagline" id="stb-tagline" aria-label="Stories Talk Back"></span>
+      <p class="stb-desc" id="stb-desc">
+        Storyteller is <em>voice-first</em>. You speak. The story listens.<br />
+        It answers. It remembers. It performs — for you.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── BEAT 5: VIGNETTES ───────────────────────────── -->
+  <section id="beat-5">
+    <div class="vignettes-header">
+      <div class="section-tag reveal-tag" style="justify-content:center; margin-bottom:20px;">Imagine</div>
+      <h2 class="vignettes-heading reveal-heading">What it feels like to be inside one.</h2>
+    </div>
+
+    <div class="vignettes-grid">
+      <div class="vignette-card" data-delay="0">
+        <img class="vignette-img" src="vision-01.png" alt="You are inside the story" loading="lazy" />
+        <div class="vignette-text">
+          <span class="vignette-number">01 — Voice</span>
+          <p class="vignette-quote">You're not watching a story unfold. You're in it.</p>
+        </div>
+      </div>
+
+      <div class="vignette-card" data-delay="120">
+        <img class="vignette-img" src="vision-02b.png" alt="The story remembers everything" loading="lazy" />
+        <div class="vignette-text">
+          <span class="vignette-number">02 — Alive</span>
+          <p class="vignette-quote">Every word you said. Every door you opened. Every monster you ran from. Woven into a story that could only be yours.</p>
+        </div>
+      </div>
+
+      <div class="vignette-card" data-delay="240">
+        <img class="vignette-img" src="vision-03.png" alt="This version only exists because you showed up" loading="lazy" />
+        <div class="vignette-text">
+          <span class="vignette-number">03 — Yours</span>
+          <p class="vignette-quote">This version of the story only exists because you showed up.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BEAT 6: THE ASK ─────────────────────────────── -->
+  <section id="beat-6">
+    <div class="ask-bg"></div>
+    <div class="ask-vignette"></div>
+    <div class="ask-content">
+      <img class="ask-quill reveal-quill" src="quill-ink.svg" alt="" />
+      <h2 class="ask-heading reveal-heading">Your story is waiting.</h2>
+      <p class="ask-sub reveal-sub">We're building something we haven't seen before. We're not ready to show you everything yet — but we're curious what you're thinking.</p>
+      <!-- TODO: Replace YOUR@EMAIL.COM with your actual email address -->
+      <a href="mailto:benjamincgoddard+storyteller@gmail.com?subject=A question about Storyteller" class="ask-cta reveal-cta">
+        Ask us anything
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <p class="ask-note reveal-note">
+        We read every one.
+        <span class="ask-reads">No spam. No newsletters. Just a real conversation.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ── GO DEEPER ───────────────────────────────────── -->
+  <div id="go-deeper">
+    <p class="go-deeper-label reveal-deeper-label">Want to know more?</p>
+    <div class="go-deeper-grid">
+      <a href="phase-1-overview.html" class="deeper-card" data-delay="0">
+        <span class="deeper-card-label">Overview</span>
+        <span class="deeper-card-title">Tell me more.</span>
+        <span class="deeper-card-desc">What Storyteller is, how it works, and where we are today. Jargon-free.</span>
+        <span class="deeper-card-arrow">Read the overview →</span>
+      </a>
+      <a href="phase-1-technical.html" class="deeper-card" data-delay="120">
+        <span class="deeper-card-label">Technical</span>
+        <span class="deeper-card-title">Tell me everything.</span>
+        <span class="deeper-card-desc">The full architecture, design decisions, and how we're building it. All of it.</span>
+        <span class="deeper-card-arrow">Read the full article →</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ──────────────────────────────────────── -->
+  <footer>
+    <div class="footer-brand">Storyteller</div>
+    <p style="font-family:'Instrument Sans',sans-serif;font-size:11px;letter-spacing:0.08em;color:var(--text-muted);opacity:0.4;">Phase One &mdash; 2026</p>
+  </footer>
+
+  <script>
+    // ── STARFIELD ──────────────────────────────────────
+    (function () {
+      const canvas = document.getElementById('starfield');
+      const ctx = canvas.getContext('2d');
+      let stars = [];
+      let W, H;
+
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+
+      function init() {
+        resize();
+        stars = [];
+        const count = Math.floor((W * H) / 5000);
+        for (let i = 0; i < count; i++) {
+          stars.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            r: Math.random() * 1.1 + 0.2,
+            a: Math.random(),
+            speed: Math.random() * 0.003 + 0.001,
+            phase: Math.random() * Math.PI * 2
+          });
+        }
+      }
+
+      let frame = 0;
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        frame++;
+        for (const s of stars) {
+          const alpha = s.a * (0.5 + 0.5 * Math.sin(frame * s.speed + s.phase));
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(201,169,110,${alpha * 0.6})`;
+          ctx.fill();
+        }
+        requestAnimationFrame(draw);
+      }
+
+      window.addEventListener('resize', init);
+      init();
+      draw();
+    })();
+
+    // ── CURSOR GLOW ────────────────────────────────────
+    const glow = document.getElementById('cursor-glow');
+    const isTouchDevice = window.matchMedia('(hover: none)').matches;
+    if (!isTouchDevice) {
+      document.addEventListener('mousemove', e => {
+        glow.style.left = e.clientX + 'px';
+        glow.style.top = e.clientY + 'px';
+      });
+    } else {
+      glow.style.display = 'none';
+    }
+
+
+    // ── PAGE LOAD REVEALS ──────────────────────────────
+    window.addEventListener('load', () => {
+      document.body.classList.add('loaded');
+      setTimeout(() => {
+        document.getElementById('nav').classList.add('visible');
+        document.getElementById('hero-eyebrow').classList.add('visible');
+        document.getElementById('scroll-hint').classList.add('visible');
+      }, 100);
+      setTimeout(() => {
+        const el = document.getElementById('hero-title');
+        const fullText = 'Stories have always been alive.';
+        const slowWord = 'alive';
+        const baseSpeed = 136;  // ms per character
+        const slowSpeed = 544;  // ms per character for "alive" (4x base)
+        const variance = 40;    // random ± ms
+        const pauseBeforeAlive = 900; // ms pause before "alive" begins
+
+        // Hide until typing begins, then reveal
+        el.textContent = '';
+        el.classList.add('typing');
+        const cursor = document.createElement('span');
+        cursor.className = 'hero-title-cursor';
+        el.appendChild(cursor);
+
+        const aliveStart = fullText.indexOf(slowWord);
+        const aliveEnd = aliveStart + slowWord.length;
+        let i = 0;
+
+        function typeNext() {
+          if (i >= fullText.length) {
+            setTimeout(() => cursor.classList.add('done'), 900);
+            return;
+          }
+          const char = fullText[i];
+          const textNode = document.createTextNode(char);
+          el.insertBefore(textNode, cursor);
+          i++;
+
+          const inAlive = (i > aliveStart && i <= aliveEnd);
+          const speed = inAlive ? slowSpeed : baseSpeed;
+          const jitter = inAlive ? 0 : (Math.random() * variance * 2) - variance;
+          // Pause AFTER typing the last char before "alive" (the space at aliveStart)
+          const extra = (i === aliveStart) ? pauseBeforeAlive : 0;
+
+          setTimeout(typeNext, Math.max(20, speed + jitter + extra));
+        }
+
+        typeNext();
+      }, 1200);
+      setTimeout(() => {
+        document.getElementById('hero-sub').classList.add('visible');
+      }, 9500);
+    });
+
+    // ── STORIES TALK BACK WORD ANIMATION ──────────────
+    function initSTBTagline() {
+      const el = document.getElementById('stb-tagline');
+      const words = ['STORIES', 'TALK', 'BACK'];
+      el.innerHTML = '';
+      words.forEach((word, wi) => {
+        const wordSpan = document.createElement('span');
+        wordSpan.className = 'stb-word';
+        wordSpan.textContent = word;
+        el.appendChild(wordSpan);
+        if (wi < words.length - 1) el.appendChild(document.createTextNode('\u00A0'));
+      });
+    }
+    initSTBTagline();
+
+    function revealSTB() {
+      const words = document.querySelectorAll('.stb-word');
+      // Each word arrives on its own breath — 1.1s apart
+      words.forEach((w, i) => {
+        setTimeout(() => w.classList.add('is-visible'), i * 1100);
+      });
+      // Desc fades in after all three words have fully settled
+      const totalReveal = words.length * 1100 + 600;
+      setTimeout(() => {
+        document.getElementById('stb-desc').classList.add('is-visible');
+      }, totalReveal);
+
+      // No JS mouse handling needed — per-character hover is pure CSS
+    }
+
+    // ── INTERSECTION OBSERVER ──────────────────────────
+    const observerOptions = { threshold: 0.2, rootMargin: '0px 0px -60px 0px' };
+    let stbRevealed = false;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+
+        // Beat 4 special case
+        if (el.id === 'beat-4' && !stbRevealed) {
+          stbRevealed = true;
+          setTimeout(revealSTB, 300);
+        }
+
+        // Generic reveals by class
+        el.querySelectorAll('.reveal-tag').forEach((e, i) => {
+          setTimeout(() => e.classList.add('is-visible'), i * 80);
+        });
+        el.querySelectorAll('.reveal-heading').forEach((e, i) => {
+          setTimeout(() => e.classList.add('is-visible'), 100 + i * 80);
+        });
+        el.querySelectorAll('.reveal-body').forEach((e, i) => {
+          setTimeout(() => e.classList.add('is-visible'), 200 + i * 80);
+        });
+        el.querySelectorAll('.reveal-image').forEach((e, i) => {
+          setTimeout(() => e.classList.add('is-visible'), 200 + i * 100);
+        });
+
+        // Beat 3 — typewriter then strike
+        if (el.id === 'beat-3') {
+          const items = el.querySelectorAll('.not-item');
+          const charSpeed = 42; // ms per character
+          let cursor = 0; // tracks absolute time offset
+
+          items.forEach(item => {
+            // Wrap every text node character in .not-char spans
+            const stText = item.querySelector('.strikethrough-text');
+            // Collect all child nodes and rebuild with char spans
+            const nodes = Array.from(stText.childNodes);
+            stText.innerHTML = '';
+            let allChars = [];
+
+            nodes.forEach(node => {
+              if (node.nodeType === Node.TEXT_NODE) {
+                for (const ch of node.textContent) {
+                  const s = document.createElement('span');
+                  s.className = 'not-char';
+                  s.textContent = ch;
+                  stText.appendChild(s);
+                  allChars.push(s);
+                }
+              } else {
+                // em.not-fade — wrap its chars too
+                const em = node.cloneNode(false);
+                for (const ch of node.textContent) {
+                  const s = document.createElement('span');
+                  s.className = 'not-char';
+                  s.textContent = ch;
+                  em.appendChild(s);
+                  allChars.push(s);
+                }
+                stText.appendChild(em);
+              }
+            });
+
+            const lineDelay = cursor;
+
+            // Make item visible (opacity/transform) immediately at its slot
+            setTimeout(() => item.classList.add('is-visible'), lineDelay);
+
+            // Type each character
+            allChars.forEach((ch, i) => {
+              setTimeout(() => ch.classList.add('shown'), lineDelay + i * charSpeed);
+            });
+
+            const typeEnd = lineDelay + allChars.length * charSpeed;
+
+            // Strike after a short pause post-typing
+            setTimeout(() => item.classList.add('struck'), typeEnd + 400);
+
+            // Next line starts shortly after this line begins typing
+            cursor = lineDelay + 300 + allChars.length * charSpeed;
+          });
+
+          // "Something else entirely" after all strikes finish
+          const lastItem = items[items.length - 1];
+          const lastChars = lastItem.querySelectorAll('.not-char').length;
+          const lastDelay = cursor - 300; // cursor already advanced
+          const totalEnd = lastDelay + lastChars * charSpeed + 400 + 3000 + 800;
+          el.querySelectorAll('.not-turn-word').forEach((w, i) => {
+            setTimeout(() => w.classList.add('is-visible'), totalEnd + i * 1100);
+          });
+        }
+
+        // Beat 5 vignette cards
+        el.querySelectorAll('.vignette-card').forEach(e => {
+          const delay = parseInt(e.dataset.delay || 0);
+          setTimeout(() => e.classList.add('is-visible'), delay);
+        });
+
+        // Beat 6 ask section
+        el.querySelectorAll('.reveal-quill').forEach(e => {
+          setTimeout(() => e.classList.add('is-visible'), 0);
+        });
+        el.querySelectorAll('.reveal-cta').forEach(e => {
+          setTimeout(() => e.classList.add('is-visible'), 600);
+        });
+        el.querySelectorAll('.reveal-note').forEach(e => {
+          setTimeout(() => e.classList.add('is-visible'), 800);
+        });
+        el.querySelectorAll('.reveal-sub').forEach(e => {
+          setTimeout(() => e.classList.add('is-visible'), 400);
+        });
+
+        observer.unobserve(el);
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('section').forEach(s => observer.observe(s));
+
+    // Observe go-deeper separately (it's a div, not a section)
+    const deeperObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.querySelectorAll('.go-deeper-label').forEach(e => {
+          setTimeout(() => e.classList.add('is-visible'), 0);
+        });
+        entry.target.querySelectorAll('.deeper-card').forEach(e => {
+          const delay = parseInt(e.dataset.delay || 0);
+          setTimeout(() => e.classList.add('is-visible'), 200 + delay);
+        });
+        deeperObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.2 });
+    const goDeeper = document.getElementById('go-deeper');
+    if (goDeeper) deeperObserver.observe(goDeeper);
+  </script>
+</body>
+</html>
