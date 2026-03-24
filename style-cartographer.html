@@ -559,32 +559,8 @@
       overflow: hidden;
     }
 
-    .sea-monster-float {
-      float: right;
-      margin: 0 0 20px 32px;
-      width: clamp(180px, 30%, 260px);
-      flex-shrink: 0;
-      animation: monster-wobble 3s ease-in-out infinite;
-      transform-origin: center;
-      opacity: 0;
-      transform: scale(0.8);
-      transition: opacity 0.8s ease, transform 0.8s ease;
-    }
-
-    .sea-monster-float.revealed {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    @keyframes monster-wobble {
-      0%   { transform: rotate(-1deg) scale(1); }
-      50%  { transform: rotate(1deg)  scale(1); }
-      100% { transform: rotate(-1deg) scale(1); }
-    }
-
     @media (prefers-reduced-motion: reduce) {
       .compass-rose-svg { animation: none; }
-      .sea-monster-float { animation: none; }
     }
 
     /* =========================================================
@@ -1180,19 +1156,19 @@
     <p>I remember him as if it were yesterday, as he came plodding to the inn door, his sea-chest following behind him in a hand-barrow — a tall, strong, heavy, nut-brown man, his tarry pigtail falling over the shoulder of his soiled blue coat, his hands ragged and scarred, with black, broken nails, and the sabre cut across one cheek, a dirty, livid white. I remember him looking round the cover and whistling to himself as he did so, and then breaking out in that old sea-song that he sang so often afterwards:</p>
 
     <blockquote style="margin: 24px 32px; padding-left: 20px; border-left: 3px solid rgba(139,58,42,0.35); font-style: italic; color: var(--ink-faded);">
-      <em>"Fifteen men on the dead man's chest —<br>
+      <em>&#8220;Fifteen men on the dead man&#8217;s chest &#8212;<br>
       Yo-ho-ho, and a bottle of rum!<br>
-      Drink and the devil had done for the rest —<br>
-      Yo-ho-ho, and a bottle of rum!"</em>
+      Drink and the devil had done for the rest &#8212;<br>
+      Yo-ho-ho, and a bottle of rum!&#8221;</em>
     </blockquote>
 
     <p>In his broken, hoarse voice he sang those words — seemingly to himself, having looked about the inn from under his old tarred hat and liking, I suppose, the look of the place and the company. Then he rapped on the door with a bit of stick like a handspike that he carried, and when my father appeared, called roughly for a glass of rum. This, when it was brought to him, he drank slowly, like a connoisseur, lingering on the taste and still looking about him at the cliffs and up at our signboard.</p>
 
-    <p>"This is a handy cove," he said at last; "and a pleasant sittyated grog-shop. Much company, mate?"</p>
+    <p>&#8220;This is a handy cove,&#8221; he said at last; &#8220;and a pleasant sittyated grog-shop. Much company, mate?&#8221;</p>
 
     <p>My father told him no, very little company, the more was the pity.</p>
 
-    <p>"Well, then," said he, "this is the berth for me. Here you, matey," he cried to the man who trundled the barrow; "bring up alongside and help up my chest. I'll stay here a bit," he continued. "I'm a plain man; rum and bacon and eggs is what I want, and that head up there for to watch ships off. What you mought call me? You mought call me captain."</p>
+    <p>&#8220;Well, then,&#8221; said he, &#8220;this is the berth for me. Here you, matey,&#8221; he cried to the man who trundled the barrow; &#8220;bring up alongside and help up my chest. I&#8217;ll stay here a bit,&#8221; he continued. &#8220;I&#8217;m a plain man; rum and bacon and eggs is what I want, and that head up there for to watch ships off. What you mought call me? You mought call me captain.&#8221;</p>
   </section>
 
   <!-- Coastline divider 2 -->
@@ -1214,7 +1190,7 @@
 
     <p class="drop-cap">Not long after this, the captain came up behind me and laid his hand on my shoulder — he was often quiet after his first glass — and I could see from his eye that something had troubled him.</p>
 
-    <p>"Tell me, boy," he said in a low tone, "does a seafaring man ever come in here to enquire after me? A seafaring man, mind ye. Something like me, but leaner and younger, maybe — like a lad at sea?"</p>
+    <p>&#8220;Tell me, boy,&#8221; he said in a low tone, &#8220;does a seafaring man ever come in here to enquire after me? A seafaring man, mind ye. Something like me, but leaner and younger, maybe &#8212; like a lad at sea?&#8221;</p>
 
     <p>I told him no; and he breathed again through his nose, and looked frightened. I said nothing, but he continued to ask me from time to time, and whenever a stranger came to the <em>Admiral Benbow</em>, he would look through the curtained door to see if it was such a person, but mostly when a stranger did appear it was not the person he sought, and he would relax, though still watchful.</p>
 
@@ -1245,76 +1221,7 @@
     <div class="legend-rule"><div class="legend-rule__line"></div><div class="legend-rule__text">The Cartographer's Warning</div><div class="legend-rule__line"></div></div>
 
     <div class="clearfix">
-      <!-- Sea Monster — inline SVG, floated right -->
-      <div class="sea-monster-float" id="sea-monster" aria-label="Decorative sea monster illustration">
-        <svg viewBox="0 0 260 320" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Body -->
-          <path d="M130,290 C80,290 40,260 30,220 C20,180 35,150 50,130 C30,120 15,100 20,80 C25,60 50,55 65,65 C60,45 70,25 90,20 C110,15 125,30 130,45 C135,30 150,15 170,20 C190,25 200,45 195,65 C210,55 235,60 240,80 C245,100 230,120 210,130 C225,150 240,180 230,220 C220,260 180,290 130,290Z"
-                fill="#d4c4a0" stroke="#6b4e3d" stroke-width="2.5" stroke-linejoin="round"/>
-
-          <!-- Scales texture -->
-          <g fill="rgba(101,74,61,0.12)" stroke="#6b4e3d" stroke-width="0.8">
-            <ellipse cx="100" cy="160" rx="14" ry="9" transform="rotate(-15 100 160)"/>
-            <ellipse cx="130" cy="155" rx="14" ry="9" transform="rotate(0 130 155)"/>
-            <ellipse cx="160" cy="160" rx="14" ry="9" transform="rotate(15 160 160)"/>
-            <ellipse cx="110" cy="185" rx="14" ry="9" transform="rotate(-10 110 185)"/>
-            <ellipse cx="140" cy="183" rx="14" ry="9" transform="rotate(8 140 183)"/>
-            <ellipse cx="125" cy="210" rx="14" ry="9" transform="rotate(0 125 210)"/>
-          </g>
-
-          <!-- Eyes -->
-          <circle cx="100" cy="90" r="12" fill="white" stroke="#6b4e3d" stroke-width="1.5"/>
-          <circle cx="160" cy="90" r="12" fill="white" stroke="#6b4e3d" stroke-width="1.5"/>
-          <circle cx="103" cy="91" r="6" fill="#8b3a2a"/>
-          <circle cx="163" cy="91" r="6" fill="#8b3a2a"/>
-          <circle cx="105" cy="89" r="2.5" fill="#3d2b1f"/>
-          <circle cx="165" cy="89" r="2.5" fill="#3d2b1f"/>
-          <!-- Eye gleam -->
-          <circle cx="107" cy="88" r="1.2" fill="white" opacity="0.8"/>
-          <circle cx="167" cy="88" r="1.2" fill="white" opacity="0.8"/>
-
-          <!-- Nostrils -->
-          <ellipse cx="120" cy="108" rx="4" ry="3" fill="#6b4e3d" opacity="0.6"/>
-          <ellipse cx="140" cy="108" rx="4" ry="3" fill="#6b4e3d" opacity="0.6"/>
-
-          <!-- Mouth — slightly open, toothy grin -->
-          <path d="M95,125 Q130,145 165,125" stroke="#6b4e3d" stroke-width="2" fill="none"/>
-          <path d="M95,125 Q130,132 165,125" stroke="none" fill="#c9963c" opacity="0.3"/>
-          <!-- Teeth -->
-          <path d="M105,126 L108,136 L112,126" fill="white" stroke="#6b4e3d" stroke-width="0.8"/>
-          <path d="M125,129 L128,139 L131,129" fill="white" stroke="#6b4e3d" stroke-width="0.8"/>
-          <path d="M148,128 L151,138 L154,128" fill="white" stroke="#6b4e3d" stroke-width="0.8"/>
-
-          <!-- Fins — left -->
-          <path d="M30,140 C10,125 5,100 20,95 C25,93 35,105 50,130Z"
-                fill="#c9a87a" stroke="#6b4e3d" stroke-width="1.8" stroke-linejoin="round"/>
-          <!-- Fins — right -->
-          <path d="M230,140 C250,125 255,100 240,95 C235,93 225,105 210,130Z"
-                fill="#c9a87a" stroke="#6b4e3d" stroke-width="1.8" stroke-linejoin="round"/>
-
-          <!-- Tail -->
-          <path d="M110,285 C90,310 60,315 45,295 C65,300 80,285 100,270"
-                fill="#c9a87a" stroke="#6b4e3d" stroke-width="1.8" stroke-linejoin="round"/>
-          <path d="M150,285 C170,310 200,315 215,295 C195,300 180,285 160,270"
-                fill="#c9a87a" stroke="#6b4e3d" stroke-width="1.8" stroke-linejoin="round"/>
-
-          <!-- Horns / spines on head -->
-          <path d="M90,25 C85,10 95,5 100,15" stroke="#6b4e3d" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <path d="M130,20 C130,5 138,2 140,12" stroke="#6b4e3d" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <path d="M170,25 C175,10 165,5 160,15" stroke="#6b4e3d" stroke-width="2" fill="none" stroke-linecap="round"/>
-
-          <!-- Water waves at base -->
-          <path d="M20,280 Q50,265 80,275 Q110,285 130,275 Q150,265 180,275 Q210,285 240,275"
-                stroke="#4a7a8a" stroke-width="2" fill="none" opacity="0.5" stroke-linecap="round"/>
-          <path d="M30,295 Q60,280 90,290 Q120,300 150,290 Q180,280 210,290 Q230,296 250,290"
-                stroke="#4a7a8a" stroke-width="1.5" fill="none" opacity="0.3" stroke-linecap="round"/>
-
-          <!-- "Hic svnt dracones" label -->
-          <text x="130" y="315" text-anchor="middle" font-family="'Cinzel', serif" font-size="9" fill="#8b3a2a" letter-spacing="1" opacity="0.8">HIC SVNT DRACONES</text>
-        </svg>
-      </div>
-
-      <p>In the old cartographic tradition, the edges of the known world were populated not with blankness, but with imagination. <em>Hic svnt dracones.</em> Here be dragons. The sea monster was the cartographer's admission that beyond a certain longitude, the map became story.</p>
+      <p>In the old cartographic tradition, the edges of the known world were populated not with blankness, but with imagination. <em>Hic svnt dracones.</em> Here be dragons. The sea monster was the cartographer&#8217;s admission that beyond a certain longitude, the map became story.</p>
 
       <p>Storyteller inhabits that same frontier. Every session begins at the edge of the known — the blank margin of your world — and populates it with creatures of narrative necessity. The Narrator does not know what you will find. Neither do you. That is the point.</p>
 
@@ -1567,22 +1474,6 @@
       path.style.strokeDasharray = 'none';
       path.style.strokeDashoffset = '0';
     });
-  }
-
-  // --- Sea monster reveal ---
-  const seaMonster = document.getElementById('sea-monster');
-  if (seaMonster) {
-    const monsterObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          setTimeout(() => {
-            seaMonster.classList.add('revealed');
-          }, prefersReducedMotion ? 0 : 200);
-          monsterObserver.unobserve(seaMonster);
-        }
-      });
-    }, { threshold: 0.2 });
-    monsterObserver.observe(seaMonster);
   }
 
   // --- Coordinate shimmer on section entry ---
