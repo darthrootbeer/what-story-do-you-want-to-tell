@@ -569,6 +569,7 @@
 
     .ink-reveal.revealed {
       animation: ink-write 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      clip-path: inset(0 0% 0 0);
     }
 
     @keyframes ink-write {
@@ -579,11 +580,13 @@
     /* Heading gets a slightly slower, more deliberate write */
     .ink-reveal-slow.revealed {
       animation: ink-write 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      clip-path: inset(0 0% 0 0);
     }
 
     /* Paragraphs stagger */
     .ink-reveal-fast.revealed {
       animation: ink-write 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      clip-path: inset(0 0% 0 0);
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -623,7 +626,7 @@
         1px 1px 0 rgba(139,58,15,0.3),
         0 0 12px rgba(139,58,15,0.2);
       filter: blur(0.3px);
-      display: block;
+      display: inline-block;
       opacity: 0;
       transform: scale(0.8);
       transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1);
@@ -1239,6 +1242,24 @@
     }
 
     /* -------------------------------------------------------
+       FALLBACK — reveal any ink-reveal elements still hidden
+       after animations have had time to run (catches edge
+       cases where IntersectionObserver fires too early)
+    ------------------------------------------------------- */
+    function revealFallback() {
+      document.querySelectorAll('.ink-reveal, .ink-reveal-slow, .ink-reveal-fast').forEach(el => {
+        if (!el.classList.contains('revealed')) {
+          el.classList.add('revealed');
+        }
+      });
+      document.querySelectorAll('.drop-cap-letter').forEach(el => {
+        if (!el.classList.contains('bloomed')) {
+          el.classList.add('bloomed');
+        }
+      });
+    }
+
+    /* -------------------------------------------------------
        INIT
     ------------------------------------------------------- */
     document.addEventListener('DOMContentLoaded', () => {
@@ -1247,6 +1268,8 @@
       initRevealObserver();
       initTitlePage();
       updateProgress();
+      // Hard fallback: anything still hidden after 3s gets revealed
+      setTimeout(revealFallback, 3000);
     });
   </script>
 
