@@ -116,11 +116,12 @@
       background-image: url("Pasted image 20260317202650.png");
       background-size: cover;
       background-position: center 40%;
-      filter: brightness(0.52) saturate(0.7);
+      filter: brightness(0.75) saturate(0.85);
       transform: scale(1.05);
-      transition: transform 20s ease;
+      transition: transform 20s ease, filter 3.5s ease;
       z-index: 0;
     }
+    .hero-bg.dimmed { filter: brightness(0.52) saturate(0.7); }
     #beat-1:hover .hero-bg { transform: scale(1.0); }
 
     .hero-vignette {
@@ -128,7 +129,10 @@
       inset: 0;
       background: radial-gradient(ellipse at center, transparent 20%, rgba(7,7,13,0.7) 70%, rgba(7,7,13,0.97) 100%);
       z-index: 1;
+      opacity: 0;
+      transition: opacity 3.5s ease;
     }
+    .hero-vignette.dimmed { opacity: 1; }
     .hero-vignette-bottom {
       position: absolute;
       bottom: 0; left: 0; right: 0;
@@ -1116,6 +1120,14 @@
     // ── PAGE LOAD REVEALS ──────────────────────────────
     window.addEventListener('load', () => {
       document.body.classList.add('loaded');
+
+      // Image starts bright, dims to atmospheric state over 3.5s
+      // Small delay so the browser has painted before transition starts
+      setTimeout(() => {
+        document.querySelector('.hero-bg').classList.add('dimmed');
+        document.querySelector('.hero-vignette').classList.add('dimmed');
+      }, 80);
+
       setTimeout(() => {
         document.getElementById('nav').classList.add('visible');
         document.getElementById('hero-eyebrow').classList.add('visible');
