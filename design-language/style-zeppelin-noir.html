@@ -66,13 +66,14 @@
     #cursor-glow {
       position: fixed;
       pointer-events: none;
-      width: 340px;
-      height: 340px;
+      width: 280px;
+      height: 280px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(201,169,110,0.07) 0%, transparent 70%);
+      background: rgba(232,220,200,0.08);
       transform: translate(-50%, -50%);
       z-index: 150;
       transition: opacity 0.3s;
+      mix-blend-mode: screen;
     }
 
     /* ── NAV ── */
@@ -131,9 +132,24 @@
       background: radial-gradient(ellipse at 40% 50%, #2a2018 0%, #1a1410 50%, #0d0c0b 100%);
     }
 
-    #rain-canvas {
+    /* Porthole vignette — dark oval closing in from edges */
+    #hero::after {
+      content: '';
       position: absolute;
       inset: 0;
+      background: radial-gradient(ellipse 72% 68% at 50% 50%,
+        transparent 40%,
+        rgba(10,8,6,0.55) 68%,
+        rgba(5,4,3,0.92) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    #rain-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
       pointer-events: none;
       z-index: 1;
     }
@@ -838,37 +854,61 @@
     let W, H;
 
     function resize() {
-      W = canvas.width = canvas.offsetWidth;
-      H = canvas.height = canvas.offsetHeight;
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
     }
     resize();
     window.addEventListener('resize', resize);
 
     const drops = [];
-    const ANGLE = Math.PI / 12; // 15 degrees
-    const COUNT = 60;
+    const ANGLE = Math.PI / 10; // ~18 degrees
+    const COUNT = 120;
 
     for (let i = 0; i < COUNT; i++) {
       drops.push({
-        x: Math.random() * (W + 200) - 100,
+        x: Math.random() * (W + 300) - 150,
         y: Math.random() * H,
-        speed: 2 + Math.random() * 2,
-        length: 12 + Math.random() * 22,
-        opacity: 0.3 + Math.random() * 0.3
+        speed: 3 + Math.random() * 3,
+        length: 18 + Math.random() * 32,
+        opacity: 0.25 + Math.random() * 0.45,
+        width: 0.5 + Math.random() * 0.8
       });
     }
 
+    // ── LIGHTNING
+    let lightningAlpha = 0;
+    function triggerLightning() {
+      lightningAlpha = 0.07 + Math.random() * 0.06;
+      setTimeout(() => { lightningAlpha = 0; }, 80);
+      // Occasional double-flash
+      if (Math.random() > 0.5) {
+        setTimeout(() => {
+          lightningAlpha = 0.04 + Math.random() * 0.04;
+          setTimeout(() => { lightningAlpha = 0; }, 60);
+        }, 140);
+      }
+      setTimeout(triggerLightning, 4000 + Math.random() * 9000);
+    }
+    setTimeout(triggerLightning, 2000 + Math.random() * 3000);
+
     function draw() {
       ctx.clearRect(0, 0, W, H);
-      ctx.save();
-      ctx.strokeStyle = '#c9a96e';
-      ctx.lineWidth = 0.8;
 
+      // Lightning flash overlay
+      if (lightningAlpha > 0) {
+        ctx.fillStyle = `rgba(180,200,230,${lightningAlpha})`;
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      ctx.save();
       for (const d of drops) {
         const dx = Math.sin(ANGLE) * d.length;
         const dy = Math.cos(ANGLE) * d.length;
 
+        // Slight storm-blue tint on rain
         ctx.globalAlpha = d.opacity;
+        ctx.strokeStyle = `rgba(180,170,140,${d.opacity})`;
+        ctx.lineWidth = d.width;
         ctx.beginPath();
         ctx.moveTo(d.x, d.y);
         ctx.lineTo(d.x + dx, d.y + dy);
@@ -877,9 +917,9 @@
         d.x += Math.sin(ANGLE) * d.speed;
         d.y += Math.cos(ANGLE) * d.speed;
 
-        if (d.y > H + 50 || d.x > W + 50) {
-          d.x = Math.random() * W - 100;
-          d.y = -30 - Math.random() * 100;
+        if (d.y > H + 60 || d.x > W + 60) {
+          d.x = Math.random() * (W + 200) - 200;
+          d.y = -50 - Math.random() * 150;
         }
       }
 
