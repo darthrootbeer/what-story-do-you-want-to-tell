@@ -951,7 +951,7 @@
 
     <div class="hero-content">
       <span class="hero-eyebrow" id="hero-eyebrow">An early look at something new</span>
-      <h1 class="hero-title" id="hero-title">Stories have always been alive.</h1>
+      <h1 class="hero-title" id="hero-title"></h1>
       <p class="hero-sub" id="hero-sub">We just forgot they could hear us.</p>
     </div>
 
@@ -1170,8 +1170,6 @@
         const variance = 40;    // random ± ms
         const pauseBeforeAlive = 900; // ms pause before "alive" begins
 
-        // Hide until typing begins, then reveal
-        el.textContent = '';
         el.classList.add('typing');
         const cursor = document.createElement('span');
         cursor.className = 'hero-title-cursor';
