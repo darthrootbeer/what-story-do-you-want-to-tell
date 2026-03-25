@@ -96,6 +96,8 @@ All images and SVGs live in `/assets/`. Pages reference them with paths relative
 | One level deep (`phase-1-overview/index.html`) | `../assets/filename.png` |
 | `design-language/style-*.html` | `../assets/filename.png` (if needed) |
 
+Old or archived assets live in `assets/archive/` — they are not referenced by live pages.
+
 ---
 
 ## Navigation
@@ -123,6 +125,40 @@ The `styles-gallery.html` file at root is a legacy redirect stub pointing to `de
 3. Asset paths use `../assets/`
 4. Back-link to root: `href="../index.html"`
 5. Add forward/back links in the adjacent pages that should connect to it
+
+---
+
+## Adding a New Style to the Design Language Gallery
+
+The preferred way to add a new style is the **Design Aesthetic Pipeline** — a 13-stage research and execution process that produces a fully researched, beautifully executed style demo. See the [pipeline brief intake template](design-language/pipeline/brief-intake.md) for how to start a run.
+
+For quick one-off styles, see [`docs/how-to-build-a-style.md`](docs/how-to-build-a-style.md).
+
+### File naming
+
+Style demos follow the pattern `design-language/style-[kebab-name].html`. The name should describe the aesthetic, not the project:
+
+- `style-soviet.html` — Soviet constructivist propaganda
+- `style-neon-tokyo.html` — Cyberpunk Japanese signage
+- `style-magazine-tabloid.html` — Sensational tabloid press
+
+### Gallery card
+
+After adding the HTML file, add a card to `design-language/index.html`. See [`docs/how-to-build-a-style.md`](docs/how-to-build-a-style.md) for the card template.
+
+---
+
+## Design Language Pipeline
+
+The `design-language/pipeline/` folder contains templates and briefs for the Design Aesthetic Pipeline.
+
+| File | Purpose |
+|---|---|
+| `pipeline/brief-intake.md` | Stage 1 intake template — fill this out to start a pipeline run |
+
+Pipeline runs produce:
+1. A style demo HTML file (`design-language/style-[name].html`)
+2. A reference document in the Storyteller Obsidian vault
 
 ---
 

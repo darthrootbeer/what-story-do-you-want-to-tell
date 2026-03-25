@@ -4,6 +4,16 @@ This is the process for creating a new entry in the design-language gallery — 
 
 ---
 
+## Preferred method: Design Aesthetic Pipeline
+
+The pipeline is the right way to build a new style. It runs 13 research and execution stages — typography, color, texture, motion, language, assets — and produces a deeply researched, fully executed demo. Brief goes in. Finished style comes out.
+
+To start a pipeline run, fill out [`design-language/pipeline/brief-intake.md`](../design-language/pipeline/brief-intake.md) and hand it to Claude.
+
+The quick prompt method below still works for fast experiments, but pipeline output is noticeably richer.
+
+---
+
 ## What a Style Demo Is
 
 Each style is a single HTML file that acts as a fake "issue" or "artifact" of a Storyteller story told in a specific aesthetic. It's not a UI mockup — it's a full-fidelity design exploration. A reader should feel immersed in the aesthetic within seconds.
@@ -12,7 +22,7 @@ The demo doesn't need to show product UI. It shows what the *world* of that styl
 
 ---
 
-## The Prompt
+## Quick Method: Single Prompt
 
 Paste this into a new Claude conversation to start a new style. Fill in the `[STYLE NAME]` and `[AESTHETIC DESCRIPTION]` before sending.
 
@@ -120,6 +130,12 @@ The more specific, the better. "Dark and mysterious" produces generic results. "
 | `style-cartographer.html` | The Cartographer — hand-drawn maps, exploration |
 | `style-neon-tokyo.html` | Neon Tokyo — cyberpunk, Japanese signage |
 | `style-broadcast.html` | Broadcast — emergency alert, live feed |
+| `style-vinyl.html` | Vinyl — record sleeve, analogue warmth |
+| `style-cape-sorrow.html` | Cape Sorrow — gothic coastal noir |
+| `style-giants.html` | Giants — myth, scale, ancient weight |
+| `style-zeppelin-noir.html` | Zeppelin Noir — dieselpunk rain and shadow |
+| `style-scriptorium.html` | Scriptorium — monastic stone and candlelight |
+| `style-soviet.html` | Soviet — constructivist propaganda |
 | `style-magazine-fashion.html` | Fashion Magazine — high editorial |
 | `style-magazine-science.html` | Science Magazine — data-forward |
 | `style-magazine-underground.html` | Underground Magazine — zine energy |
