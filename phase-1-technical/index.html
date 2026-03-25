@@ -1589,15 +1589,14 @@ flowchart LR
             <li><strong>Gather sources.</strong> Sherlock finds the primary chapter for the term, then searches every other chapter for any reference to it by name. Everything goes into a source packet.</li>
             <li><strong>Extract facts.</strong> From that source packet, Sherlock pulls a facts-only profile: what the term is, when it triggers, what it takes as input, what it produces as output, how it resolves, and any special cases. No inference, no prose.</li>
             <li><strong>Write a candidate definition.</strong> Using only the facts profile, Sherlock drafts the registry entry.</li>
-            <li><strong>Run four checks:</strong>
-              <ul class="nested-list">
-                <li><strong>Evidence check:</strong> Is every claim in the definition traceable to a specific line in the source? Anything that can't be sourced gets removed or flagged.</li>
-                <li><strong>Scope check:</strong> Is there anything in the facts profile that didn't make it into the definition? Missing mechanics, edge cases, dropped rule interactions?</li>
-                <li><strong>Relationship check:</strong> For every relationship listed in the entry, rewrite it as a plain sentence ("Action is used in Action Check"). Does that sentence hold up when you read both terms' facts profiles? If not, or if the relationship reads better in the opposite direction, flag it.</li>
-                <li><strong>Reader check:</strong> Simulate two readers: a new player and a Guide running a session. Does each one build the right mental model from this definition?</li>
-              </ul>
-            </li>
+            <li><strong>Run four checks:</strong></li>
           </ol>
+          <ul class="nested-list">
+            <li><strong>Evidence check:</strong> Is every claim in the definition traceable to a specific line in the source? Anything that can't be sourced gets removed or flagged.</li>
+            <li><strong>Scope check:</strong> Is there anything in the facts profile that didn't make it into the definition? Missing mechanics, edge cases, dropped rule interactions?</li>
+            <li><strong>Relationship check:</strong> For every relationship listed in the entry, rewrite it as a plain sentence ("Action is used in Action Check"). Does that sentence hold up when you read both terms' facts profiles? If not, or if the relationship reads better in the opposite direction, flag it.</li>
+            <li><strong>Reader check:</strong> Simulate two readers: a new player and a Guide running a session. Does each one build the right mental model from this definition?</li>
+          </ul>
           <p>Each term produces two files: a source file (evidence, citations, proposed changes) and a summary file (definition, rubric scores, flags).</p>
         </div>
 
