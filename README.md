@@ -16,36 +16,26 @@ Live at: [darthrootbeer.github.io/what-story-do-you-want-to-tell](https://darthr
 ├── phase-1-overview/           Plain-English overview of Phase 1
 ├── phase-1-technical/          Full technical deep-dive
 │
-├── design-language/            Visual design system — 24 style explorations
-│   ├── index.html              Gallery index
-│   ├── style-*.html            Individual style demos
-│   └── pipeline/               Design Aesthetic Pipeline templates and briefs
-│       └── brief-intake.md     Stage 1 intake template
-│
 ├── assets/                     Images and SVGs used by the live site
 │   └── archive/                Old assets kept for reference
 ├── archive/                    Old pages kept for reference, not linked from live site
 │
-├── docs/                       Contributor guides
-│   └── how-to-build-a-style.md  Guide for creating new style demos
-├── styles-gallery.html         Redirect stub → design-language/ (backward compat)
+├── styles-gallery.html         Legacy redirect stub (kept for backward compat)
 ├── README.md                   This file
-├── ARCHITECTURE.md             How the project is built and how to extend it
-└── docs/
-    └── how-to-build-a-style.md  Guide for creating new style demos with Claude
+└── ARCHITECTURE.md             How the project is built and how to extend it
 ```
+
+> **Design language work** (style demos, aesthetic pipeline) lives in the private repo: [darthrootbeer/storyteller-design-language](https://github.com/darthrootbeer/storyteller-design-language)
 
 ---
 
-## The Three Visitor Paths
+## The Visitor Flow
 
 The phase-1 pages form a single linear narrative:
 
 ```
 index.html  →  phase-1-overview/  →  phase-1-technical/
 ```
-
-The design-language gallery is a **separate** thing — it's a creative sandbox, not part of the visitor flow. It's not linked from the main pages.
 
 ---
 
@@ -62,5 +52,3 @@ To publish, push to `master` — GitHub Pages deploys automatically from the roo
 ## Contributing
 
 See [`ARCHITECTURE.md`](ARCHITECTURE.md) for how the pages are structured.
-
-See [`docs/how-to-build-a-style.md`](docs/how-to-build-a-style.md) for the process of creating a new style direction.
