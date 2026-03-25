@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scriptorium — Storyteller Style Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Gentium+Plus:ital,wght@0,400;0,700;1,400;1,700&family=Metamorphous&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0b06;
+      --surface: #1e1408;
+      --vellum: #e8d5a3;
+      --gold: #b8860b;
+      --red: #8b1a1a;
+      --green: #1e3a1e;
+      --leather: #4a3728;
+      --text: #e8d5a3;
+      --text-dim: rgba(232,213,163,0.55);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Gentium Plus', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.85;
+      overflow-x: hidden;
+      opacity: 0;
+      transition: opacity 0.9s ease;
+    }
+    body.loaded { opacity: 1; }
+
+    /* ── GRAIN TEXTURE ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.5;
+    }
+
+    /* ── SCROLL PROGRESS ── */
+    #progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--red), var(--gold));
+      z-index: 300;
+      transition: width 0.1s linear;
+      box-shadow: 0 0 6px rgba(184,134,11,0.5);
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      padding: 14px 40px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      background: rgba(15, 11, 6, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(184,134,11,0.3);
+    }
+    nav .brand {
+      font-family: 'Metamorphous', serif;
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+    }
+    nav a {
+      font-family: 'Metamorphous', serif;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    nav a:hover { color: var(--gold); }
+    nav .nav-back {
+      margin-left: auto;
+      border: 1px solid rgba(184,134,11,0.4);
+      padding: 5px 14px;
+      border-radius: 2px;
+      color: var(--gold) !important;
+    }
+    nav .nav-back:hover { background: rgba(184,134,11,0.12); }
+
+    /* ── CURSOR GLOW ── */
+    #cursor-glow {
+      position: fixed;
+      pointer-events: none;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(184,134,11,0.07) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      z-index: 150;
+    }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 40px 80px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    /* Candlelight flicker background */
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      animation: candleFlicker 2.7s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes candleFlicker {
+      0%, 100% { background: radial-gradient(ellipse at 50% 60%, rgba(184,134,11,0.18) 0%, transparent 65%); }
+      33%       { background: radial-gradient(ellipse at 52% 58%, rgba(184,134,11,0.13) 0%, transparent 62%); }
+      66%       { background: radial-gradient(ellipse at 49% 63%, rgba(184,134,11,0.16) 0%, transparent 58%); }
+      50%       { background: radial-gradient(ellipse at 51% 61%, rgba(184,134,11,0.10) 0%, transparent 60%); }
+    }
+
+    /* Illuminated border */
+    .hero-frame {
+      position: absolute;
+      inset: 40px;
+      border: 1px solid rgba(184,134,11,0.2);
+      pointer-events: none;
+    }
+    .hero-frame::before {
+      content: '✦ ✦ ✦';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg);
+      padding: 0 12px;
+      color: rgba(184,134,11,0.5);
+      font-size: 12px;
+      letter-spacing: 8px;
+    }
+    .hero-frame::after {
+      content: '✦ ✦ ✦';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg);
+      padding: 0 12px;
+      color: rgba(184,134,11,0.5);
+      font-size: 12px;
+      letter-spacing: 8px;
+    }
+
+    .hero-drop-cap {
+      font-family: 'Uncial Antiqua', serif;
+      font-size: clamp(64px, 12vw, 120px);
+      color: var(--gold);
+      line-height: 1;
+      text-shadow: 0 0 40px rgba(184,134,11,0.5), 0 0 80px rgba(184,134,11,0.2);
+      opacity: 0;
+      animation: fadeUp 1s ease 0.4s forwards;
+      position: relative;
+      z-index: 2;
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      font-family: 'Uncial Antiqua', serif;
+      font-size: clamp(36px, 7vw, 80px);
+      color: var(--gold);
+      text-shadow: 0 0 30px rgba(184,134,11,0.4), 0 2px 4px rgba(0,0,0,0.9);
+      line-height: 1.1;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.7s forwards;
+    }
+
+    .hero-sub {
+      font-family: 'Metamorphous', serif;
+      font-size: clamp(14px, 2vw, 18px);
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      margin-bottom: 36px;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      animation: fadeUp 1s ease 1.1s forwards;
+    }
+
+    .hero-latin {
+      font-family: 'Gentium Plus', serif;
+      font-style: italic;
+      font-size: clamp(15px, 2vw, 20px);
+      color: rgba(232,213,163,0.7);
+      position: relative;
+      z-index: 2;
+      clip-path: inset(0 100% 0 0);
+      animation: revealText 2s ease 1.6s forwards;
+    }
+    @keyframes revealText {
+      to { clip-path: inset(0 0% 0 0); }
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      animation: fadeUp 1s ease 2.2s forwards;
+    }
+    .scroll-hint span {
+      font-family: 'Metamorphous', serif;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+    .scroll-hint-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollBounce 2s ease-in-out 2.8s infinite;
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 100px 40px;
+      position: relative;
+    }
+    .inner {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: 'Metamorphous', serif;
+      font-size: 10px;
+      letter-spacing: 0.4em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: block;
+      opacity: 0.8;
+    }
+
+    .draw-line {
+      display: block;
+      height: 1px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      width: 0;
+      margin-bottom: 32px;
+      transition: width 1.2s ease;
+    }
+    .draw-line.visible { width: 220px; }
+
+    h2 {
+      font-family: 'Metamorphous', serif;
+      font-size: clamp(24px, 3.5vw, 44px);
+      color: var(--vellum);
+      line-height: 1.2;
+      margin-bottom: 32px;
+      text-shadow: 0 0 20px rgba(184,134,11,0.15);
+    }
+
+    h3 {
+      font-family: 'Metamorphous', serif;
+      font-size: 16px;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      margin-bottom: 16px;
+      margin-top: 48px;
+    }
+
+    p { margin-bottom: 1.5rem; max-width: 65ch; }
+
+    /* Drop cap */
+    .drop-cap::first-letter {
+      font-family: 'Uncial Antiqua', serif;
+      font-size: 4.8em;
+      float: left;
+      line-height: 0.75;
+      margin: 8px 12px 0 0;
+      color: var(--gold);
+      text-shadow: 0 0 20px rgba(184,134,11,0.5);
+    }
+
+    /* Pull quote */
+    .pull-quote {
+      border-left: 3px solid var(--gold);
+      padding: 24px 36px;
+      margin: 48px 0;
+      background: rgba(184,134,11,0.05);
+      border-radius: 0 4px 4px 0;
+      position: relative;
+    }
+    .pull-quote::before {
+      content: '\275D';
+      position: absolute;
+      top: -8px;
+      left: 12px;
+      font-family: 'Uncial Antiqua', serif;
+      font-size: 48px;
+      color: rgba(184,134,11,0.2);
+      line-height: 1;
+    }
+    .pull-quote p {
+      font-family: 'Uncial Antiqua', serif;
+      font-size: clamp(14px, 2vw, 18px);
+      color: var(--vellum);
+      max-width: none;
+      margin: 0;
+      line-height: 1.7;
+    }
+
+    /* Marginal gloss */
+    .gloss-container {
+      position: relative;
+      padding-right: 220px;
+    }
+    .marginal-gloss {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 200px;
+      font-family: 'Gentium Plus', serif;
+      font-style: italic;
+      font-size: 13px;
+      color: var(--text-dim);
+      border-left: 1px solid rgba(184,134,11,0.3);
+      padding-left: 16px;
+      line-height: 1.6;
+      opacity: 0;
+      transform: translateX(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .marginal-gloss.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .gloss-label {
+      font-family: 'Metamorphous', serif;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    /* Cards */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid rgba(184,134,11,0.2);
+      border-top: 3px solid var(--gold);
+      border-radius: 0 0 4px 4px;
+      padding: 28px 24px;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--gold);
+      box-shadow: 0 8px 32px rgba(184,134,11,0.12);
+    }
+    .card-title {
+      font-family: 'Metamorphous', serif;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .card p { font-size: 15px; color: var(--text-dim); margin: 0; }
+
+    /* Stained glass */
+    .stained-glass {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: 60px 80px 60px;
+      gap: 4px;
+      margin: 48px 0;
+      background: #111;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .glass-pane {
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      border-radius: 1px;
+    }
+    .glass-pane.visible { opacity: 1; transform: scale(1); }
+    .glass-pane:nth-child(1) { background: rgba(139,26,26,0.7); grid-column: span 2; transition-delay: 0.05s; }
+    .glass-pane:nth-child(2) { background: rgba(30,58,30,0.75); transition-delay: 0.12s; }
+    .glass-pane:nth-child(3) { background: rgba(184,134,11,0.6); grid-column: span 2; transition-delay: 0.18s; }
+    .glass-pane:nth-child(4) { background: rgba(20,40,80,0.75); transition-delay: 0.08s; }
+    .glass-pane:nth-child(5) { background: rgba(80,20,80,0.65); grid-column: span 2; transition-delay: 0.25s; }
+    .glass-pane:nth-child(6) { background: rgba(184,134,11,0.5); grid-column: span 2; transition-delay: 0.15s; }
+    .glass-pane:nth-child(7) { background: rgba(139,26,26,0.65); transition-delay: 0.3s; }
+    .glass-pane:nth-child(8) { background: rgba(30,58,30,0.7); grid-column: span 2; transition-delay: 0.1s; }
+    .glass-pane:nth-child(9) { background: rgba(20,60,100,0.7); transition-delay: 0.22s; }
+    .glass-pane:nth-child(10) { background: rgba(184,134,11,0.65); grid-column: span 2; transition-delay: 0.35s; }
+    .glass-pane:nth-child(11) { background: rgba(139,26,26,0.6); transition-delay: 0.18s; }
+    .glass-pane:nth-child(12) { background: rgba(30,58,30,0.65); grid-column: span 2; transition-delay: 0.28s; }
+    .glass-pane:nth-child(13) { background: rgba(80,20,80,0.7); transition-delay: 0.4s; }
+
+    /* Divider */
+    .divider {
+      text-align: center;
+      color: var(--gold);
+      font-size: 16px;
+      letter-spacing: 16px;
+      margin: 64px 0;
+      opacity: 0.4;
+    }
+
+    /* Type rows */
+    .type-row {
+      border-bottom: 1px solid rgba(184,134,11,0.15);
+      padding: 28px 0;
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .type-label {
+      font-family: 'Metamorphous', serif;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      min-width: 130px;
+      flex-shrink: 0;
+    }
+
+    /* Back bar */
+    .back-bar {
+      text-align: center;
+      padding: 60px 40px;
+      border-top: 1px solid rgba(184,134,11,0.15);
+    }
+    .back-bar a {
+      font-family: 'Metamorphous', serif;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      text-decoration: none;
+      text-transform: uppercase;
+      border: 1px solid rgba(184,134,11,0.4);
+      padding: 12px 28px;
+      border-radius: 2px;
+      transition: background 0.2s;
+    }
+    .back-bar a:hover { background: rgba(184,134,11,0.1); }
+
+    /* Reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(36px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Keyframes */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scrollBounce {
+      0%, 100% { transform: scaleY(1); opacity: 1; }
+      50%       { transform: scaleY(0.6); opacity: 0.4; }
+    }
+
+    /* ── REDUCED MOTION ── */
+    @media (prefers-reduced-motion: reduce) {
+      body { opacity: 1 !important; }
+      .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+      .glass-pane { opacity: 1 !important; transform: none !important; }
+      .hero-drop-cap, .hero-title, .hero-sub, .scroll-hint { opacity: 1 !important; animation: none !important; }
+      .hero-latin { clip-path: none !important; animation: none !important; }
+      #hero::before { animation: none !important; }
+      .marginal-gloss { opacity: 1 !important; transform: none !important; transition: none !important; }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; gap: 16px; flex-wrap: wrap; }
+      nav .brand { font-size: 11px; }
+      section { padding: 80px 24px; }
+      #cursor-glow { display: none; }
+      .hero-frame { inset: 20px; }
+      .gloss-container { padding-right: 0; }
+      .marginal-gloss { position: static; width: 100%; margin-top: 24px; transform: none !important; border-left: none; border-top: 1px solid rgba(184,134,11,0.3); padding: 16px 0 0 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="cursor-glow"></div>
+
+<nav>
+  <span class="brand">✝ SCRIPTORIUM</span>
+  <a href="#overview">The Order</a>
+  <a href="#glass">The Text</a>
+  <a href="#mystery">The Mystery</a>
+  <a href="#why">Why It Works</a>
+  <a href="./" class="nav-back">← All Styles</a>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-frame"></div>
+  <div class="hero-drop-cap">S</div>
+  <h1 class="hero-title">CRIPTORIUM</h1>
+  <p class="hero-sub">Where every word is a confession.</p>
+  <p class="hero-latin">"In principio erat Verbum — et Verbum erat apud Deum"</p>
+  <div class="scroll-hint">
+    <span>Descend</span>
+    <div class="scroll-hint-line"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     THE ORDER
+════════════════════════════════════════════════════════════ -->
+<section id="overview" style="background: linear-gradient(180deg, #0f0b06 0%, #140d07 100%);">
+  <div class="inner">
+    <span class="section-label">Regula Monasterii</span>
+    <span class="draw-line reveal"></span>
+    <h2 class="reveal">The monastery keeps its secrets<br>in stone and vellum.</h2>
+
+    <p class="reveal drop-cap">The scriptorium is cold even in summer. The brothers work in silence from Matins to Vespers, copying texts by the light of candles that have burned in this room for four hundred years. The smoke of those candles is in the walls. The prayers are in the walls. The secrets — and there are always secrets — are in the walls.</p>
+
+    <p class="reveal">Brother Anselm does not look up when you enter. This is not rudeness. This is the discipline of a man who has spent thirty years learning to disappear into his work. The illuminations he creates are extraordinary. The border animals — grotesques, really — seem to move in candlelight. They do things in shadow that they do not do in full light. This is noted in the chronicle but not explained.</p>
+
+    <div class="pull-quote reveal">
+      <p>"The book was locked. The library was locked. The monk was dead. These are three facts. They form a sentence only God can parse."</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="card reveal">
+        <div class="card-title">The Scriptorium</div>
+        <p>A room of controlled breath. Forty monks, forty desks, the scratch of forty pens. Every copy introduces new errors. Every error is a kind of prayer.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-title">The Library</div>
+        <p>Seven tiers. Nine thousand volumes. The labyrinthine upper library has not been fully mapped. Brother Librarian says this is by design.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-title">The Beer</div>
+        <p>Trappist double. Dark, rich, complex. Brewed in the cellars since 1203. The brothers drink two pints with supper. This is rule, not indulgence.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider">❧ ✦ ❧</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STAINED GLASS
+════════════════════════════════════════════════════════════ -->
+<section id="glass" style="background: #140e08;">
+  <div class="inner">
+    <span class="section-label reveal">Fenestra Mirabilis</span>
+    <span class="draw-line reveal"></span>
+    <h2 class="reveal">Light is the language<br>the stone speaks back.</h2>
+
+    <div class="stained-glass">
+      <div class="glass-pane"></div>
+      <div class="glass-pane"></div>
+      <div class="glass-pane"></div>
+      <div class="glass-pane"></div>
+      <div class="glass-pane"></div>
+      <div class="glass-pane"></div>
+      <div class="glass-pane"></div>
+      <div class="glass-pane"></div>
+      <div class="glass-pane"></div>
+      <div class="glass-pane"></div>
+      <div class="glass-pane"></div>
+      <div class="glass-pane"></div>
+      <div class="glass-pane"></div>
+    </div>
+
+    <p class="reveal">In the hour before Vespers, the west window sends a column of amber and sapphire across the nave floor. The brothers have walked through this light for generations. They do not look down. They have learned to accept transformation as a daily event — to pass from ruby to sapphire to gold in the space of thirty steps and find themselves unchanged on the other side.</p>
+
+    <p class="reveal">The glazier who built the windows in 1247 is anonymous. He signed nothing. The windows speak for him instead: a grammar of transmitted light, a theology of color that needs no Latin to be understood. The brothers walk through it twice daily. Their eyes have adjusted.</p>
+  </div>
+</section>
+
+<div class="divider">❧ ✦ ❧</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     THE MYSTERY
+════════════════════════════════════════════════════════════ -->
+<section id="mystery" style="background: #0f0b06;">
+  <div class="inner">
+    <span class="section-label reveal">From the Chronicle of Adso of Melk</span>
+    <span class="draw-line reveal"></span>
+    <h2 class="reveal">The library is a labyrinth.<br>The labyrinth is a sign.</h2>
+
+    <div class="gloss-container reveal">
+      <p>Books are not made to be believed, but to be subjected to inquiry. When we consider a book, we must not ask ourselves what it says but what it means — and in the space between saying and meaning, in that gap which is the width of a man's doubt, is where Brother William does his work. He is a reader of signs. The footprint in the snow. The laugh of the jester. The arrangement of books on a shelf — not their content but their order, the logic of proximity, the argument made by adjacency.</p>
+      <div class="marginal-gloss">
+        <span class="gloss-label">Marginal Note</span>
+        <em>Adso writes this sixty years later. He has forgotten nothing. He is not sure this is a mercy.</em>
+      </div>
+    </div>
+
+    <p class="reveal">The only truths that are useful are instruments to be thrown away. William told me this on our third day in the abbey, as we stood in the scriptorium watching Brother Anselm's pen move across the page. I did not understand it then. I have spent sixty years trying. I am not certain I understand it now. Perhaps understanding was never the point.</p>
+
+    <div class="pull-quote reveal">
+      <p>"Stat rosa pristina nomine, nomina nuda tenemus."<br><span style="font-size:0.75em; opacity:0.7; font-style:normal;">The rose of the past exists only in its name; we hold only names.</span></p>
+    </div>
+
+    <p class="reveal" style="font-family:'Gentium Plus',serif; font-style:italic; color:var(--text-dim); font-size:16px;">The fire was set before Compline. By Lauds, the library was ash. Seven hundred years of copied text: gone. The secrets the Abbot had kept in the finis Africae: gone. The book that three monks had died to possess or to suppress: gone. The labyrinth: gone. Only the idea of the labyrinth remained, which is perhaps what labyrinths are for.</p>
+  </div>
+</section>
+
+<div class="divider">❧ ✦ ❧</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     WHY IT WORKS
+════════════════════════════════════════════════════════════ -->
+<section id="why" style="background: #140e08;">
+  <div class="inner">
+    <span class="section-label reveal">Design Rationale</span>
+    <span class="draw-line reveal"></span>
+    <h2 class="reveal">The illuminated text<br>is a user interface.</h2>
+
+    <p class="reveal">Medieval manuscripts developed the most sophisticated reading hierarchy before the digital age: rubrication in red, drop caps to signal chapter breaks, marginalia for commentary, colophon to identify the hand. Every element served a function. Nothing was ornamental that was not also structural. Storyteller inherits this tradition directly — hierarchy through weight, color, and placement rather than size alone.</p>
+
+    <div class="card-grid">
+      <div class="card reveal">
+        <div class="card-title">Hierarchy of Reading</div>
+        <p>Rubrication, drop caps, marginalia, colophon — the manuscript invented every reading-aid we still use. Storyteller inherits all of them.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-title">The Gloss as Interaction</div>
+        <p>The marginal gloss was the medieval hyperlink — a reader's annotation, a correction, an argument with the author across centuries. Interactive text is ancient.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-title">Mystery as Form</div>
+        <p>Eco understood that the mystery genre is about epistemology — what can be known, what can't, and who decides. Storyteller asks the same question.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider">❧ ✦ ❧</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TYPE SYSTEM
+════════════════════════════════════════════════════════════ -->
+<section id="type" style="background: #0f0b06;">
+  <div class="inner">
+    <span class="section-label reveal">Type System</span>
+    <span class="draw-line reveal"></span>
+    <h2 class="reveal">The Letterforms</h2>
+
+    <div class="type-row reveal">
+      <span class="type-label">Uncial Antiqua</span>
+      <span style="font-family:'Uncial Antiqua',serif; font-size:clamp(32px,5vw,64px); color:var(--gold); text-shadow:0 0 20px rgba(184,134,11,0.3);">Scriptorium</span>
+    </div>
+    <div class="type-row reveal">
+      <span class="type-label">Metamorphous H2</span>
+      <span style="font-family:'Metamorphous',serif; font-size:clamp(20px,3vw,36px); color:var(--vellum);">The monastery keeps its secrets</span>
+    </div>
+    <div class="type-row reveal">
+      <span class="type-label">Metamorphous Label</span>
+      <span style="font-family:'Metamorphous',serif; font-size:11px; letter-spacing:0.4em; color:var(--gold); text-transform:uppercase;">Regula Monasterii · Spaced</span>
+    </div>
+    <div class="type-row reveal">
+      <span class="type-label">Gentium Plus Body</span>
+      <span style="font-family:'Gentium Plus',serif; font-size:18px; color:var(--text); max-width:50ch;">The scriptorium is cold even in summer. The brothers work in silence from Matins to Vespers.</span>
+    </div>
+    <div class="type-row reveal">
+      <span class="type-label">Gentium Plus Italic</span>
+      <span style="font-family:'Gentium Plus',serif; font-style:italic; font-size:18px; color:var(--text-dim);">In principio erat Verbum, et Verbum erat apud Deum.</span>
+    </div>
+    <div class="type-row reveal">
+      <span class="type-label">Drop Cap Example</span>
+      <span style="display:block; max-width:420px;">
+        <span style="font-family:'Uncial Antiqua',serif; font-size:72px; float:left; line-height:0.75; margin:8px 10px 0 0; color:var(--gold); text-shadow:0 0 20px rgba(184,134,11,0.5);">T</span>
+        <span style="font-family:'Gentium Plus',serif; font-size:17px; color:var(--text); display:block;">he drop cap announces the beginning of something. It is a door, not a decoration. Cross the threshold.</span>
+      </span>
+    </div>
+    <div class="type-row reveal">
+      <span class="type-label">Palette</span>
+      <span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <span style="display:inline-flex;flex-direction:column;align-items:center;gap:4px;">
+          <span style="width:32px;height:32px;border-radius:50%;background:#0f0b06;border:1px solid #333;display:inline-block;"></span>
+          <span style="font-size:10px;color:var(--text-dim);">Night</span>
+        </span>
+        <span style="display:inline-flex;flex-direction:column;align-items:center;gap:4px;">
+          <span style="width:32px;height:32px;border-radius:50%;background:#e8d5a3;display:inline-block;"></span>
+          <span style="font-size:10px;color:var(--text-dim);">Vellum</span>
+        </span>
+        <span style="display:inline-flex;flex-direction:column;align-items:center;gap:4px;">
+          <span style="width:32px;height:32px;border-radius:50%;background:#b8860b;display:inline-block;"></span>
+          <span style="font-size:10px;color:var(--text-dim);">Gold</span>
+        </span>
+        <span style="display:inline-flex;flex-direction:column;align-items:center;gap:4px;">
+          <span style="width:32px;height:32px;border-radius:50%;background:#8b1a1a;display:inline-block;"></span>
+          <span style="font-size:10px;color:var(--text-dim);">Red</span>
+        </span>
+        <span style="display:inline-flex;flex-direction:column;align-items:center;gap:4px;">
+          <span style="width:32px;height:32px;border-radius:50%;background:#1e3a1e;display:inline-block;"></span>
+          <span style="font-size:10px;color:var(--text-dim);">Verdigris</span>
+        </span>
+      </span>
+    </div>
+  </div>
+</section>
+
+<div class="back-bar">
+  <a href="./">← All Styles</a>
+</div>
+
+<script>
+  // ── LOAD
+  window.addEventListener('load', () => {
+    document.body.classList.add('loaded');
+  });
+
+  // ── SCROLL PROGRESS
+  function updateProgress() {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+
+  // ── SCROLL REVEAL
+  const revealEls = document.querySelectorAll('.reveal');
+  const drawLines = document.querySelectorAll('.draw-line');
+  const glossEls = document.querySelectorAll('.marginal-gloss');
+  const glassPanes = document.querySelectorAll('.glass-pane');
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const el = e.target;
+        const delay = parseFloat(el.dataset.delay || 0);
+        setTimeout(() => el.classList.add('visible'), delay);
+        io.unobserve(el);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  revealEls.forEach(el => {
+    const siblings = Array.from(el.parentElement.querySelectorAll('.reveal'));
+    const idx = siblings.indexOf(el);
+    el.dataset.delay = idx * 90;
+    io.observe(el);
+  });
+
+  drawLines.forEach(el => {
+    const dlio = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); dlio.unobserve(e.target); }
+      });
+    }, { threshold: 0.5 });
+    dlio.observe(el);
+  });
+
+  // Stained glass panes
+  glassPanes.forEach(el => {
+    io.observe(el);
+  });
+
+  // Marginal gloss
+  glossEls.forEach(el => {
+    const glossIO = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); glossIO.unobserve(e.target); }
+      });
+    }, { threshold: 0.3 });
+    glossIO.observe(el);
+  });
+
+  // ── CURSOR GLOW
+  const glow = document.getElementById('cursor-glow');
+  let gx = 0, gy = 0, tx = 0, ty = 0;
+  document.addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; });
+  function animGlow() {
+    gx += (tx - gx) * 0.08;
+    gy += (ty - gy) * 0.08;
+    glow.style.left = gx + 'px';
+    glow.style.top = gy + 'px';
+    requestAnimationFrame(animGlow);
+  }
+  animGlow();
+</script>
+</body>
+</html>

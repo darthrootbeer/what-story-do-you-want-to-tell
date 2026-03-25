@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Internationale — Storyteller Style Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Barlow+Condensed:wght@400;700;800;900&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d0d0d;
+      --red:      #cc1c1c;
+      --cream:    #f5f0e8;
+      --gold:     #d4a017;
+      --text:     #f5f0e8;
+      --text-dim: rgba(245,240,232,0.6);
+      --deep:     #1a0505;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'PT Serif', serif;
+      font-size: clamp(16px, 1.1vw, 18px);
+      line-height: 1.8;
+      overflow-x: hidden;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    body.loaded { opacity: 1; }
+
+    /* ── SCROLL PROGRESS ── */
+    #progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: var(--red);
+      z-index: 9000;
+      transition: width 0.1s linear;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 8000;
+      padding: 14px 40px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      background: #0d0d0d;
+      border-bottom: 2px solid var(--red);
+    }
+    nav .brand {
+      font-family: 'Russo One', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      color: var(--red);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    nav a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+    nav a:hover { color: var(--red); }
+    nav .nav-back {
+      margin-left: auto;
+      border: 1px solid rgba(204,28,28,0.5);
+      padding: 5px 14px;
+      border-radius: 1px;
+      color: var(--red) !important;
+      transition: background 0.2s !important;
+    }
+    nav .nav-back:hover { background: rgba(204,28,28,0.15); }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 140px 8vw 100px;
+      overflow: hidden;
+      background: #0d0d0d;
+    }
+
+    /* Diagonal red sweep bar */
+    .hero-bar {
+      position: absolute;
+      top: -10%;
+      left: -5%;
+      width: 55%;
+      height: 120%;
+      background: var(--red);
+      transform: translateX(-110%) skewX(-8deg);
+      z-index: 1;
+      animation: sweepIn 0.4s cubic-bezier(0.2, 0, 0.4, 1) 0.2s forwards;
+    }
+
+    @keyframes sweepIn {
+      from { transform: translateX(-110%) skewX(-8deg); }
+      to   { transform: translateX(-52%) skewX(-8deg); }
+    }
+
+    .hero-text-block {
+      position: relative;
+      z-index: 3;
+    }
+
+    .hero-line {
+      font-family: 'Russo One', sans-serif;
+      font-size: clamp(52px, 10vw, 130px);
+      line-height: 0.92;
+      letter-spacing: -0.01em;
+      display: block;
+      overflow: hidden;
+    }
+    .hero-line-inner {
+      display: block;
+    }
+
+    .hero-line-1 .hero-line-inner {
+      color: var(--cream);
+      animation: slamLeft 0.5s cubic-bezier(0.2, 0, 0.2, 1) 0.45s both;
+    }
+    .hero-line-2 .hero-line-inner {
+      color: var(--red);
+      animation: slamRight 0.5s cubic-bezier(0.2, 0, 0.2, 1) 0.6s both;
+    }
+    .hero-line-3 .hero-line-inner {
+      color: var(--cream);
+      animation: slamUp 0.5s cubic-bezier(0.2, 0, 0.2, 1) 0.75s both;
+    }
+
+    @keyframes slamLeft {
+      from { transform: translateX(-80px); opacity: 0; }
+      to   { transform: translateX(0);     opacity: 1; }
+    }
+    @keyframes slamRight {
+      from { transform: translateX(80px); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+    @keyframes slamUp {
+      from { transform: translateY(60px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .hero-sub {
+      font-family: 'PT Serif', serif;
+      font-style: italic;
+      font-size: clamp(15px, 1.8vw, 19px);
+      color: var(--text-dim);
+      max-width: 520px;
+      margin-top: 40px;
+      opacity: 0;
+      animation: fadeIn 0.8s ease 1.2s forwards;
+      position: relative;
+      z-index: 3;
+    }
+
+    /* Gold star */
+    .hero-star {
+      position: absolute;
+      bottom: 60px;
+      right: 80px;
+      z-index: 3;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      animation: starAppear 0.5s ease 1s forwards;
+    }
+    .star-shape {
+      display: block;
+      width: 80px;
+      height: 80px;
+      position: relative;
+      animation: starSpin 20s linear infinite;
+    }
+    .star-shape::before,
+    .star-shape::after {
+      content: '';
+      position: absolute;
+      background: var(--gold);
+      top: 50%; left: 50%;
+      transform-origin: center;
+    }
+    /* CSS 5-point star via clip-path */
+    .star-svg {
+      width: 80px;
+      height: 80px;
+      animation: starSpin 20s linear infinite;
+      filter: drop-shadow(0 0 12px rgba(212,160,23,0.4));
+    }
+
+    @keyframes starSpin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes starAppear {
+      to { opacity: 1; }
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 100px 40px;
+      position: relative;
+    }
+
+    .inner {
+      max-width: 840px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: 0.4em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .draw-line {
+      display: block;
+      height: 2px;
+      background: var(--red);
+      width: 0;
+      margin-bottom: 36px;
+      transition: width 0.8s ease;
+    }
+    .draw-line.visible { width: 120px; }
+
+    h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(28px, 4vw, 52px);
+      color: var(--cream);
+      line-height: 1.05;
+      margin-bottom: 40px;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+    }
+
+    p {
+      margin-bottom: 1.5rem;
+      max-width: 65ch;
+    }
+
+    em { font-style: italic; }
+
+    /* ── PULL QUOTE ── */
+    .pull-quote {
+      margin: 56px 0;
+    }
+    .pull-quote p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(28px, 4vw, 52px);
+      color: var(--red);
+      line-height: 1.0;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      max-width: none;
+      margin: 0;
+    }
+
+    /* ── MANIFESTO SECTION ── */
+    #manifesto {
+      position: relative;
+    }
+    #manifesto::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 6px;
+      background: var(--red);
+    }
+
+    /* ── PROPAGANDA POINTS ── */
+    .prop-list {
+      list-style: none;
+      margin: 48px 0;
+    }
+    .prop-list li {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      padding: 28px 0;
+      border-bottom: 1px solid rgba(204,28,28,0.2);
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .prop-list li.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .prop-num {
+      font-family: 'Russo One', sans-serif;
+      font-size: clamp(36px, 5vw, 60px);
+      color: var(--red);
+      line-height: 1;
+      min-width: 72px;
+      flex-shrink: 0;
+    }
+    .prop-content {
+      padding-top: 4px;
+    }
+    .prop-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 22px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--cream);
+      margin-bottom: 8px;
+      display: block;
+    }
+    .prop-content p {
+      font-size: 16px;
+      color: var(--text-dim);
+      margin: 0;
+    }
+
+    /* ── CARDS ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2px;
+      margin-top: 48px;
+      background: rgba(204,28,28,0.15);
+    }
+
+    .card {
+      background: #111;
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      height: 3px;
+      width: 0;
+      background: var(--red);
+      transition: width 0.3s ease;
+    }
+    .card:hover { background: #161616; }
+    .card:hover::after { width: 100%; }
+
+    .card-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 15px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--cream);
+      margin-bottom: 14px;
+    }
+    .card p { font-size: 15px; color: var(--text-dim); margin: 0; max-width: none; }
+
+    /* ── CONSTRUCTIVIST LAYOUT ── */
+    .constructivist-block {
+      margin: 52px 0;
+      position: relative;
+    }
+    .constructivist-block .big-word {
+      font-family: 'Russo One', sans-serif;
+      font-size: clamp(60px, 10vw, 120px);
+      color: var(--red);
+      line-height: 0.85;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .constructivist-block .body-text {
+      font-family: 'PT Serif', serif;
+      font-size: 17px;
+      color: var(--text);
+      max-width: 55ch;
+      line-height: 1.8;
+    }
+
+    /* Diagonal divider */
+    .diagonal-divider {
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--red) 60%, transparent 60%);
+      margin: 48px 0;
+      position: relative;
+    }
+    .diagonal-divider::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 60%;
+      width: 0;
+      height: 0;
+      border-top: 3px solid var(--red);
+      border-right: 20px solid transparent;
+    }
+
+    /* ── GEOMETRIC BORDER (Soviet CSS) ── */
+    .soviet-border {
+      margin: 52px 0;
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .sb-row {
+      display: flex;
+      height: 8px;
+      gap: 2px;
+    }
+    .sb-r { background: var(--red); }
+    .sb-b { background: #111; }
+    .sb-c { background: var(--cream); }
+    .sb-r1 { flex: 3; }
+    .sb-b1 { flex: 1; }
+    .sb-c1 { flex: 2; }
+    .sb-r2 { flex: 1; }
+    .sb-b2 { flex: 3; }
+
+    /* ── TYPE SHOWCASE ── */
+    .type-row {
+      border-bottom: 1px solid rgba(204,28,28,0.2);
+      padding: 28px 0;
+    }
+    .type-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    /* ── BACK BAR ── */
+    .back-bar {
+      text-align: center;
+      padding: 60px 40px;
+      border-top: 2px solid var(--red);
+    }
+    .back-bar a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: 0.3em;
+      color: var(--red);
+      text-decoration: none;
+      text-transform: uppercase;
+      border: 2px solid var(--red);
+      padding: 14px 32px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .back-bar a:hover { background: var(--red); color: var(--cream); }
+
+    /* ── REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin: 0;
+    }
+    .divider-bar {
+      height: 4px;
+      flex: 1;
+      background: var(--red);
+    }
+    .divider-dot {
+      width: 20px;
+      height: 20px;
+      background: var(--gold);
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+
+    /* ── REDUCED MOTION ── */
+    @media (prefers-reduced-motion: reduce) {
+      body { opacity: 1 !important; }
+      .reveal, .prop-list li { opacity: 1 !important; transform: none !important; transition: none !important; }
+      .hero-line-inner { animation: none !important; opacity: 1 !important; transform: none !important; }
+      .hero-bar { animation: none !important; transform: translateX(-52%) skewX(-8deg); }
+      .hero-sub { opacity: 1 !important; animation: none !important; }
+      .hero-star, .star-svg { animation: none !important; opacity: 1 !important; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 12px 16px; gap: 12px; }
+      nav a { font-size: 9px; }
+      section { padding: 72px 20px; }
+      #hero { padding: 120px 5vw 80px; }
+      .hero-star { right: 20px; bottom: 40px; }
+      .prop-num { font-size: 36px; min-width: 48px; }
+      #manifesto::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<nav>
+  <span class="brand">★ The Internationale</span>
+  <a href="#manifesto">Manifesto</a>
+  <a href="#story">The Story</a>
+  <a href="#why">Why It Works</a>
+  <a href="#type">Type</a>
+  <a href="./" class="nav-back">← All Styles</a>
+</nav>
+
+<!-- ═══════ HERO ═══════ -->
+<section id="hero">
+  <div class="hero-bar"></div>
+
+  <div class="hero-text-block">
+    <span class="hero-line hero-line-1"><span class="hero-line-inner">THE STORY</span></span>
+    <span class="hero-line hero-line-2"><span class="hero-line-inner">IS THE</span></span>
+    <span class="hero-line hero-line-3"><span class="hero-line-inner">WEAPON.</span></span>
+  </div>
+
+  <p class="hero-sub">
+    "Every story ever told was an act of power. Storyteller gives that power back."
+  </p>
+
+  <div class="hero-star" id="hero-star">
+    <svg class="star-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35" fill="#d4a017"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ═══════ MANIFESTO ═══════ -->
+<section id="manifesto" style="background: #0d0d0d; padding-left: 60px;">
+  <div class="inner">
+    <span class="section-label">Принципы — Principles</span>
+    <span class="draw-line reveal"></span>
+    <h2 class="reveal">The collective voice<br>is louder than the author's.</h2>
+
+    <ul class="prop-list">
+      <li>
+        <span class="prop-num">1</span>
+        <div class="prop-content">
+          <span class="prop-title">The Author Is Dead.</span>
+          <p>Every story that has ever been told required a listener. The listener is now a participant. The author recedes the moment the words leave their mouth. What remains is yours.</p>
+        </div>
+      </li>
+      <li>
+        <span class="prop-num">2</span>
+        <div class="prop-content">
+          <span class="prop-title">The Machine Serves the People.</span>
+          <p>Storyteller does not generate content. It generates conditions for human experience. The tool does not speak. You speak. The tool clears the room.</p>
+        </div>
+      </li>
+      <li>
+        <span class="prop-num">3</span>
+        <div class="prop-content">
+          <span class="prop-title">All Stories Are Political.</span>
+          <p>The choice of what story gets told, and how, is never neutral. Every form is an argument. We choose openness. We choose the reader over the institution.</p>
+        </div>
+      </li>
+      <li>
+        <span class="prop-num">4</span>
+        <div class="prop-content">
+          <span class="prop-title">History Belongs to Those Who Live It.</span>
+          <p>Your version of the story is the correct one. Not because it is accurate. Because it is yours, and you carried it here, and no archive gets to tell you otherwise.</p>
+        </div>
+      </li>
+    </ul>
+
+    <div class="pull-quote reveal">
+      <p>"Art is not a mirror. It is a hammer."</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider">
+  <div class="divider-bar"></div>
+  <div class="divider-dot"></div>
+  <div class="divider-bar"></div>
+</div>
+
+<!-- ═══════ THE STORY ═══════ -->
+<section id="story" style="background: var(--deep);">
+  <div class="inner">
+    <span class="section-label">Excerpt — Adapted from Gorky</span>
+    <span class="draw-line reveal"></span>
+
+    <div class="constructivist-block reveal">
+      <span class="big-word">СЛОВО</span>
+      <p class="body-text">She had walked this road many times, always in the same direction, always carrying the same weight. But today something had shifted in the marrow of the morning — a word had been spoken, and words, once spoken, have a way of becoming walls.</p>
+    </div>
+
+    <div class="diagonal-divider reveal"></div>
+
+    <p class="reveal">She had not chosen to become the kind of person who keeps secrets. She had simply kept enough of them that the distinction stopped mattering. The factory was behind her. The street was in front. Between those two facts was everything that had changed.</p>
+
+    <p class="reveal">The word had been: <em>remember.</em> Someone had said it quietly, standing close. As if remembering were something you could instruct a person to do. As if the past were a file that could be opened and closed. As if anything that had happened in that room had not already become permanent, the way all witnessed things become permanent, whether or not the witnesses survive.</p>
+
+    <div class="soviet-border reveal">
+      <div class="sb-row"><div class="sb-r sb-r1"></div><div class="sb-b sb-b1"></div><div class="sb-c sb-c1"></div></div>
+      <div class="sb-row"><div class="sb-b sb-b2"></div><div class="sb-r sb-r2"></div><div class="sb-c sb-c1"></div></div>
+      <div class="sb-row"><div class="sb-c sb-c1"></div><div class="sb-r sb-r1"></div><div class="sb-b sb-b1"></div></div>
+    </div>
+
+    <p class="reveal">The story remembers everything the state forgets. Every whispered name, every burned document — the story holds it. Not as evidence. Not as accusation. As the simple, absolute fact of what occurred, which does not require permission to remain true.</p>
+
+    <div class="pull-quote reveal">
+      <p>"The record is the only court that cannot be adjourned."</p>
+    </div>
+
+    <p class="reveal">This is what Storyteller understands: that the act of telling is also an act of keeping. Every story placed in the world is one the world will have to account for. The machine does not forget. The listener does not forget. And the story — once told, truly told — cannot be untold.</p>
+  </div>
+</section>
+
+<div class="divider">
+  <div class="divider-bar"></div>
+  <div class="divider-dot"></div>
+  <div class="divider-bar"></div>
+</div>
+
+<!-- ═══════ WHY IT WORKS ═══════ -->
+<section id="why" style="background: #0d0d0d;">
+  <div class="inner">
+    <span class="section-label">Design Rationale</span>
+    <span class="draw-line reveal"></span>
+    <h2 class="reveal">Form is function.<br>Function is power.</h2>
+    <p class="reveal">Soviet Constructivism understood something about design that most movements miss: the form is the argument. The size of the type is not aesthetic preference — it is a claim about importance. The angle of the composition is not decoration — it is urgency made visible.</p>
+    <p class="reveal">This is why Constructivist design still lands. It does not ask you to admire it. It demands that you respond to it. Every element takes a position. Ambiguity is, in Rodchenko's famous formulation, a bourgeois luxury.</p>
+
+    <div class="card-grid">
+      <div class="card reveal">
+        <div class="card-title">Typography as Weapon</div>
+        <p>Constructivism understood that type was not decoration — it was argumentation. Size, weight, placement are rhetoric. Every typographic choice is a political choice.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-title">Colour as Ideology</div>
+        <p>Red and black eliminate the middle ground. Every element takes a position. Ambiguity is a bourgeois luxury. The cream is newsprint — the surface where truth gets pressed.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-title">The Reader as Comrade</div>
+        <p>Soviet design assumed the reader was capable of confronting big ideas in bold form. It treated attention as something to be earned, not coddled. So does Storyteller.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider">
+  <div class="divider-bar"></div>
+  <div class="divider-dot"></div>
+  <div class="divider-bar"></div>
+</div>
+
+<!-- ═══════ TYPE SYSTEM ═══════ -->
+<section id="type" style="background: #111;">
+  <div class="inner">
+    <span class="section-label">Type System</span>
+    <span class="draw-line reveal"></span>
+    <h2 class="reveal">The Type System</h2>
+
+    <div class="type-row reveal">
+      <span class="type-label">Russo One — Hero Display</span>
+      <div style="font-family:'Russo One',sans-serif; font-size:clamp(48px,9vw,120px); color:var(--cream); line-height:0.9; letter-spacing:-0.01em;">СЛОВО</div>
+      <div style="font-family:'Russo One',sans-serif; font-size:14px; color:var(--text-dim); margin-top:8px; letter-spacing:0.1em;">THE WORD</div>
+    </div>
+
+    <div class="type-row reveal">
+      <span class="type-label">Barlow Condensed 900 — Headings</span>
+      <div style="font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:clamp(28px,5vw,60px); color:var(--red); line-height:1; text-transform:uppercase; letter-spacing:0.02em;">POWER THROUGH STORY</div>
+    </div>
+
+    <div class="type-row reveal">
+      <span class="type-label">PT Serif — Body</span>
+      <div style="font-family:'PT Serif',serif; font-size:17px; color:var(--text); max-width:55ch; line-height:1.8;">The story remembers everything the state forgets. Every whispered name, every burned document — the story holds it. Not as evidence. As the simple fact of what occurred.</div>
+    </div>
+
+    <div class="type-row reveal">
+      <span class="type-label">PT Serif Italic</span>
+      <div style="font-family:'PT Serif',serif; font-style:italic; font-size:17px; color:var(--text-dim); max-width:55ch; line-height:1.8;">"A word had been spoken, and words, once spoken, have a way of becoming walls."</div>
+    </div>
+
+    <div class="type-row reveal">
+      <span class="type-label">Palette</span>
+      <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:8px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#0d0d0d;border:1px solid rgba(255,255,255,0.15);"></div>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase;">Black</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#cc1c1c;"></div>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase;">Soviet Red</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#f5f0e8;"></div>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase;">Newsprint</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#d4a017;"></div>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase;">Gold Star</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="back-bar">
+  <a href="./">← All Styles</a>
+</div>
+
+<script>
+  // ── LOAD
+  window.addEventListener('load', () => {
+    document.body.classList.add('loaded');
+    setTimeout(() => {
+      const star = document.getElementById('hero-star');
+      star.style.opacity = '1';
+    }, 1000);
+  });
+
+  // ── SCROLL PROGRESS
+  window.addEventListener('scroll', () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+  }, { passive: true });
+
+  // ── SCROLL REVEAL — general .reveal elements
+  const reveals = document.querySelectorAll('.reveal');
+  const drawLines = document.querySelectorAll('.draw-line');
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const el = e.target;
+        const delay = el.dataset.delay || 0;
+        setTimeout(() => el.classList.add('visible'), Number(delay));
+        io.unobserve(el);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+  reveals.forEach(el => {
+    const siblings = Array.from(el.parentElement.querySelectorAll('.reveal'));
+    const idx = siblings.indexOf(el);
+    el.dataset.delay = idx * 70;
+    io.observe(el);
+  });
+
+  drawLines.forEach(el => {
+    const dlio = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); dlio.unobserve(e.target); }
+      });
+    }, { threshold: 0.5 });
+    dlio.observe(el);
+  });
+
+  // ── PROPAGANDA POINTS — percussive stagger
+  const propItems = document.querySelectorAll('.prop-list li');
+  const propIo = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const items = Array.from(e.target.parentElement.querySelectorAll('li'));
+        const idx = items.indexOf(e.target);
+        setTimeout(() => e.target.classList.add('visible'), idx * 120);
+        propIo.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  propItems.forEach(item => propIo.observe(item));
+</script>
+</body>
+</html>

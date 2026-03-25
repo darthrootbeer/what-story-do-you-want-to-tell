@@ -726,6 +726,142 @@
       box-shadow: 0 12px 60px rgba(232,0,26,0.15), 0 0 0 1px rgba(17,17,17,0.3);
     }
 
+    /* ===== SECTION 4: THE NEW SIX ===== */
+
+    .card-zeppelin {
+      background:
+        radial-gradient(ellipse 90% 50% at 50% 100%, rgba(139,26,26,0.35) 0%, transparent 70%),
+        linear-gradient(160deg, #1a1410 0%, #0d0a08 100%);
+      border-color: rgba(139,115,85,0.2);
+    }
+    .card-zeppelin .card-name { color: #c9a96e; }
+    .card-zeppelin::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        105deg,
+        transparent,
+        transparent 40px,
+        rgba(201,169,110,0.02) 40px,
+        rgba(201,169,110,0.02) 41px
+      );
+    }
+    .card-zeppelin:hover {
+      border-color: rgba(201,169,110,0.35);
+      box-shadow: 0 12px 60px rgba(139,26,26,0.2), 0 0 0 1px rgba(139,115,85,0.15);
+    }
+
+    .card-soviet {
+      background:
+        linear-gradient(135deg, #0d0d0d 0%, #1a0505 60%, #0d0d0d 100%);
+      border-color: rgba(204,28,28,0.3);
+    }
+    .card-soviet .card-name { color: #f5f0e8; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+    .card-soviet::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 5px; height: 100%;
+      background: #cc1c1c;
+    }
+    .card-soviet:hover {
+      border-color: rgba(204,28,28,0.6);
+      box-shadow: 0 12px 60px rgba(204,28,28,0.2);
+    }
+
+    .card-vinyl {
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 80%, rgba(193,127,61,0.2) 0%, transparent 65%),
+        linear-gradient(160deg, #1a1208 0%, #100c05 100%);
+      border-color: rgba(193,127,61,0.2);
+    }
+    .card-vinyl .card-name { color: #c17f3d; }
+    .card-vinyl::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: repeating-radial-gradient(
+        circle at center,
+        rgba(193,127,61,0.06) 0px,
+        rgba(193,127,61,0.06) 1px,
+        transparent 1px,
+        transparent 6px
+      );
+      opacity: 0.6;
+    }
+    .card-vinyl:hover {
+      border-color: rgba(193,127,61,0.4);
+      box-shadow: 0 12px 60px rgba(193,127,61,0.1);
+    }
+
+    .card-scriptorium {
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 70%, rgba(184,134,11,0.15) 0%, transparent 65%),
+        linear-gradient(160deg, #0f0b06 0%, #080604 100%);
+      border-color: rgba(184,134,11,0.2);
+    }
+    .card-scriptorium .card-name { color: #e8d5a3; }
+    .card-scriptorium::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(184,134,11,0.08) 0%, transparent 30%),
+        linear-gradient(to top, rgba(184,134,11,0.08) 0%, transparent 30%),
+        linear-gradient(to right, rgba(184,134,11,0.08) 0%, transparent 20%),
+        linear-gradient(to left, rgba(184,134,11,0.08) 0%, transparent 20%);
+    }
+    .card-scriptorium:hover {
+      border-color: rgba(184,134,11,0.4);
+      box-shadow: 0 12px 60px rgba(184,134,11,0.12);
+    }
+
+    .card-cape-sorrow {
+      background:
+        radial-gradient(ellipse 90% 60% at 50% 80%, rgba(26,58,92,0.6) 0%, transparent 70%),
+        linear-gradient(160deg, #0a1628 0%, #050d18 100%);
+      border-color: rgba(196,163,90,0.2);
+    }
+    .card-cape-sorrow .card-name { color: #c4a35a; }
+    .card-cape-sorrow::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        180deg,
+        transparent,
+        transparent 8px,
+        rgba(139,157,195,0.02) 8px,
+        rgba(139,157,195,0.02) 9px
+      );
+    }
+    .card-cape-sorrow:hover {
+      border-color: rgba(196,163,90,0.4);
+      box-shadow: 0 12px 60px rgba(26,58,92,0.4);
+    }
+
+    .card-giants {
+      background:
+        radial-gradient(ellipse 100% 60% at 50% 100%, rgba(74,124,31,0.25) 0%, transparent 65%),
+        linear-gradient(160deg, #0a1a04 0%, #050f02 100%);
+      border-color: rgba(245,200,66,0.2);
+    }
+    .card-giants .card-name { color: #f5c842; }
+    .card-giants::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(to right, #4a7c1f, #f5c842, #4a7c1f);
+    }
+    .card-giants:hover {
+      border-color: rgba(245,200,66,0.4);
+      box-shadow: 0 12px 60px rgba(74,124,31,0.2);
+    }
+
     /* ===== FOOTER ===== */
 
     footer {
@@ -841,7 +977,7 @@
 
       <a href="style-primordial-fire.html" class="style-card card-fire" data-index="0">
         <div class="card-inner">
-          <div class="card-number">01 / 18</div>
+          <div class="card-number">01 / 24</div>
           <div class="card-name">Primordial Fire</div>
           <div class="card-tagline">The dawn of storytelling. Cave drawings, ember glow, and the first story ever told.</div>
           <div class="card-swatches">
@@ -856,7 +992,7 @@
 
       <a href="style-gutenberg-pulp.html" class="style-card card-gutenberg" data-index="1">
         <div class="card-inner">
-          <div class="card-number">02 / 18</div>
+          <div class="card-number">02 / 24</div>
           <div class="card-name">Gutenberg &amp; the Pulp Age</div>
           <div class="card-tagline">Letterpress, penny dreadfuls, ink bleed, and the romance of print.</div>
           <div class="card-swatches">
@@ -871,7 +1007,7 @@
 
       <a href="style-library-eternal.html" class="style-card card-library" data-index="2">
         <div class="card-inner">
-          <div class="card-number">03 / 18</div>
+          <div class="card-number">03 / 24</div>
           <div class="card-name">The Library Eternal</div>
           <div class="card-tagline">Borges' infinite shelves. Leather, gold leaf, and the civilizational weight of every book ever written.</div>
           <div class="card-swatches">
@@ -887,7 +1023,7 @@
       <a href="style-infocom-terminal.html" class="style-card card-terminal" data-index="3">
         <div class="terminal-cursor">&gt;&nbsp;</div>
         <div class="card-inner">
-          <div class="card-number">04 / 18</div>
+          <div class="card-number">04 / 24</div>
           <div class="card-name">Infocom Terminal</div>
           <div class="card-tagline">Phosphor green. Blinking cursor. The golden age of interactive fiction — with a working parser.</div>
           <div class="card-swatches">
@@ -903,7 +1039,7 @@
       <a href="style-oral-tradition.html" class="style-card card-oral" data-index="4">
         <div class="sound-wave" id="soundWave"></div>
         <div class="card-inner">
-          <div class="card-number">05 / 18</div>
+          <div class="card-number">05 / 24</div>
           <div class="card-name">The Oral Tradition</div>
           <div class="card-tagline">Voice, breath, and the living story. Griot, bard, sound waves, and the moment before the tale begins.</div>
           <div class="card-swatches">
@@ -919,7 +1055,7 @@
       <a href="style-dark-editorial.html" class="style-card card-editorial" data-index="5">
         <div class="editorial-bar"></div>
         <div class="card-inner">
-          <div class="card-number">06 / 18</div>
+          <div class="card-number">06 / 24</div>
           <div class="card-name">Dark Editorial</div>
           <div class="card-tagline">Art magazine at midnight. Bold typography, section-color cycling, scroll-driven animation.</div>
           <div class="card-swatches">
@@ -946,7 +1082,7 @@
 
       <a href="style-manuscript.html" class="style-card card-manuscript" data-index="0">
         <div class="card-inner">
-          <div class="card-number">07 / 18</div>
+          <div class="card-number">07 / 24</div>
           <div class="card-name">The Manuscript</div>
           <div class="card-tagline">Ink &amp; vellum. Drop caps, marginalia, wax seals, and the weight of a handwritten world.</div>
           <div class="card-swatches">
@@ -962,7 +1098,7 @@
       <a href="style-void.html" class="style-card card-void" data-index="1">
         <div class="void-dot"></div>
         <div class="card-inner">
-          <div class="card-number">08 / 18</div>
+          <div class="card-number">08 / 24</div>
           <div class="card-name">The Void</div>
           <div class="card-tagline">Negative space horror. Black on black, one red moment, and the breathing dark.</div>
           <div class="card-swatches">
@@ -977,7 +1113,7 @@
 
       <a href="style-risograph.html" class="style-card card-risograph" data-index="2">
         <div class="card-inner">
-          <div class="card-number">09 / 18</div>
+          <div class="card-number">09 / 24</div>
           <div class="card-name">Risograph Print</div>
           <div class="card-tagline">Indie zine in two inks. Teal and coral, halftone dots, misregistration as aesthetic.</div>
           <div class="card-swatches">
@@ -992,7 +1128,7 @@
 
       <a href="style-cartographer.html" class="style-card card-cartographer" data-index="3">
         <div class="card-inner">
-          <div class="card-number">10 / 18</div>
+          <div class="card-number">10 / 24</div>
           <div class="card-name">The Cartographer</div>
           <div class="card-tagline">Ancient maps and sea monsters. Compass roses, fog of war, and coastlines drawn by hand.</div>
           <div class="card-swatches">
@@ -1007,7 +1143,7 @@
 
       <a href="style-neon-tokyo.html" class="style-card card-neon" data-index="4">
         <div class="card-inner">
-          <div class="card-number">11 / 18</div>
+          <div class="card-number">11 / 24</div>
           <div class="card-name">Neon Tokyo</div>
           <div class="card-tagline">Wet asphalt and chromatic aberration. Rain canvas, puddle reflections, and the city at 2am.</div>
           <div class="card-swatches">
@@ -1031,7 +1167,7 @@
           <span style="background:#0000ff"></span>
         </div>
         <div class="card-inner">
-          <div class="card-number">12 / 18</div>
+          <div class="card-number">12 / 24</div>
           <div class="card-name">The Broadcast</div>
           <div class="card-tagline">Emergency signal. SMPTE bars, VHS tracking lines, EAS alerts, and an intercepted transmission.</div>
           <div class="card-swatches">
@@ -1058,7 +1194,7 @@
 
       <a href="style-magazine-fashion.html" class="style-card card-magazine-fashion" data-index="0">
         <div class="card-inner">
-          <div class="card-number">13 / 18</div>
+          <div class="card-number">13 / 24</div>
           <div class="card-name">Fashion Editorial</div>
           <div class="card-tagline">Vogue/W at its coldest. White space as power. One gold rule, used twice.</div>
           <div class="card-swatches">
@@ -1073,7 +1209,7 @@
 
       <a href="style-magazine-science.html" class="style-card card-magazine-science" data-index="1">
         <div class="card-inner">
-          <div class="card-number">14 / 18</div>
+          <div class="card-number">14 / 24</div>
           <div class="card-name">Science Weekly</div>
           <div class="card-tagline">Nature/NatGeo rigor. Data components, SVG charts, Source Serif and Space Mono.</div>
           <div class="card-swatches">
@@ -1088,7 +1224,7 @@
 
       <a href="style-magazine-underground.html" class="style-card card-magazine-underground" data-index="2">
         <div class="card-inner">
-          <div class="card-number">15 / 18</div>
+          <div class="card-number">15 / 24</div>
           <div class="card-name">Underground Press</div>
           <div class="card-tagline">1960s–70s counterculture. Black reverso, manifesto typography, conspiracy sidebars.</div>
           <div class="card-swatches">
@@ -1103,7 +1239,7 @@
 
       <a href="style-magazine-japan.html" class="style-card card-magazine-japan" data-index="3">
         <div class="card-inner">
-          <div class="card-number">16 / 18</div>
+          <div class="card-number">16 / 24</div>
           <div class="card-name">Japanese Design Annual</div>
           <div class="card-tagline">Idea Magazine precision. 12-column grid, bilingual typography, one red accent used four ways.</div>
           <div class="card-swatches">
@@ -1118,7 +1254,7 @@
 
       <a href="style-magazine-longform.html" class="style-card card-magazine-longform" data-index="4">
         <div class="card-inner">
-          <div class="card-number">17 / 18</div>
+          <div class="card-number">17 / 24</div>
           <div class="card-name">Long-Form Narrative</div>
           <div class="card-tagline">New Yorker/Esquire 1968. Drop caps, pull quotes, dingbat breaks, and prose that earns the space.</div>
           <div class="card-swatches">
@@ -1133,7 +1269,7 @@
 
       <a href="style-magazine-tabloid.html" class="style-card card-magazine-tabloid" data-index="5">
         <div class="card-inner">
-          <div class="card-number">18 / 18</div>
+          <div class="card-number">18 / 24</div>
           <div class="card-name">Newsstand Tabloid</div>
           <div class="card-tagline">AI LEARNS TO TELL STORIES: EXPERTS STUNNED. Breaking tickers, screamer headlines, 3-column grid.</div>
           <div class="card-swatches">
@@ -1141,6 +1277,105 @@
             <div class="swatch" style="background:#aaa"></div>
             <div class="swatch" style="background:#111"></div>
             <div class="swatch" style="background:#e8001a"></div>
+          </div>
+          <div class="card-cta">Explore →</div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <section class="gallery-section">
+    <div class="section-header">
+      <span class="section-title">The New Six</span>
+    </div>
+    <div class="style-grid">
+
+      <a href="style-zeppelin-noir.html" class="style-card card-zeppelin" data-index="0">
+        <div class="card-inner">
+          <div class="card-number">19 / 24</div>
+          <div class="card-name">Zeppelin Noir</div>
+          <div class="card-tagline">Someone is dead. Landfall in 31 hours. Somewhere over the Atlantic, 1937.</div>
+          <div class="card-swatches">
+            <div class="swatch" style="background:#1a1410"></div>
+            <div class="swatch" style="background:#8b7355"></div>
+            <div class="swatch" style="background:#c9a96e"></div>
+            <div class="swatch" style="background:#8b1a1a"></div>
+          </div>
+          <div class="card-cta">Explore →</div>
+        </div>
+      </a>
+
+      <a href="style-soviet.html" class="style-card card-soviet" data-index="1">
+        <div class="card-inner">
+          <div class="card-number">20 / 24</div>
+          <div class="card-name">The Internationale</div>
+          <div class="card-tagline">THE STORY IS THE WEAPON. Bold diagonals, red and black, the art of argumentation.</div>
+          <div class="card-swatches">
+            <div class="swatch" style="background:#0d0d0d"></div>
+            <div class="swatch" style="background:#cc1c1c"></div>
+            <div class="swatch" style="background:#f5f0e8"></div>
+            <div class="swatch" style="background:#d4a017"></div>
+          </div>
+          <div class="card-cta">Explore →</div>
+        </div>
+      </a>
+
+      <a href="style-vinyl.html" class="style-card card-vinyl" data-index="2">
+        <div class="card-inner">
+          <div class="card-number">21 / 24</div>
+          <div class="card-name">The Velvet Needle</div>
+          <div class="card-tagline">A record store that knows what you need. Dust, wood, a cat named Coltrane.</div>
+          <div class="card-swatches">
+            <div class="swatch" style="background:#1a1208"></div>
+            <div class="swatch" style="background:#2d1f0e"></div>
+            <div class="swatch" style="background:#c17f3d"></div>
+            <div class="swatch" style="background:#f0e8d8"></div>
+          </div>
+          <div class="card-cta">Explore →</div>
+        </div>
+      </a>
+
+      <a href="style-scriptorium.html" class="style-card card-scriptorium" data-index="3">
+        <div class="card-inner">
+          <div class="card-number">22 / 24</div>
+          <div class="card-name">Scriptorium</div>
+          <div class="card-tagline">Candlelit. Vellum. Stained glass. Every word is a confession. The monk is dead.</div>
+          <div class="card-swatches">
+            <div class="swatch" style="background:#0f0b06"></div>
+            <div class="swatch" style="background:#e8d5a3"></div>
+            <div class="swatch" style="background:#b8860b"></div>
+            <div class="swatch" style="background:#8b1a1a"></div>
+          </div>
+          <div class="card-cta">Explore →</div>
+        </div>
+      </a>
+
+      <a href="style-cape-sorrow.html" class="style-card card-cape-sorrow" data-index="4">
+        <div class="card-inner">
+          <div class="card-number">23 / 24</div>
+          <div class="card-name">Cape Sorrow</div>
+          <div class="card-tagline">Population 412. A treasure map. A sea monster. Summer 1953, coastal Maine.</div>
+          <div class="card-swatches">
+            <div class="swatch" style="background:#0a1628"></div>
+            <div class="swatch" style="background:#1a3a5c"></div>
+            <div class="swatch" style="background:#c4a35a"></div>
+            <div class="swatch" style="background:#8b9dc3"></div>
+          </div>
+          <div class="card-cta">Explore →</div>
+        </div>
+      </a>
+
+      <a href="style-giants.html" class="style-card card-giants" data-index="5">
+        <div class="card-inner">
+          <div class="card-number">24 / 24</div>
+          <div class="card-name">Fe Fi Fo Fum</div>
+          <div class="card-tagline">BIG. CHUNKY. MASSIVE. HEAVY. Typography as physical experience.</div>
+          <div class="card-swatches">
+            <div class="swatch" style="background:#0a1a04"></div>
+            <div class="swatch" style="background:#4a7c1f"></div>
+            <div class="swatch" style="background:#f5c842"></div>
+            <div class="swatch" style="background:#3d2010"></div>
           </div>
           <div class="card-cta">Explore →</div>
         </div>
@@ -1158,7 +1393,7 @@
       <span class="footer-divider">—</span>
       STRY-164
       <span class="footer-divider">—</span>
-      18 Directions
+      24 Directions
       <span class="footer-divider">—</span>
       2026
     </p>
