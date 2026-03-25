@@ -1156,11 +1156,11 @@
         document.querySelector('.hero-vignette').classList.add('dimmed');
       }, 80);
 
-      setTimeout(() => {
+      document.fonts.ready.then(() => {
         document.getElementById('nav').classList.add('visible');
         document.getElementById('hero-eyebrow').classList.add('visible');
         document.getElementById('scroll-hint').classList.add('visible');
-      }, 100);
+      });
       setTimeout(() => {
         const el = document.getElementById('hero-title');
         const fullText = 'Stories have always been alive.';
@@ -1283,6 +1283,70 @@
     }, { threshold: 0.65, rootMargin: '0px 0px -80px 0px' });
     stbObserver.observe(document.getElementById('beat-4'));
 
+    let beat3Revealed = false;
+    const beat3Observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting || beat3Revealed) return;
+        beat3Revealed = true;
+        const el = document.getElementById('beat-3');
+        el.querySelectorAll('.reveal-tag').forEach((e, i) => {
+          setTimeout(() => e.classList.add('is-visible'), i * 80);
+        });
+        el.querySelectorAll('.reveal-heading').forEach((e, i) => {
+          setTimeout(() => e.classList.add('is-visible'), 100 + i * 80);
+        });
+        el.querySelectorAll('.reveal-body').forEach((e, i) => {
+          setTimeout(() => e.classList.add('is-visible'), 200 + i * 80);
+        });
+        const items = el.querySelectorAll('.not-item');
+        const charSpeed = 42;
+        let cursor = 0;
+        items.forEach(item => {
+          const stText = item.querySelector('.strikethrough-text');
+          const nodes = Array.from(stText.childNodes);
+          stText.innerHTML = '';
+          let allChars = [];
+          nodes.forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE) {
+              for (const ch of node.textContent) {
+                const s = document.createElement('span');
+                s.className = 'not-char';
+                s.textContent = ch;
+                stText.appendChild(s);
+                allChars.push(s);
+              }
+            } else {
+              const em = node.cloneNode(false);
+              for (const ch of node.textContent) {
+                const s = document.createElement('span');
+                s.className = 'not-char';
+                s.textContent = ch;
+                em.appendChild(s);
+                allChars.push(s);
+              }
+              stText.appendChild(em);
+            }
+          });
+          const lineDelay = cursor;
+          setTimeout(() => item.classList.add('is-visible'), lineDelay);
+          allChars.forEach((ch, i) => {
+            setTimeout(() => ch.classList.add('shown'), lineDelay + i * charSpeed);
+          });
+          const typeEnd = lineDelay + allChars.length * charSpeed;
+          setTimeout(() => item.classList.add('struck'), typeEnd + 400);
+          cursor = lineDelay + 300 + allChars.length * charSpeed;
+        });
+        const lastItem = items[items.length - 1];
+        const lastChars = lastItem.querySelectorAll('.not-char').length;
+        const lastDelay = cursor - 300;
+        const totalEnd = lastDelay + lastChars * charSpeed + 400 + 3000 + 800;
+        el.querySelectorAll('.not-turn-word').forEach((w, i) => {
+          setTimeout(() => w.classList.add('is-visible'), totalEnd + i * 1100);
+        });
+      });
+    }, { threshold: 0.5, rootMargin: '0px 0px -80px 0px' });
+    beat3Observer.observe(document.getElementById('beat-3'));
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
@@ -1305,71 +1369,8 @@
           setTimeout(() => e.classList.add('is-visible'), 200 + i * 100);
         });
 
-        // Beat 3 — typewriter then strike
-        if (el.id === 'beat-3') {
-          const items = el.querySelectorAll('.not-item');
-          const charSpeed = 42; // ms per character
-          let cursor = 0; // tracks absolute time offset
-
-          items.forEach(item => {
-            // Wrap every text node character in .not-char spans
-            const stText = item.querySelector('.strikethrough-text');
-            // Collect all child nodes and rebuild with char spans
-            const nodes = Array.from(stText.childNodes);
-            stText.innerHTML = '';
-            let allChars = [];
-
-            nodes.forEach(node => {
-              if (node.nodeType === Node.TEXT_NODE) {
-                for (const ch of node.textContent) {
-                  const s = document.createElement('span');
-                  s.className = 'not-char';
-                  s.textContent = ch;
-                  stText.appendChild(s);
-                  allChars.push(s);
-                }
-              } else {
-                // em.not-fade — wrap its chars too
-                const em = node.cloneNode(false);
-                for (const ch of node.textContent) {
-                  const s = document.createElement('span');
-                  s.className = 'not-char';
-                  s.textContent = ch;
-                  em.appendChild(s);
-                  allChars.push(s);
-                }
-                stText.appendChild(em);
-              }
-            });
-
-            const lineDelay = cursor;
-
-            // Make item visible (opacity/transform) immediately at its slot
-            setTimeout(() => item.classList.add('is-visible'), lineDelay);
-
-            // Type each character
-            allChars.forEach((ch, i) => {
-              setTimeout(() => ch.classList.add('shown'), lineDelay + i * charSpeed);
-            });
-
-            const typeEnd = lineDelay + allChars.length * charSpeed;
-
-            // Strike after a short pause post-typing
-            setTimeout(() => item.classList.add('struck'), typeEnd + 400);
-
-            // Next line starts shortly after this line begins typing
-            cursor = lineDelay + 300 + allChars.length * charSpeed;
-          });
-
-          // "Something else entirely" after all strikes finish
-          const lastItem = items[items.length - 1];
-          const lastChars = lastItem.querySelectorAll('.not-char').length;
-          const lastDelay = cursor - 300; // cursor already advanced
-          const totalEnd = lastDelay + lastChars * charSpeed + 400 + 3000 + 800;
-          el.querySelectorAll('.not-turn-word').forEach((w, i) => {
-            setTimeout(() => w.classList.add('is-visible'), totalEnd + i * 1100);
-          });
-        }
+        // Beat 3 handled by dedicated beat3Observer
+        if (el.id === 'beat-3') return;
 
         // Beat 5 vignette cards
         el.querySelectorAll('.vignette-card').forEach(e => {
