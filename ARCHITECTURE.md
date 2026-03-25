@@ -128,37 +128,9 @@ The `styles-gallery.html` file at root is a legacy redirect stub pointing to `de
 
 ---
 
-## Adding a New Style to the Design Language Gallery
+## Design Language
 
-The preferred way to add a new style is the **Design Aesthetic Pipeline** — a 13-stage research and execution process that produces a fully researched, beautifully executed style demo. See the [pipeline brief intake template](design-language/pipeline/brief-intake.md) for how to start a run.
-
-For quick one-off styles, see [`docs/how-to-build-a-style.md`](docs/how-to-build-a-style.md).
-
-### File naming
-
-Style demos follow the pattern `design-language/style-[kebab-name].html`. The name should describe the aesthetic, not the project:
-
-- `style-soviet.html` — Soviet constructivist propaganda
-- `style-neon-tokyo.html` — Cyberpunk Japanese signage
-- `style-magazine-tabloid.html` — Sensational tabloid press
-
-### Gallery card
-
-After adding the HTML file, add a card to `design-language/index.html`. See [`docs/how-to-build-a-style.md`](docs/how-to-build-a-style.md) for the card template.
-
----
-
-## Design Language Pipeline
-
-The `design-language/pipeline/` folder contains templates and briefs for the Design Aesthetic Pipeline.
-
-| File | Purpose |
-|---|---|
-| `pipeline/brief-intake.md` | Stage 1 intake template — fill this out to start a pipeline run |
-
-Pipeline runs produce:
-1. A style demo HTML file (`design-language/style-[name].html`)
-2. A reference document in the Storyteller Obsidian vault
+Style demos, the aesthetic pipeline, and all design R&D live in the private repo: [darthrootbeer/storyteller-design-language](https://github.com/darthrootbeer/storyteller-design-language)
 
 ---
 
