@@ -1,0 +1,2281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Storyteller — Project Introduction</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+
+  <style>
+    /* ─── RESET & BASE ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --text: #f0ede8;
+      --text-muted: #9e9a95;
+      --accent: #7c3aed;
+      --accent-glow: rgba(124,58,237,0.15);
+      --accent-soft: #a78bfa;
+      --section-bg: rgba(124,58,237,0.06);
+      --active: #a78bfa;
+      /* Part colors */
+      --part1: #a78bfa;
+      --part2: #60a5fa;
+      --part3: #4ade80;
+      --part4: #fbbf24;
+      --part5: #f87171;
+      --part6: #22d3ee;
+      /* Companion callout / link color */
+      --violet: #a855f7;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 18px;
+      line-height: 1.8;
+      overflow-x: hidden;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    body.loaded { opacity: 1; }
+
+    /* ─── SCROLL PROGRESS BAR ────────────────────────────────────── */
+    #scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 9999;
+      background: var(--active);
+      transition: background 0.4s ease;
+      will-change: width, background;
+    }
+
+    /* ─── CURSOR GLOW ────────────────────────────────────────────── */
+    #cursor-glow {
+      position: fixed;
+      pointer-events: none;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--active) 0%, transparent 70%);
+      opacity: 0.08;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+      will-change: transform, background;
+      transition: background 0.4s ease;
+    }
+
+    @media (max-width: 1199px) { #cursor-glow { display: none; } }
+    @media (hover: none) { #cursor-glow { display: none; } }
+
+    /* ─── TYPOGRAPHY ────────────────────────────────────────────── */
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(52px, 8vw, 96px);
+      line-height: 1.05;
+      text-align: center;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 600;
+      padding-left: 16px;
+      border-left: 3px solid var(--accent);
+      margin: 2.5rem 0 1rem;
+      color: var(--text);
+      position: relative;
+      overflow: hidden;
+      transition: border-left-width 0.2s ease, padding-left 0.2s ease;
+      will-change: transform, opacity;
+    }
+
+    h3:hover {
+      border-left-width: 5px;
+      padding-left: 18px;
+    }
+
+    h3::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--accent);
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform 0.3s ease;
+    }
+
+    h3.reveal-done::after { transform: scaleY(1); }
+
+    p { max-width: 65ch; margin-bottom: 1.4rem; }
+
+    a { color: var(--accent-soft); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    strong { color: #fff; font-weight: 600; }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82em;
+      background: rgba(255,255,255,0.08);
+      color: var(--accent-soft);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    /* ─── HERO ──────────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px;
+      position: relative;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 50% 60%, rgba(124,58,237,0.18) 0%, transparent 70%);
+    }
+
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(124,58,237,0.12) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(37,99,235,0.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      will-change: transform;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.25em;
+      color: var(--accent-soft);
+      margin-bottom: 28px;
+      opacity: 0;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .hero-title {
+      opacity: 0;
+      margin-bottom: 48px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.15em;
+    }
+
+    .hero-title .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(30px);
+      will-change: transform, opacity;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent-soft);
+    }
+
+    .hero-pull {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(22px, 3.5vw, 36px);
+      font-style: italic;
+      text-align: center;
+      max-width: 720px;
+      color: rgba(240,237,232,0.75);
+      line-height: 1.4;
+      opacity: 0;
+      transform: translateY(20px);
+      position: relative;
+      will-change: transform, opacity;
+    }
+
+    .hero-pull::before,
+    .hero-pull::after {
+      content: '"';
+      font-size: 1.4em;
+      color: var(--accent-soft);
+      opacity: 0.6;
+    }
+
+    .hero-pull-inner {
+      position: relative;
+      will-change: transform;
+    }
+
+    /* ─── COMPANION CALLOUT ─── */
+    .companion-callout {
+      margin: 32px 0 48px;
+      padding: 20px 28px;
+      border-left: 3px solid var(--violet);
+      background: rgba(168, 85, 247, 0.08);
+      border-radius: 0 6px 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .companion-callout:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(168,85,247,0.15);
+    }
+
+    .companion-callout-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      color: var(--violet);
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .companion-callout-text {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 14px;
+      color: #888;
+      line-height: 1.5;
+    }
+    .companion-callout-text a {
+      color: var(--violet);
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.4);
+      transition: border-color 0.2s;
+    }
+    .companion-callout-text a:hover { border-color: var(--violet); }
+
+    .companion-link {
+      display: inline-block;
+      margin-top: 32px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 15px;
+      letter-spacing: 0.12em;
+      color: var(--violet);
+      text-decoration: none;
+      border: 1px solid var(--violet);
+      padding: 8px 20px;
+      border-radius: 3px;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+
+    .companion-link:hover {
+      background: var(--violet);
+      color: #0a0a0f;
+      text-decoration: none;
+    }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      will-change: opacity, transform;
+    }
+
+    .hero-scroll-hint span {
+      display: block;
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, var(--accent-soft), transparent);
+      margin: 0 auto;
+      animation: scrollBounce 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateY(0); opacity: 1; }
+      50% { transform: translateY(8px); opacity: 0.5; }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 0.5; }
+    }
+
+    /* ─── SCROLL REVEAL BASE STATES ─────────────────────────────── */
+    .reveal-para {
+      opacity: 0;
+      transform: translateY(40px);
+      will-change: transform, opacity;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal-para.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-h2 {
+      opacity: 0;
+      transform: translateX(-60px);
+      will-change: transform, opacity;
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal-h2.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .reveal-h3 {
+      opacity: 0;
+      transform: translateY(16px);
+      will-change: transform, opacity;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .reveal-h3.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-card {
+      opacity: 0;
+      transform: scale(0.92) translateY(20px);
+      will-change: transform, opacity;
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+
+    .reveal-card.visible {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+
+    .reveal-callout {
+      opacity: 0;
+      transform: translateX(40px);
+      will-change: transform, opacity;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal-callout.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .reveal-pull {
+      opacity: 0;
+      transform: translateY(30px) rotate(-2deg);
+      will-change: transform, opacity;
+      transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    .reveal-pull.visible {
+      opacity: 1;
+      transform: translateY(0) rotate(0deg);
+    }
+
+    .reveal-table-row {
+      opacity: 0;
+      transform: translateY(12px);
+      will-change: transform, opacity;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .reveal-table-row.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-li {
+      opacity: 0;
+      transform: scale(0.94) translateY(12px);
+      will-change: transform, opacity;
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .reveal-li.visible {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+
+    /* ─── LAYOUT ────────────────────────────────────────────────── */
+    .page-wrapper {
+      display: grid;
+      grid-template-columns: 1fr;
+      position: relative;
+    }
+
+    @media (min-width: 1200px) {
+      .page-wrapper {
+        grid-template-columns: 260px 1fr;
+        align-items: start;
+      }
+    }
+
+    .content-column {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 32px 120px;
+      width: 100%;
+    }
+
+    @media (min-width: 1200px) {
+      .content-column {
+        grid-column: 2;
+        margin: 0 auto 0 0;
+        padding: 0 48px 120px 32px;
+        max-width: 820px;
+      }
+    }
+
+    /* ─── STICKY TOC ────────────────────────────────────────────── */
+    .toc-sidebar {
+      display: none;
+    }
+
+    @media (min-width: 1200px) {
+      .toc-sidebar {
+        display: block;
+        position: sticky;
+        top: 32px;
+        height: calc(100vh - 64px);
+        overflow-y: auto;
+        padding: 32px 16px 32px 32px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.1) transparent;
+        opacity: 0;
+        transform: translateX(-20px);
+        will-change: transform, opacity;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+
+      .toc-sidebar.loaded {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .toc-sidebar::-webkit-scrollbar { width: 4px; }
+      .toc-sidebar::-webkit-scrollbar-track { background: transparent; }
+      .toc-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+    }
+
+    .toc-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: rgba(240,237,232,0.3);
+      margin-bottom: 16px;
+      padding-left: 12px;
+    }
+
+    .toc-list { list-style: none; }
+    .toc-list li { margin-bottom: 2px; }
+
+    .toc-part-link {
+      display: block;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      color: rgba(240,237,232,0.45);
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: color 0.3s, background 0.3s, border-left-color 0.3s, padding-left 0.2s;
+      border-left: 2px solid transparent;
+    }
+
+    .toc-part-link:hover {
+      color: var(--active);
+      border-left-color: var(--active);
+      background: rgba(255,255,255,0.04);
+      text-decoration: none;
+      padding-left: 16px;
+    }
+
+    .toc-part-link.active {
+      color: var(--active);
+      border-left-color: var(--active);
+      background: rgba(255,255,255,0.04);
+      text-decoration: none;
+    }
+
+    .toc-h3-link {
+      display: block;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 11px;
+      color: rgba(240,237,232,0.3);
+      padding: 3px 12px 3px 20px;
+      border-radius: 4px;
+      transition: color 0.3s, padding-left 0.2s;
+      border-left: 2px solid transparent;
+      line-height: 1.4;
+    }
+
+    .toc-h3-link:hover {
+      color: rgba(240,237,232,0.7);
+      text-decoration: none;
+      padding-left: 26px;
+    }
+
+    .toc-h3-link.active {
+      color: rgba(240,237,232,0.7);
+      text-decoration: none;
+    }
+
+    /* ─── CHAPTER OPENER ─────────────────────────────────────────── */
+    .chapter-opener {
+      background: var(--section-bg);
+      padding: 64px 0 48px;
+      margin: 0 -32px;
+      padding-left: 32px;
+      padding-right: 32px;
+      position: relative;
+      overflow: hidden;
+      transform: scaleX(0.95);
+      transform-origin: left;
+      will-change: transform;
+      transition: transform 0.8s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    .chapter-opener.visible {
+      transform: scaleX(1);
+    }
+
+    .chapter-opener::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--accent), transparent);
+      opacity: 0.3;
+    }
+
+    /* Parallax zoom on chapter opener */
+    .chapter-opener-inner {
+      will-change: transform;
+    }
+
+    @media (min-width: 1200px) {
+      .chapter-opener {
+        margin: 0 -48px 0 -32px;
+        padding-left: 32px;
+        padding-right: 48px;
+      }
+    }
+
+    .chapter-eyebrow {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: var(--accent-soft);
+      margin-bottom: 8px;
+      opacity: 0;
+      transform: translateY(12px);
+      will-change: transform, opacity;
+      transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+      position: relative;
+    }
+
+    .chapter-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 0;
+      height: 1px;
+      background: var(--accent-soft);
+      margin-right: 0;
+      vertical-align: middle;
+      transition: width 0.4s ease, margin-right 0.4s ease;
+    }
+
+    .chapter-opener.visible .chapter-eyebrow {
+      opacity: 0.7;
+      transform: translateY(0);
+    }
+
+    .chapter-opener.visible .chapter-eyebrow::before {
+      width: 20px;
+      margin-right: 8px;
+    }
+
+    .chapter-opener.visible .chapter-eyebrow.pulse-once {
+      animation: eyebrowPulse 0.4s ease;
+    }
+
+    @keyframes eyebrowPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .chapter-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(36px, 5vw, 64px);
+      line-height: 1.1;
+      color: var(--text);
+      max-width: 700px;
+      opacity: 0;
+      letter-spacing: -0.02em;
+      will-change: opacity, letter-spacing;
+      transition: opacity 0.7s ease 0.35s, letter-spacing 0.7s ease 0.35s;
+    }
+
+    .chapter-opener.visible .chapter-title {
+      opacity: 1;
+      letter-spacing: -0.02em;
+    }
+
+    /* ─── PULL QUOTES ────────────────────────────────────────────── */
+    .pull-quote {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(22px, 3vw, 30px);
+      font-style: italic;
+      line-height: 1.4;
+      text-align: center;
+      max-width: 100%;
+      padding: 48px 0;
+      margin: 2rem 0;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      color: rgba(240,237,232,0.85);
+      position: relative;
+      clip-path: inset(0 0 100% 0);
+      will-change: clip-path, opacity, transform;
+      transition: clip-path 0.8s cubic-bezier(0.22,1,0.36,1), opacity 0.5s ease, transform 0.8s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    .pull-quote.visible {
+      clip-path: inset(0 0 0% 0);
+    }
+
+    .pull-quote::before {
+      content: '"';
+      display: block;
+      font-size: 5rem;
+      line-height: 0.6;
+      margin-bottom: 24px;
+      color: var(--accent);
+      opacity: 0.6;
+    }
+
+    .pull-quote .attribution {
+      display: block;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 13px;
+      font-style: normal;
+      letter-spacing: 0.1em;
+      color: var(--accent-soft);
+      margin-top: 20px;
+      text-transform: uppercase;
+    }
+
+    /* ─── STATS CARD ─────────────────────────────────────────────── */
+    .stats-card {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 3rem 0;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .stat-item {
+      background: rgba(10,10,15,0.95);
+      padding: 40px 24px;
+      text-align: center;
+      position: relative;
+      transition: background 0.25s ease;
+      will-change: transform, opacity;
+    }
+
+    .stat-item:hover {
+      background: rgba(255,255,255,0.04);
+    }
+
+    .stat-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+
+    .stat-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(36px, 5vw, 56px);
+      color: var(--accent-soft);
+      display: block;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* ─── TABLES ─────────────────────────────────────────────────── */
+    .table-wrapper {
+      overflow-x: auto;
+      margin: 2rem 0;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+
+    thead tr {
+      background: var(--accent);
+    }
+
+    thead th {
+      padding: 14px 20px;
+      text-align: left;
+      font-family: 'Instrument Sans', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.9);
+    }
+
+    tbody tr {
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover { background: rgba(255,255,255,0.05); }
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody td {
+      padding: 14px 20px;
+      color: var(--text);
+      vertical-align: top;
+    }
+
+    tbody td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--accent-soft);
+    }
+
+    /* ─── LISTS ──────────────────────────────────────────────────── */
+    ul, ol {
+      max-width: 65ch;
+      padding-left: 0;
+      margin-bottom: 1.4rem;
+    }
+
+    ul { list-style: none; }
+
+    ul li {
+      padding: 4px 0 4px 28px;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+
+    ul li:hover { transform: translateX(4px); }
+
+    ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent-soft);
+      font-weight: 700;
+    }
+
+    ol { list-style: none; counter-reset: list-counter; }
+
+    ol li {
+      counter-increment: list-counter;
+      padding: 6px 0 6px 44px;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+
+    ol li:hover { transform: translateX(4px); }
+
+    ol li::before {
+      content: counter(list-counter, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      color: var(--accent);
+      line-height: 1.6;
+      width: 36px;
+    }
+
+    /* ─── MERMAID DIAGRAMS ───────────────────────────────────────── */
+    .diagram-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 32px;
+      margin: 2.5rem 0;
+      overflow-x: auto;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .diagram-card:hover {
+      border-color: rgba(255,255,255,0.18);
+      box-shadow: 0 0 30px rgba(124,58,237,0.12);
+    }
+
+    .diagram-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: rgba(240,237,232,0.3);
+      margin-bottom: 20px;
+    }
+
+    .mermaid {
+      text-align: center;
+    }
+
+    /* ─── BLOCKQUOTE / PIPELINE CALLOUT ─────────────────────────── */
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: var(--accent-glow);
+      padding: 24px 28px;
+      margin: 2rem 0;
+      border-radius: 0 8px 8px 0;
+      max-width: 65ch;
+    }
+
+    blockquote p {
+      font-family: 'DM Serif Display', serif;
+      font-size: 18px;
+      font-style: italic;
+      color: rgba(240,237,232,0.85);
+      margin-bottom: 0;
+    }
+
+    /* ─── SECTION TRANSITION ─────────────────────────────────────── */
+    .section-transition {
+      height: 120px;
+      background: linear-gradient(to bottom, var(--from-color, transparent), var(--to-color, transparent));
+      margin: 0 -9999px;
+      padding: 0 9999px;
+    }
+
+    /* ─── PART SECTIONS ──────────────────────────────────────────── */
+    .part-section {
+      --accent: #7c3aed;
+      --accent-glow: rgba(124,58,237,0.12);
+      --accent-soft: #a78bfa;
+      --section-bg: rgba(124,58,237,0.06);
+      padding-top: 0;
+    }
+
+    .part-section[data-part="2"] {
+      --accent: #2563eb;
+      --accent-glow: rgba(37,99,235,0.12);
+      --accent-soft: #60a5fa;
+      --section-bg: rgba(37,99,235,0.06);
+    }
+
+    .part-section[data-part="3"] {
+      --accent: #16a34a;
+      --accent-glow: rgba(22,163,74,0.12);
+      --accent-soft: #4ade80;
+      --section-bg: rgba(22,163,74,0.06);
+    }
+
+    .part-section[data-part="4"] {
+      --accent: #d97706;
+      --accent-glow: rgba(217,119,6,0.12);
+      --accent-soft: #fbbf24;
+      --section-bg: rgba(217,119,6,0.06);
+    }
+
+    .part-section[data-part="5"] {
+      --accent: #dc2626;
+      --accent-glow: rgba(220,38,38,0.12);
+      --accent-soft: #f87171;
+      --section-bg: rgba(220,38,38,0.06);
+    }
+
+    .part-section[data-part="6"] {
+      --accent: #0891b2;
+      --accent-glow: rgba(8,145,178,0.12);
+      --accent-soft: #22d3ee;
+      --section-bg: rgba(8,145,178,0.06);
+    }
+
+    /* ─── BACK TO TOP ────────────────────────────────────────────── */
+    #back-to-top {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 44px;
+      height: 44px;
+      background: var(--active);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.3s, transform 0.3s, background 0.4s;
+      z-index: 1000;
+    }
+
+    #back-to-top.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #back-to-top svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ─── MOBILE MENU ────────────────────────────────────────────── */
+    .mobile-toc-toggle {
+      display: flex;
+      position: fixed;
+      bottom: 32px;
+      left: 32px;
+      z-index: 1000;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(10,10,15,0.9);
+      border: 1px solid rgba(255,255,255,0.12);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateX(-20px);
+      will-change: transform, opacity;
+      transition: transform 0.3s ease, opacity 0.3s ease, background 0.2s;
+    }
+
+    .mobile-toc-toggle.loaded {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    @media (min-width: 1200px) {
+      .mobile-toc-toggle { display: none; }
+    }
+
+    .mobile-toc-toggle svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: var(--text);
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    .mobile-toc-panel {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,15,0.96);
+      z-index: 999;
+      padding: 80px 32px 32px;
+      overflow-y: auto;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .mobile-toc-panel.open {
+      transform: translateX(0);
+    }
+
+    .mobile-toc-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    /* ─── UTILITIES ──────────────────────────────────────────────── */
+    .section-content {
+      padding: 48px 0 64px;
+    }
+
+    .text-block { max-width: 65ch; }
+
+    .nested-list { margin-left: 16px; }
+
+    @media (max-width: 599px) {
+      body { font-size: 16px; }
+      .content-column { padding: 0 20px 80px; }
+      .stats-card { grid-template-columns: 1fr; }
+      .chapter-opener { padding: 40px 20px 32px; margin: 0 -20px; }
+      h1 { font-size: 44px; }
+      .pull-quote { font-size: 20px; }
+      .diagram-card { padding: 20px; }
+      ol li { padding-left: 36px; }
+    }
+
+    @media (min-width: 600px) and (max-width: 1199px) {
+      .content-column { padding: 0 40px 100px; }
+    }
+
+    /* ─── INLINE BADGE (for section heading) ────────────────────── */
+    .part-badge {
+      display: inline-block;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      background: var(--accent);
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 3px;
+      opacity: 0.7;
+      margin-bottom: 12px;
+      vertical-align: middle;
+    }
+
+    /* ─── REDUCED MOTION ─────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      body { opacity: 1 !important; }
+      .toc-sidebar { opacity: 1 !important; transform: none !important; }
+      .mobile-toc-toggle { opacity: 1 !important; transform: none !important; }
+      .companion-link { opacity: 1 !important; }
+      .hero-eyebrow { opacity: 1 !important; }
+      .hero-title, .hero-title .word { opacity: 1 !important; transform: none !important; }
+      .hero-pull { opacity: 1 !important; transform: none !important; }
+      .hero-scroll-hint { opacity: 0.5 !important; }
+      .chapter-opener { transform: none !important; }
+      .chapter-eyebrow { opacity: 0.7 !important; transform: none !important; }
+      .chapter-title { opacity: 1 !important; letter-spacing: -0.02em !important; }
+      .pull-quote { clip-path: none !important; opacity: 1 !important; transform: none !important; }
+      .reveal-para, .reveal-h2, .reveal-h3, .reveal-card,
+      .reveal-callout, .reveal-pull, .reveal-table-row, .reveal-li {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+      #cursor-glow { display: none !important; }
+    }
+  /* ─── BREADCRUMB NAV ────────────────────────────────────────────── */
+  #breadcrumb-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(10,10,15,0.95) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  #breadcrumb-nav a {
+    pointer-events: all;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: rgba(255,255,255,0.35);
+    transition: color 0.25s;
+  }
+  #breadcrumb-nav a:hover { color: rgba(255,255,255,0.85); }
+  #breadcrumb-nav .bc-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.25);
+  }
+  #breadcrumb-nav .bc-brand:hover { color: rgba(255,255,255,0.7); }
+  @media (max-width: 600px) {
+    #breadcrumb-nav { padding: 12px 16px; }
+  }
+  </style>
+</head>
+<body>
+
+<!-- ─── BREADCRUMB NAV ─────────────────────────────────────────────── -->
+<nav id="breadcrumb-nav">
+  <a href="../index.html" class="bc-brand">Storyteller</a>
+  <a href="../phase-1-overview/">&larr; Overview</a>
+</nav>
+
+<!-- ─── SCROLL PROGRESS ──────────────────────────────────────────── -->
+<div id="scroll-progress"></div>
+
+<!-- ─── CURSOR GLOW ─────────────────────────────────────────────── -->
+<div id="cursor-glow" aria-hidden="true"></div>
+
+<!-- ─── HERO ─────────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow" id="heroEyebrow">Storyteller &mdash; Project Introduction &mdash; Phase 1</div>
+    <h1 class="hero-title" id="heroTitle" aria-label="Storyteller Project Intro">
+    </h1>
+    <p class="hero-pull" id="heroPull">
+      <span class="hero-pull-inner">The world speaks to you. You speak back. The story bends.</span>
+    </p>
+    <a href="../phase-1-overview/" class="companion-link" id="heroCompanionLink">Plain English version &rarr;</a>
+  </div>
+  <div class="hero-scroll-hint" id="heroScrollHint"><span></span></div>
+</section>
+
+<!-- ─── MOBILE TOC ────────────────────────────────────────────────── -->
+<button class="mobile-toc-toggle" id="mobileTocToggle" aria-label="Open table of contents">
+  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+</button>
+<div class="mobile-toc-panel" id="mobileTocPanel">
+  <button class="mobile-toc-close" id="mobileTocClose">&times;</button>
+  <div class="toc-label">Contents</div>
+  <ul class="toc-list" id="mobileTocList"></ul>
+</div>
+
+<!-- ─── PAGE WRAPPER ─────────────────────────────────────────────── -->
+<div class="page-wrapper">
+
+  <!-- SIDEBAR TOC -->
+  <aside class="toc-sidebar" id="tocSidebar">
+    <div class="toc-label">Contents</div>
+    <ul class="toc-list" id="desktopTocList"></ul>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content-column">
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- PART ONE                                       -->
+    <!-- ══════════════════════════════════════════════ -->
+    <section class="part-section" data-part="1" id="part-1">
+      <div class="chapter-opener">
+        <div class="chapter-opener-inner">
+          <div class="chapter-eyebrow">Part One</div>
+          <h2 class="chapter-title">What Storyteller Will Be</h2>
+        </div>
+      </div>
+
+      <div class="section-content">
+
+        <!-- COMPANION CALLOUT -->
+        <div class="companion-callout reveal-callout">
+          <span class="companion-callout-label">Brief Overview</span>
+          <p class="companion-callout-text">New here? Start with the <a href="../phase-1-overview/">plain English version</a> — a one-page summary written for a general audience.</p>
+        </div>
+
+        <h3 id="the-experience">The Experience</h3>
+        <div class="text-block">
+          <p>Storyteller is an interactive narrative platform driven by AI: not a game in the traditional sense, not a chatbot, not a choose-your-own-adventure with a coat of paint. You step inside a living story, and everything that happens inside it is shaped by what you do, what you say, and who you are as a player.</p>
+          <p>The experience is voice-native: the world speaks to you, you speak back, and the story bends. At its best, Storyteller delivers the feeling of sitting across from the best Game Master you've ever had — one who never gets tired, never loses the thread, and always has exactly the right scene waiting on the other side of your next decision.</p>
+          <p>That illusion is maintained by a layered architecture. Five named Programs each handle a separate concern, invisibly, so the player never has to think about the machinery:</p>
+          <ul>
+            <li><strong>The Narrator:</strong> the voice that speaks, reacts, and drives the scene</li>
+            <li><strong>The Guide:</strong> handles everything outside active play: onboarding, settings, transitions</li>
+            <li><strong>The Deejay:</strong> manages all audio: music, effects, atmosphere</li>
+            <li><strong>The Chronicle:</strong> remembers everything that's happened across sessions</li>
+            <li><strong>The Play Engine:</strong> orchestrates all of them, second by second, from a loaded story file</li>
+          </ul>
+        </div>
+
+        <div class="diagram-card reveal-card">
+          <div class="diagram-label">DIAGRAM — SYSTEM ARCHITECTURE</div>
+          <div class="mermaid">
+graph TD
+    Player["🎙️ Player"] --> Engine["Play Engine"]
+    Engine --> Narrator["Narrator<br />(performs story)"]
+    Engine --> Guide["Guide<br />(handles setup)"]
+    Engine --> Deejay["Deejay<br />(manages audio)"]
+    Engine --> Chronicle["Chronicle<br />(memory)"]
+    Engine --> State["State Model<br />(source of truth)"]
+    State --> Engine
+          </div>
+        </div>
+
+        <div class="text-block">
+          <p>Under ordinary conditions, the player never encounters any of this. They just experience a story that responds to them.</p>
+        </div>
+
+        <h3 id="the-narrator">The Narrator</h3>
+        <div class="text-block">
+          <p>The Narrator is the voice of the story. It describes the world, voices characters, sets atmosphere, and reacts to player input in real time. Every story has a Narrator, and every Narrator has a persona: a defined tone, a vocabulary range, and a way of moving through a scene. A horror story's Narrator is not the same as a fantasy adventure's Narrator. The same engine plays both — the persona is what makes them different.</p>
+          <p>That persona is encoded in a format called <code>P3RSONA</code>, a structured personality configuration stored in the story file. P3RSONA treats personality as data. Formality is not "high"; it's 15. Patience is not "endlessly patient"; it's 19. The full format defines 33 traits across four categories (Communication Style, Interaction Patterns, Language and Expression, and Information Delivery and Storytelling), each scored on a 1–20 scale, a deliberate nod to the tabletop twenty-sided die. The three traits at the end of that list (<code>story_cadence</code>, <code>world_detail</code>, and <code>character_depth</code>) are the ones that matter most for narrative work. They're what separates a Narrator that tells a story from one that performs it.</p>
+          <p>The Narrator extracts intent rather than matching keywords. When a player says "Um, maybe I should, like, go through the door?" the system reads the core action (go through the door) and the hesitation alongside it. The hesitation might change how the Narrator describes the moment. It might change how an NPC (a non-player character, meaning any character in the story run by the system rather than the player) reacts. The input pipeline runs every player statement through intent extraction, tone detection, and world grounding before anything reaches story logic. Generous interpretation is the default: the Narrator assumes the most reasonable reading of what you said, not the most literal one.</p>
+          <p>That behavioral tracking accumulates over time. The Narrator holds a detailed profile of how you play: whether you explore thoroughly or move fast, whether you engage NPCs at length or get straight to the action, how formal or casual your speech tends to be. Consistently curious players receive richer scene descriptions without having to ask. Action-oriented players get leaner prose. A player who's spent an entire session treating NPCs with warmth walks into a village where people are already inclined to help them.</p>
+          <p>When a player gets stuck, the Narrator never breaks the fourth wall. All hints are delivered in-character, across a spectrum from Level 0 (absolute silence) to Level 10 (the story essentially narrates itself). Level 2 is a flickering torch. Level 4 is a character noting that a door looks different from the others. Level 6 is an explicit in-story suggestion. Level 8 is "Try using the iron key on the right-hand door." The escalation is automatic, triggered by repeated failed attempts, long pauses, frustrated language patterns, or aimless wandering. The player never sees it happen.</p>
+          <p>Voice performance is handled by a TTS (text-to-speech) plug-in (Author-selectable per story, architecturally swappable without touching the story itself). "Author" in this context means the person or team who built the story — a writer, game designer, or publisher using Storyteller's creation tools. The Narrator distinguishes characters through pitch, pacing, accent, and emotional delivery. Before any spoken output reaches the player, it passes through a content filter: profanity becomes fantasy euphemism, graphic violence becomes implied description, and discriminatory language gets corrected or challenged by the narrative. The transformation happens in real time, invisibly, without breaking the story's voice.</p>
+        </div>
+
+        <div class="pull-quote reveal-pull">
+          A player who's spent an entire session treating NPCs with warmth walks into a village where people are already inclined to help them.
+          <span class="attribution">Part One — The Narrator</span>
+        </div>
+
+        <h3 id="the-guide">The Guide</h3>
+        <div class="text-block">
+          <p>The Guide is a separate voice from the Narrator, and it never speaks during a story. "Storytime" is the term for an active story session — the period when the Narrator is performing and the player is inside the fiction. The player doesn't know the Guide is there when Storytime is running, and that's the whole point.</p>
+          <p>Outside Storytime, the Guide handles everything: onboarding, story selection, settings configuration, and any system interaction the player needs. Its voice is warm and functional — a mentor, not a performer. Once a player is ready to start a story, the Guide walks them to what the architecture calls the Storytime Boundary: the invisible line where the Guide goes silent and the Narrator takes over. That handoff is inviolable. Non-critical items (safety summaries, content reports, anything that can wait) queue for post-session. The Guide never interrupts a story in progress unless the player explicitly asks to stop.</p>
+          <p>Getting into a session involves four steps.</p>
+          <ol>
+            <li>The Guide reads the story file's metadata to understand what kind of story this is and what the Author recommends.</li>
+            <li>It checks the player's persistent profile for preferences they've established across previous sessions.</li>
+            <li>It walks the player through any relevant configuration — not as a settings screen, but as a conversation. "The Author recommends Adventure Mode for this mystery, but you can choose any difficulty you prefer."</li>
+            <li>Once the player confirms, the Guide brings them to the boundary and hands control to the Narrator.</li>
+          </ol>
+          <p>Settings exist in three layers, each able to override the one below:</p>
+          <ol>
+            <li><strong>Platform Settings:</strong> device-global: master audio, language, accessibility services</li>
+            <li><strong>Player Profile:</strong> travels with you across devices: narrative preferences, hint tendencies, content levels</li>
+            <li><strong>Story Configuration:</strong> specific to a single save: romance intensity, horror filter, how much the AI can improvise beyond the authored content</li>
+          </ol>
+          <p>There are limits. Stories can't override mandatory safety constraints. Players can't violate system security policies. Author recommendations for how to experience their story are just starting points; player preference takes precedence. Authors set their stories free when they publish.</p>
+          <p>When a player returns to an in-progress story, the Guide takes them back to the boundary with a recap, and the Narrator picks up inside.</p>
+          <p>Imagine a 1950s Hollywood actor arriving at a studio lot; the PA driving the golf cart to take the actor back to the shooting location hangar a half mile away is the Guide. He's friendly, a gifted smooth talker, and can ease you through any situation. In this case, he's catching you up on the story in 60 seconds.</p>
+          <p>This re-entry moment (internally called "Where Were We?") is an audio trigger designed to help the player's brain cross back into the story. The recap adapts based on how long the player has been away and how much they tend to remember. The three things it always covers: what was happening, where they were, and why it mattered.</p>
+          <p>And just maybe done in character as the golf cart guy.</p>
+        </div>
+
+        <h3 id="the-play-engine">The Play Engine</h3>
+        <div class="text-block">
+          <p>The Play Engine is the runtime. When a player sits down to experience a story, the Play Engine is what's running. It coordinates all five Programs, manages session state, handles player input, and executes the story beat by beat from a loaded story file. It knows how to run a story without knowing anything specific about what that story is.</p>
+          <p>Three principles define how it operates.</p>
+          <ul>
+            <li><strong>Progressive Narrative:</strong> no Game Over states, no dead ends, no fail conditions in the default configuration. Mistakes become consequences that branch forward. Save-scumming becomes pointless because every path leads somewhere interesting.</li>
+            <li><strong>Contextual Flexibility:</strong> the engine evaluates every player action for intent, tone, context, and world rules before routing it to story logic.</li>
+            <li><strong>Adaptive Storytelling:</strong> the engine tracks fine-grained behavioral signals called microstates across every session. Microstates are small, persistent behavioral signals: does this player explore thoroughly or rush? Do they treat NPCs warmly or dismissively? Those signals accumulate and shape everything the player experiences going forward.</li>
+          </ul>
+          <p>The microstate system is what makes the adaptation feel earned rather than procedural. It tracks:</p>
+          <ul>
+            <li>how a player <strong>communicates</strong> (formal, casual, terse, verbose)</li>
+            <li>how they <strong>approach problems</strong> (brute force vs. clever, diplomatic vs. direct)</li>
+            <li>how they behave socially (kind to NPCs, rude, indifferent, curious)</li>
+            <li>how they <strong>explore</strong> (thorough vs. rushed)</li>
+            <li>their <strong>moral tendencies</strong>, <strong>risk tolerance</strong>, <strong>dialogue preferences</strong>, and <strong>persistence</strong></li>
+          </ul>
+          <p>A consistently rude player finds NPCs reacting with fear or hostility before they've done anything overtly threatening. That reaction comes from accumulated history, not a scripted trigger.</p>
+          <p>Stories are built from modular units called story nodes, which are scenes with defined triggers for entering and exiting.</p>
+        </div>
+
+        <div class="pull-quote reveal-pull">
+          Think of a visual map of the key plot points in a novel. But a novel that never ends, as much as you zoom out. À la Google Maps: nodes are houses, which become neighborhoods, clusters, cities, countries, planets. Multiple. Then galaxies. Universes.
+          <span class="attribution">Part One — Story Nodes</span>
+        </div>
+
+        <div class="text-block">
+          <p>A node might open when a player visits a location, or only after they've built a relationship with a particular character and are carrying a specific item. When a node ends, the world updates: objects change state, relationships shift, new scenes unlock. The same authored story can play out very differently for different players, not because there are dozens of hand-written endings, but because the engine combines branching (you see a different scene than I do) with transformation (we see the same scene, but it plays differently based on how we've each been behaving).</p>
+          <p>Authors also control how much the engine is allowed to improvise. Think of it as a dial. At one end, a story behaves like a classic text adventure: rigid rules, predictable outcomes, no AI deviation. At the other, the engine adapts freely to each player. Individual scenes, puzzles, and characters can each carry their own setting on that dial. The setting is per element, not a global switch, so an Author can lock down a specific puzzle while leaving everything around it open.</p>
+          <p>The state model is the single source of truth for everything happening in a session. Six categories are tracked continuously:</p>
+        </div>
+
+        <div class="table-wrapper reveal-card">
+          <table>
+            <thead>
+              <tr><th>Category</th><th>What it holds</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Narrative state</td><td>Current scene, active nodes, branch positions</td></tr>
+              <tr><td>World state</td><td>Locations, object states, time, weather</td></tr>
+              <tr><td>Character state</td><td>NPC positions, relationships, knowledge</td></tr>
+              <tr><td>Player state</td><td>Microstates, inventory, behavioral patterns</td></tr>
+              <tr><td>Puzzle state</td><td>Progress, solutions attempted</td></tr>
+              <tr><td>System state</td><td>Active plug-ins, configuration, audio</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="text-block">
+          <p>All Programs read from it; no Program communicates directly with another. Everything flows through the state model.</p>
+          <p>Before any story reaches a player, it passes through five validation steps:</p>
+          <ol>
+            <li><strong>Structural validation:</strong> file structure complete, schema compliance verified</li>
+            <li><strong>Signature verification:</strong> unsigned stories load in Unverified Story Mode with enhanced restrictions</li>
+            <li><strong>Version compatibility check:</strong> migration logic applied if the format version doesn't match the engine version</li>
+            <li><strong>Dependency resolution:</strong> all resources present, plug-in requirements satisfied</li>
+            <li><strong>Environment initialization:</strong> Programs initialized, audio engine primed, clean runtime state created</li>
+          </ol>
+          <p>Almost everything in the platform is a plug-in — including the things you'd think were built in. There are three tiers. Core plug-ins ship with the platform and can't be removed, though they can be swapped for alternatives. Official plug-ins come from Storyteller itself. Community plug-ins come from third-party developers and run in the same sandboxed environment as official ones. If a plug-in breaks during a session, the engine keeps the story running. It might be a little less rich, but it never stops.</p>
+          <p>Seven Programs operate inside the engine. The Narrator and the Guide are the only ones that speak. The others run silently:</p>
+          <ul>
+            <li><strong>The Deejay</strong> manages all audio: real-time orchestration, acoustic modeling based on scene geometry, LucasArts-style iMUSE-inspired dynamic scoring. It functions like a Broadway pit conductor and a film's entire audio post-production department, rolled into one.</li>
+            <li><strong>AEGIS</strong> (Automated Enforcement and Guardian of Immersive Safety) handles content safety across three layers: pre-execution scanning, sandbox enforcement, and the Narrator Output Filter.</li>
+            <li><strong>Minerva</strong> monitors world rule integrity, ensuring the story's internal logic stays consistent even as the engine adapts.</li>
+            <li><strong>The Chronicle</strong> manages persistent narrative memory, keeping a full record of what's happened across every session.</li>
+          </ul>
+          <p>Programs subscribe to relevant state changes and events; they respond within their defined domains; they do not talk to each other.</p>
+        </div>
+
+        <h3 id="create-engine-story-package">The Create Engine and Story Package</h3>
+        <div class="text-block">
+          <p>Authors use the Create Engine — a suite of tools designed for writers, not engineers.</p>
+          <p>The interface offers two views of the same story, synchronized in real time. A zoomable canvas lets an Author drag scenes, choices, and characters spatially: scenes as nodes, choices as edges. Underneath, everything is stored in human-readable text: YAML for structured data, Markdown for narrative prose. Edit in one view, see the change in the other.</p>
+          <p>For beginners, a guided Easy Mode asks questions and builds from answers. For professionals, direct YAML editing, custom logic, and scripting tools are all available.</p>
+          <p>Built into the Create Engine is the Pathfinder — an AI co-writer. It operates across five levels of involvement:</p>
+        </div>
+
+        <div class="table-wrapper reveal-card">
+          <table>
+            <thead>
+              <tr><th>Mode</th><th>What it does</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Off</td><td>No creative help; validation still runs before publication</td></tr>
+              <tr><td>Passive</td><td>Watches and learns, responds only when asked, never interrupts</td></tr>
+              <tr><td>Active</td><td>Proactive suggestions at key moments, non-blocking, easily ignored</td></tr>
+              <tr><td>Co-Writer</td><td>Drafts dialogue, expands scenes, builds sections from outlines; the Author decides what to keep</td></tr>
+              <tr><td>Daydream</td><td>A full playable story outline from roughly thirty seconds of spoken input</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="text-block">
+          <p>In practice, these aren't discrete modes on a switch; a combination is always operating.</p>
+          <p>Every story passes through Pathfinder validation before publication regardless of which mode was used during creation. Pathfinder simulates thousands of playthrough variations, checks for plot coherence, character consistency, puzzle solvability, unreachable content, and soft-lock conditions. The validation report identifies critical blockers, minor polish issues, and suggested fixes with impact assessments.</p>
+          <p>When a story is finished, the Create Engine exports it as a single file: a <code>.tome</code>, the Story Package. It contains everything the Play Engine needs to run that story:</p>
+          <ul>
+            <li>Plot structure, story beats, and branching paths</li>
+            <li>Scene definitions and world spatial structure</li>
+            <li>Object states, all character data (across four complexity tiers), and puzzle definitions</li>
+            <li>Sound design direction and music scoring intent</li>
+            <li>Narrator configuration and voice guidance</li>
+            <li>Save state structure, attribution, and validation signatures</li>
+          </ul>
+          <p>The consumer name for a Story Package is StoryPak — modeled after the Nintendo Entertainment System's GamePak branding from 1985. One technical artifact, one consumer brand, one-to-one.</p>
+          <p>Every <code>.tome</code> is cryptographically signed. Any modification after signing breaks the signature. Signed packages run normally. Unsigned or modified ones load in Unverified Story Mode, which runs with tighter restrictions — no profile writes, enhanced content guardrails, and a consent screen for the player. Community-created content is still playable; it just doesn't get the same level of trust as verified packages.</p>
+          <p>Format versioning is baked into every file, so a story published in 2026 should still be playable decades later. The engine reads the version tag, applies any necessary migration, and runs it.</p>
+        </div>
+
+        <h3 id="why-architecture-matters">Why the Architecture Matters</h3>
+        <div class="text-block">
+          <p>Authoring and playback are fully decoupled: the Play Engine doesn't care what story it's running, and the Create Engine doesn't care how stories get played. That separation is the design's central purpose.</p>
+          <p>It means Storyteller is a platform, not a product. A horror writer, a fantasy game designer, and a tabletop RPG publisher can all build Story Packages with the Create Engine, and every one of them runs on the Play Engine without modification. Stories are apps; the Play Engine is the operating system. The platform runs whatever it's given.</p>
+          <p>The immutability control is what lets the platform serve players who want very different things without forking the architecture. An Author building a faithful Infocom-style text adventure sets immutability near 100%. An Author building a maximally adaptive character drama sets it near 0%. The same engine, the same pipeline, the same runtime — just different values in the story file.</p>
+          <p>At scale, this separation enables a publishing layer. Story Packages are discrete, portable, publishable artifacts. Third-party developers can build plug-ins that run on the same sandboxed infrastructure as official ones. None of this requires changes to the engine. The architecture is built for it.</p>
+        </div>
+
+      </div><!-- /section-content -->
+    </section><!-- /part-1 -->
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- PART TWO                                       -->
+    <!-- ══════════════════════════════════════════════ -->
+    <section class="part-section" data-part="2" id="part-2">
+      <div class="chapter-opener">
+        <div class="chapter-opener-inner">
+          <div class="chapter-eyebrow">Part Two</div>
+          <h2 class="chapter-title">Phase 1 — Proof of Concept</h2>
+        </div>
+      </div>
+
+      <div class="section-content">
+
+        <h3 id="goal-phase-1">The Goal of Phase 1</h3>
+        <div class="text-block">
+          <p>Before the full platform exists, one claim has to be proven: that an AI can take a real, structured game system and run it correctly in real time, not approximately and not with plausible-sounding guesses. Actually run it: adjudicate the rules, track the state, drive the session, the way a human Game Master would.</p>
+          <p>Phase 1 is a focused proof of concept targeting Storyteller's TTRPG layer. TTRPG stands for tabletop role-playing game — think Dungeons &amp; Dragons, but the broader category. It's the hardest version of the problem: it has explicit, interdependent rules, real-time mechanical adjudication, persistent character state, and a player base that notices when things go wrong. If we can build an agent that runs a tabletop RPG correctly from a structured ruleset, the engine is proven. Everything else is variation on that foundation.</p>
+          <p>Phase 1 has a deliberate scope constraint: one system, one format, one contained test. The goal is a working answer to a specific question, not a launch-ready platform.</p>
+        </div>
+
+        <h3 id="what-ttrpg-agent-does">What the TTRPG Agent Does</h3>
+        <div class="text-block">
+          <p>The TTRPG agent takes an existing game system and breaks it into two things an AI can actually use:</p>
+          <ol>
+            <li><strong>A rules engine:</strong> a structured representation of the game's mechanics that the agent can query, apply, and reason over</li>
+            <li><strong>A game state model:</strong> a live record of everything currently true in the game: character stats, inventory, active effects, encounter state, NPC positions, relationships</li>
+          </ol>
+          <p>Together, they let an AI run a full session in real time.</p>
+          <p>When a player says "I attack the guard," the agent queries the rules engine for the correct resolution procedure, applies it against the current game state, updates the state with the result, and hands the outcome to the Narrator. These two components stay separate — because knowing the rules is different from knowing what's happening right now. A good GM holds both in their head at once; the agent keeps them in two distinct systems.</p>
+          <p>The danger here is quiet failure. An agent that misrepresents what the rules say doesn't crash; it produces plausible-sounding outputs that are mechanically wrong, and those errors compound. A player at the table notices something is off — they just can't always say where. Getting the input data right before the agent sees it is the whole problem Phase 1 is solving.</p>
+        </div>
+
+        <h3 id="why-right-poc">Why This Is the Right POC</h3>
+        <div class="text-block">
+          <p>A tabletop RPG is a near-perfect proving ground because it's a closed system with knowable answers. Every mechanic can be verified. Every rule interaction has a correct resolution. If the agent gets it wrong, you can point to exactly where it failed and why.</p>
+          <p>A single Action Check in Open Adventure might reference the acting character's relevant attribute, modifiers from equipment, environmental conditions, active spell effects, and bonuses from Modus Operandi abilities simultaneously. Adjudicating that correctly, in context, in real time, requires the agent to hold and reason over a complex interdependent state object without losing coherence across the session. Solving that problem produces something that can handle the mechanical complexity of any story system Storyteller will encounter.</p>
+          <p>The TTRPG format also makes failures visible in a way that purely narrative systems don't. A story that drifts narratively is hard to pin down. A game that adjudicates a combat roll incorrectly is immediately obvious to anyone who knows the rules. That visibility is useful — it makes the test meaningful.</p>
+        </div>
+
+      </div>
+    </section><!-- /part-2 -->
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- PART THREE                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+    <section class="part-section" data-part="3" id="part-3">
+      <div class="chapter-opener">
+        <div class="chapter-opener-inner">
+          <div class="chapter-eyebrow">Part Three</div>
+          <h2 class="chapter-title">Open Adventure</h2>
+        </div>
+      </div>
+
+      <div class="section-content">
+
+        <h3 id="what-open-adventure-is">What Open Adventure Is</h3>
+        <div class="text-block">
+          <p>Open Adventure was born from a specific frustration. In 2023, the tabletop RPG community had a reckoning with just how much control a single company could exert over a game system that thousands of publishers, creators, and players had built their livelihoods around. Marc Tassin, a veteran game designer with nearly four decades of RPG experience and credits spanning Shadowrun products to Dragon Magazine to the stage at Gen Con's Writer's Symposium, asked a straightforward question: what if there was a game system that nobody owned? Not licensed to the community. Actually, legally, permanently free — belonging to everyone who played it.</p>
+          <p>The result was Open Adventure, published by kåjøda under the <code>CC0</code> license. CC0 is the most permissive open license in existence. It means no restrictions on use, modification, or redistribution. No attribution requirements. No terms to negotiate. You can take the entire rulebook, rewrite it, publish it commercially, convert it into something else entirely, and you never have to ask anyone's permission. That's not a common thing in the RPG world, where most systems with meaningful structure also come with meaningful legal exposure.</p>
+          <p>The game itself was designed from the ground up to be learnable in ten to twenty minutes. It runs on standard six-sided dice you'd find in any board game. The entire rulebook is structured to get people playing as quickly as possible, with rules kept in plain English and a single unified mechanic — the Action Check — that handles physical feats, social encounters, intellectual challenges, and magical effects all the same way. No separate combat system. No separate skill system. One procedure, applied consistently across the whole game. A new player can understand the core loop in a single session and spend the rest of their time actually playing, rather than learning subsystems.</p>
+          <p>That simplicity doesn't mean it's shallow. Open Adventure has real depth: a flexible character system built around archetypes and roles rather than locked classes, open-ended spellcasting limited only by a player's willingness to accept risk, a structured approach to adversaries and challenges that scales consistently, and a 240-term glossary where every mechanic is named and every name is defined. The game was designed for the kind of old-school adventure gaming spirit — exploration, consequence, player agency — that a lot of modern systems have moved away from, rebuilt with contemporary design sensibilities. It plays like someone loved the best parts of 1980s dungeon-crawling and decided to make those parts work better.</p>
+        </div>
+
+        <h3 id="why-we-chose-it">Why We Chose It</h3>
+        <div class="text-block">
+          <p>Open Adventure solves two problems at once. The license eliminates friction entirely. CC0 means we can convert it, transform it, publish our tools, and open-source the pipeline without asking permission or negotiating terms. Most game systems with structural clarity also come with IP exposure. Open Adventure gives us both.</p>
+          <p>The structure is what makes it tractable. The rules are organized consistently across chapters. Headings follow a predictable hierarchy. Terms are defined where they're introduced and used consistently thereafter. A poorly structured rulebook would make the agent problem significantly harder — the model would spend its capacity reconstructing meaning rather than understanding it.</p>
+          <p>The glossary is the specific thing that made Open Adventure the right choice over other open systems. Every mechanic has a name. Every name has a definition. Every definition connects to others in predictable ways. That terminological structure isn't incidental; it's the foundation the entire pipeline is built on. We needed a graph, and Open Adventure gave us one.</p>
+          <p>Open Adventure is also the system the founding team knows. That matters for testing. A team that can spot a wrong adjudication in real time is more useful than one that has to look up whether the agent got it right.</p>
+        </div>
+
+      </div>
+    </section><!-- /part-3 -->
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- PART FOUR                                      -->
+    <!-- ══════════════════════════════════════════════ -->
+    <section class="part-section" data-part="4" id="part-4">
+      <div class="chapter-opener">
+        <div class="chapter-opener-inner">
+          <div class="chapter-eyebrow">Part Four</div>
+          <h2 class="chapter-title">Converting OA to Markdown</h2>
+        </div>
+      </div>
+
+      <div class="section-content">
+
+        <h3 id="the-conversion">The Conversion</h3>
+        <div class="text-block">
+          <p>We've taken the full Open Adventure rulebook (sourced from a WordPress/BetterDocs XML export in February 2026) and converted it into clean, structured Markdown. The output is 23 files: 16 chapters, six appendices, and a welcome document. Every chapter is a discrete file. Every rule section has a named heading. The whole thing lives in a GitHub repository called <code>open-adventure-rules</code>, versioned and publicly accessible.</p>
+          <p>The conversion involved real editorial decisions: how to break up chapters that were structured inconsistently in the source, how to normalize heading levels across 23 files so the hierarchy behaves predictably when a model reads them, how to handle tables and formula notation, and how to represent rule cross-references in a way that downstream tools can parse. The output is Markdown written for machines as much as humans — the two requirements are different, and both were kept in mind throughout.</p>
+          <p>Every editorial change is documented in the repository's CHANGELOG with its rationale. A style guide governs formatting conventions across all 23 files: heading levels, bold and italic usage, table structure, cross-reference format, CommonMark rendering rules. These constraints exist so the files behave predictably as pipeline inputs. A 419-test suite validates structural integrity and content fidelity on every change.</p>
+        </div>
+
+        <h3 id="why-markdown">Why Markdown</h3>
+        <div class="text-block">
+          <p>Every major language model understands Markdown natively. It doesn't require a parser, a schema validator, or a transformation step before a model can reason over it. You hand it a Markdown document and it reads it. The whole advantage is that no conversion step is needed.</p>
+          <p>When we feed a chapter of Open Adventure to a language model, we want the model's full attention on understanding the rules, not on reconstructing structure that got lost in a PDF conversion or fighting inconsistent formatting. Clean Markdown means the signal-to-noise ratio is as high as it can be.</p>
+          <p>At the pipeline level, Markdown is trivially diffable, versionable, and composable. When we're running hundreds of automated processing passes against these files, extracting facts, verifying relationships, proposing edits, we need to track exactly what changed and why. Markdown gives us that. Git gives us the history. The combination means every change to the ruleset has an audit trail.</p>
+        </div>
+
+        <h3 id="term-registry">The Term Registry</h3>
+        <div class="text-block">
+          <p>At the center of the conversion is <code>term-registry.yaml</code>: a machine-readable index of 445 game terms, structured as a data object to be queried by software rather than read as documentation.</p>
+          <p>Each entry in the registry carries:</p>
+          <ul>
+            <li>Canonical name and aliases</li>
+            <li>Category and definition</li>
+            <li>Mechanical summary and formula notation (where applicable)</li>
+            <li>Resolution blocks for terms that involve dice or attribute checks</li>
+            <li>Source chapter reference</li>
+            <li>Quality metadata: <code>source_grounded</code>, <code>editorial_quality</code>, <code>last_reviewed_by</code>, <code>criticality_score</code>, <code>breadth</code></li>
+          </ul>
+          <p>That last field, criticality score, reflects how broadly a term touches the rest of the system. A term referenced by 40 others scores higher than one referenced by two.</p>
+          <p>The relationship fields are where the real value is. Every term lists its connections to other terms, with explicit direction:</p>
+          <ul>
+            <li><code>used_in</code>: this term appears as part of a larger mechanic</li>
+            <li><code>component_of</code>: this term is a building block of something else</li>
+            <li><code>variant_of</code>: this is an alternate form of another term</li>
+            <li><code>derived_from</code>: this term extends or specializes another</li>
+          </ul>
+          <p>Together, these relationships form a directed graph of the entire game system. When an agent needs to resolve a Spellcasting check, it doesn't search for the word "spell." It walks the graph: Spellcasting → Spirit Points, Action Check, Difficulty Score, Range Modifier, Reality Modifier — all pulled in a single structured query. The agent reasons about how rules interact, not just what individual rules say.</p>
+          <p>All of this only works if the graph is correct, and making sure it's correct is exactly what the next section is about.</p>
+        </div>
+
+        <div class="pull-quote reveal-pull">
+          An agent reasoning over an incorrect registry fails quietly, producing plausible-sounding outputs that are mechanically wrong. The errors compound. Finding and fixing the errors before the agent ever sees the data is not optional — it's the difference between building on solid ground and building on sand.
+          <span class="attribution">Part Four — What Comes Next</span>
+        </div>
+
+        <h3 id="what-comes-next-oa">What Comes Next</h3>
+        <div class="text-block">
+          <p>The plan is to feed the complete, verified Markdown ruleset into the TTRPG agent kit. The agent will ingest the structured content, interpret the rules, build its internal game state model, and produce the components needed to run a live session. This is the step where the rulebook stops being a document and starts being a running system.</p>
+          <p>But before that, the data has to be right. An agent reasoning over an incorrect registry fails quietly, producing plausible-sounding outputs that are mechanically wrong. The errors compound. A bad relationship definition in <code>term-registry.yaml</code> propagates into every rule interaction that touches that term. By the time the symptom appears, you're several layers of inference away from the source. Finding and fixing the errors before the agent ever sees the data is not optional — it's the difference between building on solid ground and building on sand.</p>
+        </div>
+
+      </div>
+    </section><!-- /part-4 -->
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- PART FIVE                                      -->
+    <!-- ══════════════════════════════════════════════ -->
+    <section class="part-section" data-part="5" id="part-5">
+      <div class="chapter-opener">
+        <div class="chapter-opener-inner">
+          <div class="chapter-eyebrow">Part Five</div>
+          <h2 class="chapter-title">The Glossary — Sherlock</h2>
+        </div>
+      </div>
+
+      <div class="section-content">
+
+        <div class="diagram-card reveal-card">
+          <div class="diagram-label">DIAGRAM — PIPELINE FLOW</div>
+          <div class="mermaid">
+flowchart LR
+    A["Open Adventure Rulebook (23 files)"] --> B["Sherlock (per-term verification)"]
+    B --> C["Verified term-registry.yaml"]
+    C --> D["TTRPG Agent"]
+    D --> E["Rules Engine + Game State Model"]
+    E --> F["Live Session"]
+          </div>
+        </div>
+
+        <h3 id="glossary-first">Why the Glossary Has to Come First</h3>
+        <div class="text-block">
+          <p>All 445 terms in the registry were written by hand. At that scale, errors are inevitable — not because the authors were careless, but because 445 interconnected definitions is more than any person can hold in their head at once.</p>
+          <p>The errors that show up are predictable:</p>
+          <ul>
+            <li>A relationship listed in the wrong direction ("A uses B" when it should be "B uses A")</li>
+            <li>A term that references another without the other referencing it back</li>
+            <li>A formula field that was left blank when the author moved on</li>
+          </ul>
+          <p>None of these are obvious when you read the registry. They only surface when you try to actually use it — when an agent walks the graph to resolve a rule and the answer comes back wrong.</p>
+          <p>The first test batch proved this out. Terms like Action, Challenge, Spell, and Action Check all had relationship issues that only became visible when read as a connected system, not in isolation. Those terms feed almost everything else in Open Adventure. A bad relationship there doesn't just break one rule interaction — it breaks every rule interaction that touches it.</p>
+          <p>Here's the problem with feeding a broken graph to a language model: the model doesn't know it's broken, so it produces confident, fluent, wrong answers. The output looks correct, the formatting is right, but the answer isn't. Fixing the data before the agent ever sees it isn't a preliminary step; it's the whole job.</p>
+        </div>
+
+        <h3 id="what-sherlock-is">What Sherlock Is</h3>
+        <div class="text-block">
+          <p>Sherlock is a specialized AI agent built for one job: take a term from the registry, read every relevant section of the rulebook, and produce a verified output. Think of it as a meticulous research assistant that never skims and never assumes.</p>
+          <p>Here's how it works, step by step:</p>
+          <ol>
+            <li><strong>Gather sources.</strong> Sherlock finds the primary chapter for the term, then searches every other chapter for any reference to it by name. Everything goes into a source packet.</li>
+            <li><strong>Extract facts.</strong> From that source packet, Sherlock pulls a facts-only profile: what the term is, when it triggers, what it takes as input, what it produces as output, how it resolves, and any special cases. No inference, no prose.</li>
+            <li><strong>Write a candidate definition.</strong> Using only the facts profile, Sherlock drafts the registry entry.</li>
+            <li><strong>Run four checks:</strong>
+              <ul class="nested-list">
+                <li><strong>Evidence check:</strong> Is every claim in the definition traceable to a specific line in the source? Anything that can't be sourced gets removed or flagged.</li>
+                <li><strong>Scope check:</strong> Is there anything in the facts profile that didn't make it into the definition? Missing mechanics, edge cases, dropped rule interactions?</li>
+                <li><strong>Relationship check:</strong> For every relationship listed in the entry, rewrite it as a plain sentence ("Action is used in Action Check"). Does that sentence hold up when you read both terms' facts profiles? If not, or if the relationship reads better in the opposite direction, flag it.</li>
+                <li><strong>Reader check:</strong> Simulate two readers: a new player and a Guide running a session. Does each one build the right mental model from this definition?</li>
+              </ul>
+            </li>
+          </ol>
+          <p>Each term produces two files: a source file (evidence, citations, proposed changes) and a summary file (definition, rubric scores, flags).</p>
+        </div>
+
+        <h3 id="how-it-self-verifies">How It Self-Verifies</h3>
+        <div class="text-block">
+          <p>Every Sherlock run is scored against seven dimensions before anything gets committed:</p>
+          <ol>
+            <li>Evidence grounding</li>
+            <li>Source packet completeness</li>
+            <li>Facts profile integrity</li>
+            <li>Scope and omission discipline</li>
+            <li>Relationship integrity</li>
+            <li>Reader clarity</li>
+            <li>Definition quality</li>
+          </ol>
+          <p>A run that doesn't pass gets flagged, not committed. Nothing goes into the registry until it clears the rubric.</p>
+          <p>After each batch, a script called <code>parse_flags.py</code> reads all the summary files, pulls out every flagged relationship issue, and compiles a proposed set of changes to <code>term-registry.yaml</code>. Each proposed change includes the specific field that needs updating, the new value, and the exact lines from the source chapters that justify it.</p>
+          <p>Nothing is applied automatically. The proposed changes go to a human reviewer first. They can open the source chapter, read the passage, and confirm the fix is correct before anything merges. The evidence lives right next to the correction — it's all auditable.</p>
+        </div>
+
+        <h3 id="why-that-matters">Why That Matters</h3>
+        <div class="text-block">
+          <p>Processing 445 interconnected terms with a language model and trusting the output without verification would produce a registry that looks correct, reads correctly, and fails at runtime in ways that are difficult to trace. The failures would be invisible until you tried to run something real.</p>
+          <p>The paper trail is what makes the output trustworthy. A human reviewer can follow the chain from the flagged relationship to the source chapter passage to the proposed fix, without relying on the model's judgment. That auditability is a precondition for handing the registry to an agent and expecting correct behavior, not a best practice.</p>
+          <p>There's also a secondary benefit: the verification step surfaces things the hand-authored entries got right. When Sherlock confirms that a definition is fully grounded and all relationships check out, that's not nothing. It's a positive signal that the original work was solid. The audit isn't just finding errors; it's building justified confidence in the entries that don't have any.</p>
+        </div>
+
+        <h3 id="where-we-are">Where We Are</h3>
+        <div class="text-block">
+          <p>We're processing terms in batches, highest priority first. The priority order isn't arbitrary — it's based on each term's criticality score: how many other terms reference it, and how broadly it connects to the rest of the system. The terms we're tackling first are the ones where a single error would ripple into the most rule interactions: Action, Challenge, Spell, Adversary, Action Check, Action Score, Modus Operandi.</p>
+          <p>Four batches are done. The pipeline is running cleanly and passing the rubric consistently.</p>
+        </div>
+
+        <div class="stats-card reveal-card">
+          <div class="stat-item">
+            <span class="stat-number" data-target-text="~4 min">~4 min</span>
+            <div class="stat-label">per term<br><small style="opacity:0.6">(inference, extraction, scoring, file commit)</small></div>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target-text="~$0.13">~$0.13</span>
+            <div class="stat-label">per term<br><small style="opacity:0.6">(on Claude Sonnet)</small></div>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target-text="&lt;$60">&lt;$60</span>
+            <div class="stat-label">total<br><small style="opacity:0.6">(full 445-term run)</small></div>
+          </div>
+        </div>
+
+        <div class="text-block">
+          <p>A dispatcher script handles the queue automatically. It reads the priority list, skips terms that already have output files, and runs the next batch without manual intervention. When a batch finishes, it produces a flags report and a proposed set of registry corrections, ready for review.</p>
+          <p>P1 → P2 → P3. When all three tiers are done, the registry is verified and we hand it to the agent.</p>
+        </div>
+
+      </div>
+    </section><!-- /part-5 -->
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- PART SIX                                       -->
+    <!-- ══════════════════════════════════════════════ -->
+    <section class="part-section" data-part="6" id="part-6">
+      <div class="chapter-opener">
+        <div class="chapter-opener-inner">
+          <div class="chapter-eyebrow">Part Six</div>
+          <h2 class="chapter-title">What Comes After</h2>
+        </div>
+      </div>
+
+      <div class="section-content">
+
+        <h3 id="bringing-oa-into-agent">Bringing OA Into the Agent</h3>
+        <div class="text-block">
+          <p>Once the glossary is verified, the full dataset goes in: the 23-file Markdown rulebook plus the enriched term registry. The agent ingests them and builds its internal representation of the system — the rules engine, the game state model, the resolution procedures for every mechanic.</p>
+          <p>This phase is as much observation as engineering. We'll watch how the agent structures what it's learned:</p>
+          <ul>
+            <li>What representation does it build for the rules?</li>
+            <li>How does it model character state?</li>
+            <li>How does it handle rule interactions it hasn't seen spelled out explicitly?</li>
+            <li>Where does it make mistakes, and what kind?</li>
+          </ul>
+          <p>The first pass won't be production-ready; it will show us where the architecture needs to be smarter. Doing this before building anything else is what makes the lessons useful.</p>
+        </div>
+
+        <h3 id="first-playable-build">The First Playable Build</h3>
+        <div class="text-block">
+          <p>From there, we build the first test environment — a contained room or set of rooms with working combat, at least one puzzle, and the full mechanical loop running live through the agent. A player can enter, explore, fight, and solve. The rules are enforced by the system, not approximated by a language model doing its best.</p>
+          <p>Three things have to be true simultaneously: the rules are applied correctly (not approximated), the state tracks accurately across the full session, and the Narrator voices outcomes in-character without breaking the fiction. Any one of those failing makes the test meaningless. All three working together is the proof.</p>
+          <p>What failure looks like at this stage is still useful data. A combat that miscalculates damage tells us something specific about how the agent traverses the rules graph. A puzzle that soft-locks tells us something about how the state model handles edge cases. A Narrator that breaks character to explain a rule tells us something about where the boundary between narration and adjudication needs to be drawn. We want the failures to be visible and traceable — which is exactly what the pipeline is designed to produce.</p>
+        </div>
+
+        <div class="pull-quote reveal-pull">
+          What success looks like is simpler: a player who doesn't know they're in a proof of concept, experiencing a session that feels like someone is running the game for them, correctly, without interruption.
+          <span class="attribution">Part Six — The First Playable Build</span>
+        </div>
+
+        <div class="text-block" style="padding-bottom: 40px;">
+          <p>If that happens, Phase 1 is proven and Phase 2 begins.</p>
+        </div>
+
+      </div>
+    </section><!-- /part-6 -->
+
+  </main><!-- /content-column -->
+</div><!-- /page-wrapper -->
+
+<!-- ─── BACK TO TOP ────────────────────────────────────────────────── -->
+<button id="back-to-top" aria-label="Back to top">
+  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<!-- ─── SCRIPTS ───────────────────────────────────────────────────── -->
+<script>
+  // Initialize Mermaid
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      darkMode: true,
+      background: '#0a0a0f',
+      primaryColor: '#1e1e2e',
+      primaryTextColor: '#f0ede8',
+      primaryBorderColor: '#7c3aed',
+      lineColor: '#7c3aed',
+      secondaryColor: '#16213e',
+      tertiaryColor: '#1a1a2e',
+      edgeLabelBackground: '#0a0a0f',
+      nodeTextColor: '#f0ede8'
+    }
+  });
+
+  // ─── TOC DATA ────────────────────────────────────────────────────
+  const tocData = [
+    {
+      part: 1, id: 'part-1', label: 'Part One', title: 'What Storyteller Will Be',
+      color: '#a78bfa',
+      h3s: [
+        { id: 'the-experience', label: 'The Experience' },
+        { id: 'the-narrator', label: 'The Narrator' },
+        { id: 'the-guide', label: 'The Guide' },
+        { id: 'the-play-engine', label: 'The Play Engine' },
+        { id: 'create-engine-story-package', label: 'Create Engine & Story Package' },
+        { id: 'why-architecture-matters', label: 'Why the Architecture Matters' },
+      ]
+    },
+    {
+      part: 2, id: 'part-2', label: 'Part Two', title: 'Phase 1 — POC',
+      color: '#60a5fa',
+      h3s: [
+        { id: 'goal-phase-1', label: 'The Goal of Phase 1' },
+        { id: 'what-ttrpg-agent-does', label: 'What the TTRPG Agent Does' },
+        { id: 'why-right-poc', label: 'Why This Is the Right POC' },
+      ]
+    },
+    {
+      part: 3, id: 'part-3', label: 'Part Three', title: 'Open Adventure',
+      color: '#4ade80',
+      h3s: [
+        { id: 'what-open-adventure-is', label: 'What Open Adventure Is' },
+        { id: 'why-we-chose-it', label: 'Why We Chose It' },
+      ]
+    },
+    {
+      part: 4, id: 'part-4', label: 'Part Four', title: 'Converting OA to Markdown',
+      color: '#fbbf24',
+      h3s: [
+        { id: 'the-conversion', label: 'The Conversion' },
+        { id: 'why-markdown', label: 'Why Markdown' },
+        { id: 'term-registry', label: 'The Term Registry' },
+        { id: 'what-comes-next-oa', label: 'What Comes Next' },
+      ]
+    },
+    {
+      part: 5, id: 'part-5', label: 'Part Five', title: 'The Glossary — Sherlock',
+      color: '#f87171',
+      h3s: [
+        { id: 'glossary-first', label: 'Why the Glossary Comes First' },
+        { id: 'what-sherlock-is', label: 'What Sherlock Is' },
+        { id: 'how-it-self-verifies', label: 'How It Self-Verifies' },
+        { id: 'why-that-matters', label: 'Why That Matters' },
+        { id: 'where-we-are', label: 'Where We Are' },
+      ]
+    },
+    {
+      part: 6, id: 'part-6', label: 'Part Six', title: 'What Comes After',
+      color: '#22d3ee',
+      h3s: [
+        { id: 'bringing-oa-into-agent', label: 'Bringing OA Into the Agent' },
+        { id: 'first-playable-build', label: 'The First Playable Build' },
+      ]
+    },
+  ];
+
+  // ─── BUILD TOC ───────────────────────────────────────────────────
+  function buildToc(container) {
+    const frag = document.createDocumentFragment();
+    tocData.forEach(part => {
+      const partLi = document.createElement('li');
+      const partLink = document.createElement('a');
+      partLink.href = `#${part.id}`;
+      partLink.className = 'toc-part-link';
+      partLink.dataset.id = part.id;
+      partLink.dataset.partColor = part.color;
+      partLink.textContent = `${part.label}: ${part.title}`;
+      partLi.appendChild(partLink);
+
+      const subUl = document.createElement('ul');
+      subUl.className = 'toc-list';
+      part.h3s.forEach(h => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `#${h.id}`;
+        a.className = 'toc-h3-link';
+        a.dataset.id = h.id;
+        a.textContent = h.label;
+        li.appendChild(a);
+        subUl.appendChild(li);
+      });
+      partLi.appendChild(subUl);
+      frag.appendChild(partLi);
+    });
+    container.appendChild(frag);
+  }
+
+  buildToc(document.getElementById('desktopTocList'));
+  buildToc(document.getElementById('mobileTocList'));
+
+  // ─── REDUCED MOTION CHECK ─────────────────────────────────────────
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ─── PART COLOR MAP ───────────────────────────────────────────────
+  const partColorMap = {
+    '1': '#a78bfa',
+    '2': '#60a5fa',
+    '3': '#4ade80',
+    '4': '#fbbf24',
+    '5': '#f87171',
+    '6': '#22d3ee',
+  };
+
+  function setActiveColor(color) {
+    document.documentElement.style.setProperty('--active', color);
+    const progressBar = document.getElementById('scroll-progress');
+    if (progressBar) progressBar.style.background = color;
+    const cursorGlow = document.getElementById('cursor-glow');
+    if (cursorGlow) cursorGlow.style.background = `radial-gradient(circle, ${color} 0%, transparent 70%)`;
+    const btt = document.getElementById('back-to-top');
+    if (btt) btt.style.background = color;
+  }
+
+  // ─── INTERSECTION OBSERVER FOR TOC + PART COLOR ──────────────────
+  const allSectionIds = tocData.flatMap(p => [p.id, ...p.h3s.map(h => h.id)]);
+  let activeId = null;
+
+  const tocObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        if (allSectionIds.includes(id)) {
+          activeId = id;
+          updateTocActive(id);
+        }
+      }
+    });
+  }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
+
+  allSectionIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) tocObserver.observe(el);
+  });
+
+  // Also observe part sections for color updates
+  const partObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const part = entry.target.dataset.part;
+        if (part && partColorMap[part]) {
+          setActiveColor(partColorMap[part]);
+        }
+      }
+    });
+  }, { rootMargin: '-10% 0px -60% 0px', threshold: 0 });
+
+  document.querySelectorAll('.part-section').forEach(el => partObserver.observe(el));
+
+  function updateTocActive(id) {
+    document.querySelectorAll('.toc-part-link, .toc-h3-link').forEach(a => {
+      a.classList.remove('active');
+    });
+    document.querySelectorAll(`[data-id="${id}"]`).forEach(a => {
+      a.classList.add('active');
+      const part = tocData.find(p => p.id === id || p.h3s.some(h => h.id === id));
+      if (part) {
+        setActiveColor(part.color);
+      }
+    });
+  }
+
+  // ─── SCROLL PROGRESS BAR ─────────────────────────────────────────
+  const scrollProgress = document.getElementById('scroll-progress');
+  function updateScrollProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    scrollProgress.style.width = pct + '%';
+  }
+
+  // ─── BACK TO TOP ─────────────────────────────────────────────────
+  const backToTop = document.getElementById('back-to-top');
+  window.addEventListener('scroll', () => {
+    updateScrollProgress();
+    if (window.scrollY > 600) {
+      backToTop.classList.add('visible');
+    } else {
+      backToTop.classList.remove('visible');
+    }
+  }, { passive: true });
+
+  backToTop.addEventListener('click', () => {
+    if (prefersReducedMotion) {
+      window.scrollTo({ top: 0 });
+    } else {
+      smoothScrollTo(0, 600);
+    }
+  });
+
+  // ─── SMOOTH SCROLL WITH EASING ───────────────────────────────────
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
+  }
+
+  function smoothScrollTo(targetY, duration) {
+    const startY = window.scrollY;
+    const diff = targetY - startY;
+    let startTime = null;
+
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      window.scrollTo(0, startY + diff * easeInOutCubic(progress));
+      if (elapsed < duration) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ─── TOC SMOOTH SCROLL ────────────────────────────────────────────
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href').slice(1);
+      const el = document.getElementById(id);
+      if (el) {
+        e.preventDefault();
+        const offset = 40;
+        const targetY = el.getBoundingClientRect().top + window.scrollY - offset;
+        if (prefersReducedMotion) {
+          window.scrollTo({ top: targetY });
+        } else {
+          smoothScrollTo(targetY, 700);
+        }
+        // Close mobile panel if open
+        document.getElementById('mobileTocPanel').classList.remove('open');
+      }
+    });
+  });
+
+  // ─── MOBILE TOC ───────────────────────────────────────────────────
+  const mobileToggle = document.getElementById('mobileTocToggle');
+  const mobilePanel = document.getElementById('mobileTocPanel');
+  const mobileClose = document.getElementById('mobileTocClose');
+
+  mobileToggle.addEventListener('click', () => {
+    mobilePanel.classList.add('open');
+  });
+  mobileClose.addEventListener('click', () => {
+    mobilePanel.classList.remove('open');
+  });
+  mobilePanel.addEventListener('click', e => {
+    if (e.target.tagName === 'A') {
+      mobilePanel.classList.remove('open');
+    }
+  });
+
+  // ─── TOC HOVER COLOR ──────────────────────────────────────────────
+  document.querySelectorAll('.toc-part-link').forEach(link => {
+    const partColor = link.dataset.partColor;
+    if (partColor) {
+      link.addEventListener('mouseenter', () => {
+        link.style.color = partColor;
+        link.style.borderLeftColor = partColor;
+      });
+      link.addEventListener('mouseleave', () => {
+        if (!link.classList.contains('active')) {
+          link.style.color = '';
+          link.style.borderLeftColor = '';
+        }
+      });
+    }
+  });
+
+  // ─── CURSOR GLOW ─────────────────────────────────────────────────
+  if (!prefersReducedMotion && window.matchMedia('(hover: hover)').matches) {
+    const cursorGlow = document.getElementById('cursor-glow');
+    let mouseX = 0, mouseY = 0;
+    let curX = 0, curY = 0;
+
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    }, { passive: true });
+
+    function animateCursor() {
+      curX += (mouseX - curX) * 0.12;
+      curY += (mouseY - curY) * 0.12;
+      cursorGlow.style.left = curX + 'px';
+      cursorGlow.style.top = curY + 'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+  }
+
+  // ─── PARALLAX ────────────────────────────────────────────────────
+  if (!prefersReducedMotion) {
+    const heroInner = document.querySelector('.hero-inner');
+    const heroPullInner = document.querySelector('.hero-pull-inner');
+
+    function updateParallax() {
+      const scrollY = window.scrollY;
+
+      // Hero inner parallax (0.4x)
+      if (heroInner) {
+        heroInner.style.transform = `translateY(${scrollY * 0.4}px)`;
+      }
+
+      // Hero pull quote (0.6x - slightly faster than hero)
+      if (heroPullInner) {
+        // This adds relative offset within the already-moved hero
+        heroPullInner.style.transform = `translateY(${scrollY * 0.1}px)`;
+      }
+
+      // Chapter opener parallax zoom
+      document.querySelectorAll('.chapter-opener-inner').forEach(opener => {
+        const rect = opener.closest('.chapter-opener').getBoundingClientRect();
+        const viewH = window.innerHeight;
+        // Only apply when visible
+        if (rect.bottom > 0 && rect.top < viewH) {
+          const progress = (viewH - rect.top) / (viewH + rect.height);
+          const scale = 1.0 + (progress * 0.05);
+          opener.style.transform = `scale(${Math.min(scale, 1.05)})`;
+        }
+      });
+
+      requestAnimationFrame(updateParallax);
+    }
+    requestAnimationFrame(updateParallax);
+  }
+
+  // ─── SCROLL REVEAL (IntersectionObserver) ────────────────────────
+  if (!prefersReducedMotion) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          // Chapter eyebrow pulse
+          if (entry.target.classList.contains('chapter-opener')) {
+            const eyebrow = entry.target.querySelector('.chapter-eyebrow');
+            if (eyebrow) {
+              setTimeout(() => {
+                eyebrow.classList.add('pulse-once');
+                setTimeout(() => eyebrow.classList.remove('pulse-once'), 500);
+              }, 350);
+            }
+          }
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.15,
+      rootMargin: '0px 0px -60px 0px'
+    });
+
+    // Mark all reveal targets
+    // Paragraphs
+    document.querySelectorAll('.text-block p, .section-content > p').forEach((el, i) => {
+      el.classList.add('reveal-para');
+      // Stagger siblings by index within their parent
+      const siblings = Array.from(el.parentElement.querySelectorAll('p'));
+      const idx = siblings.indexOf(el);
+      el.style.transitionDelay = `${idx * 80}ms`;
+      revealObserver.observe(el);
+    });
+
+    // H2 chapter titles
+    document.querySelectorAll('.chapter-opener').forEach(el => {
+      el.classList.add('chapter-opener');
+      revealObserver.observe(el);
+    });
+
+    // H3 headings
+    document.querySelectorAll('h3').forEach(el => {
+      el.classList.add('reveal-h3');
+      revealObserver.observe(el);
+    });
+
+    // Cards and diagram cards
+    document.querySelectorAll('.diagram-card, .stats-card, .table-wrapper').forEach((el, i) => {
+      if (!el.classList.contains('reveal-card')) {
+        el.classList.add('reveal-card');
+      }
+      revealObserver.observe(el);
+    });
+
+    // Callouts (companion callout)
+    document.querySelectorAll('.companion-callout, blockquote').forEach(el => {
+      if (!el.classList.contains('reveal-callout')) {
+        el.classList.add('reveal-callout');
+      }
+      revealObserver.observe(el);
+    });
+
+    // Pull quotes
+    document.querySelectorAll('.pull-quote').forEach(el => {
+      if (!el.classList.contains('reveal-pull')) {
+        el.classList.add('reveal-pull');
+      }
+      revealObserver.observe(el);
+    });
+
+    // List items — stagger
+    document.querySelectorAll('ul li, ol li').forEach((el, i) => {
+      el.classList.add('reveal-li');
+      const siblings = Array.from(el.parentElement.children);
+      const idx = siblings.indexOf(el);
+      el.style.transitionDelay = `${idx * 100}ms`;
+      revealObserver.observe(el);
+    });
+
+    // Table rows — stagger
+    document.querySelectorAll('tbody tr').forEach((el, i) => {
+      el.classList.add('reveal-table-row');
+      el.style.transitionDelay = `${i * 60}ms`;
+      revealObserver.observe(el);
+    });
+
+    // Stat items — stagger
+    document.querySelectorAll('.stat-item').forEach((el, i) => {
+      el.classList.add('reveal-card');
+      el.style.transitionDelay = `${i * 120}ms`;
+      revealObserver.observe(el);
+    });
+  } else {
+    // If reduced motion, make everything visible immediately
+    document.querySelectorAll('.chapter-opener').forEach(el => el.classList.add('visible'));
+  }
+
+  // ─── PAGE LOAD SEQUENCE ──────────────────────────────────────────
+  if (!prefersReducedMotion) {
+    // Hero title: split into words
+    const heroTitleEl = document.getElementById('heroTitle');
+    const heroWords = ['<em>Story</em>teller', 'Project', 'Intro'];
+    heroTitleEl.innerHTML = heroWords.map((w, i) =>
+      `<span class="word" style="transition-delay:${400 + i * 150}ms">${w}</span>`
+    ).join('');
+
+    // Hero eyebrow typewriter effect
+    const heroEyebrow = document.getElementById('heroEyebrow');
+    const eyebrowText = 'Storyteller — Project Introduction — Phase 1';
+    heroEyebrow.textContent = '';
+    let charIdx = 0;
+    function typeEyebrow() {
+      if (charIdx < eyebrowText.length) {
+        heroEyebrow.textContent += eyebrowText[charIdx];
+        charIdx++;
+        setTimeout(typeEyebrow, 25);
+      }
+    }
+
+    // Sequence on load
+    window.addEventListener('load', () => {
+      document.body.classList.add('loaded');
+
+      // Mobile TOC toggle slides in at 200ms
+      setTimeout(() => {
+        document.getElementById('mobileTocToggle').classList.add('loaded');
+      }, 200);
+
+      // Eyebrow typewriter at 300ms
+      setTimeout(() => {
+        heroEyebrow.style.opacity = '1';
+        typeEyebrow();
+      }, 300);
+
+      // Hero title words stagger from 400ms
+      setTimeout(() => {
+        heroTitleEl.style.opacity = '1';
+        heroTitleEl.querySelectorAll('.word').forEach(w => {
+          w.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
+          w.style.opacity = '1';
+          w.style.transform = 'translateY(0)';
+        });
+      }, 400);
+
+      // Hero pull fades up at 900ms
+      setTimeout(() => {
+        const heroPull = document.getElementById('heroPull');
+        heroPull.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+        heroPull.style.opacity = '1';
+        heroPull.style.transform = 'translateY(0)';
+      }, 900);
+
+      // Companion link at 1050ms
+      setTimeout(() => {
+        const companionLink = document.getElementById('heroCompanionLink');
+        companionLink.style.transition = 'opacity 0.5s ease, transform 0.5s ease, background 0.2s, color 0.2s';
+        companionLink.style.opacity = '1';
+      }, 1050);
+
+      // Scroll hint bounces in at 1100ms
+      setTimeout(() => {
+        const scrollHint = document.getElementById('heroScrollHint');
+        scrollHint.style.transition = 'opacity 0.6s ease';
+        scrollHint.style.opacity = '0.5';
+      }, 1100);
+
+      // TOC sidebar slides in at 600ms
+      setTimeout(() => {
+        document.getElementById('tocSidebar').classList.add('loaded');
+      }, 600);
+
+      // Initial progress bar update
+      updateScrollProgress();
+    });
+
+    // Companion link pulse every 4 seconds
+    setInterval(() => {
+      const link = document.getElementById('heroCompanionLink');
+      if (link) {
+        link.style.transition = 'transform 0.2s ease, background 0.2s, color 0.2s, opacity 0.5s ease';
+        link.style.transform = 'scale(1.02)';
+        setTimeout(() => { link.style.transform = 'scale(1)'; }, 200);
+      }
+    }, 4000);
+
+  } else {
+    // Reduced motion: show everything immediately
+    document.body.classList.add('loaded');
+    const heroTitleEl = document.getElementById('heroTitle');
+    heroTitleEl.innerHTML = '<em>Story</em>teller<br>Project Intro';
+    heroTitleEl.style.opacity = '1';
+    const heroEyebrow = document.getElementById('heroEyebrow');
+    heroEyebrow.textContent = 'Storyteller — Project Introduction — Phase 1';
+    heroEyebrow.style.opacity = '1';
+    document.getElementById('heroPull').style.opacity = '1';
+    document.getElementById('heroCompanionLink').style.opacity = '1';
+    document.getElementById('heroScrollHint').style.opacity = '0.5';
+    document.getElementById('tocSidebar').classList.add('loaded');
+    document.getElementById('mobileTocToggle').classList.add('loaded');
+
+    window.addEventListener('load', updateScrollProgress);
+  }
+
+</script>
+
+<!-- ─── FOOTER ────────────────────────────────────────────────────── -->
+<footer style="
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 36px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+">
+  <a href="../index.html" style="color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">&larr; Back to start</a>
+  <span style="color:rgba(255,255,255,0.15);">Storyteller &mdash; Phase One</span>
+  <a href="../phase-1-overview/" style="color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">Overview &rarr;</a>
+</footer>
+
+</body>
+</html>
