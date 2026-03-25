@@ -156,12 +156,11 @@
       text-transform: uppercase;
       color: var(--gold);
       opacity: 0;
-      transform: translateY(8px);
-      transition: opacity 1s ease 1s, transform 1s ease 1s;
+      transition: opacity 1s ease 1s;
       margin-bottom: 28px;
       display: block;
     }
-    .hero-eyebrow.visible { opacity: 1; transform: translateY(0); }
+    .hero-eyebrow.visible { opacity: 1; }
 
     .hero-title {
       font-family: 'DM Serif Display', serif;
@@ -214,10 +213,10 @@
       font-size: clamp(18px, 2.5vw, 24px);
       color: var(--text-muted);
       opacity: 0;
-      transform: translateY(12px);
-      transition: opacity 1s ease 2.2s, transform 1s ease 2.2s;
+      min-height: 1.5em;
+      transition: opacity 1s ease 2.2s;
     }
-    .hero-sub.visible { opacity: 1; transform: translateY(0); }
+    .hero-sub.visible { opacity: 1; }
 
     .scroll-hint {
       position: absolute;
