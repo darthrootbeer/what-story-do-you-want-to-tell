@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The ink has left the page — Storyteller</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #07070d;
+      --text: #f0ece4;
+      --text-muted: rgba(240,236,228,0.45);
+      --gold: #c9a96e;
+      --gold-dim: rgba(201,169,110,0.15);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Instrument Sans', sans-serif;
+      overflow: hidden;
+    }
+
+    /* ── CANVAS ─────────────────────────────────────── */
+    #ink-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 3s ease;
+    }
+    #ink-canvas.visible { opacity: 1; }
+
+    /* ── CONTENT ─────────────────────────────────────── */
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 48px 24px;
+    }
+
+    .eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0;
+      margin-bottom: 40px;
+      transition: opacity 1.4s ease;
+    }
+    .eyebrow.visible { opacity: 0.7; }
+
+    .headline {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--text);
+      opacity: 0;
+      margin-bottom: 28px;
+      transition: opacity 1.6s ease;
+    }
+    .headline em {
+      font-style: italic;
+      color: rgba(240,236,228,0.6);
+    }
+    .headline.visible { opacity: 1; }
+
+    .body-text {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: clamp(15px, 2vw, 19px);
+      color: var(--text-muted);
+      max-width: 440px;
+      line-height: 1.7;
+      opacity: 0;
+      margin-bottom: 56px;
+      transition: opacity 1.4s ease;
+    }
+    .body-text.visible { opacity: 1; }
+
+    .home-link {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(201,169,110,0.3);
+      padding-bottom: 3px;
+      opacity: 0;
+      transition: opacity 1.2s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+    .home-link.visible { opacity: 1; }
+    .home-link:hover {
+      color: var(--text);
+      border-color: rgba(240,236,228,0.4);
+    }
+
+    /* ── QUILL ───────────────────────────────────────── */
+    .quill-wrap {
+      position: fixed;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 2s ease;
+      z-index: 2;
+    }
+    .quill-wrap.visible { opacity: 0.18; }
+    .quill-wrap img {
+      width: 32px;
+      filter: invert(1) sepia(1) saturate(0.5) hue-rotate(10deg);
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="ink-canvas"></canvas>
+
+<div class="page">
+  <span class="eyebrow" id="eyebrow">Page not found</span>
+  <h1 class="headline" id="headline">The ink has left<br><em>the page.</em></h1>
+  <p class="body-text" id="body">Whatever story was here has moved on.<br>Some pages only exist for a moment.</p>
+  <a href="/" class="home-link" id="home-link">← Return to the beginning</a>
+</div>
+
+<div class="quill-wrap" id="quill">
+  <img src="assets/quill-ink.svg" alt="">
+</div>
+
+<script>
+  // ── INK DROP CANVAS ──────────────────────────────────
+  const canvas = document.getElementById('ink-canvas');
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const drops = [];
+  const BG = [7, 7, 13];
+
+  function spawnDrop() {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const maxR = 60 + Math.random() * 180;
+    drops.push({
+      x, y,
+      r: 0,
+      maxR,
+      speed: 0.12 + Math.random() * 0.18,
+      alpha: 0.04 + Math.random() * 0.07,
+      born: performance.now(),
+    });
+  }
+
+  // Seed some drops
+  for (let i = 0; i < 12; i++) {
+    setTimeout(spawnDrop, i * 600 + Math.random() * 400);
+  }
+  // Trickle more in over time
+  setInterval(() => {
+    if (drops.length < 28) spawnDrop();
+  }, 1800);
+
+  function draw(now) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = drops.length - 1; i >= 0; i--) {
+      const d = drops[i];
+      const progress = d.r / d.maxR;
+
+      // Fade in then out
+      let alpha = d.alpha;
+      if (progress < 0.15) alpha *= progress / 0.15;
+      if (progress > 0.7) alpha *= 1 - (progress - 0.7) / 0.3;
+
+      const grd = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, d.r);
+      grd.addColorStop(0, `rgba(201,169,110,${alpha * 0.6})`);
+      grd.addColorStop(0.4, `rgba(201,169,110,${alpha * 0.25})`);
+      grd.addColorStop(0.75, `rgba(${BG[0]},${BG[1]},${BG[2]},0)`);
+      grd.addColorStop(1, `rgba(${BG[0]},${BG[1]},${BG[2]},0)`);
+
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+      ctx.fillStyle = grd;
+      ctx.fill();
+
+      d.r += d.speed;
+
+      if (d.r >= d.maxR) {
+        drops.splice(i, 1);
+        // Respawn somewhere new
+        setTimeout(spawnDrop, 800 + Math.random() * 2000);
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+
+  // ── REVEAL SEQUENCE ──────────────────────────────────
+  setTimeout(() => canvas.classList.add('visible'), 200);
+  setTimeout(() => document.getElementById('eyebrow').classList.add('visible'), 800);
+  setTimeout(() => document.getElementById('headline').classList.add('visible'), 1600);
+  setTimeout(() => document.getElementById('body').classList.add('visible'), 2600);
+  setTimeout(() => document.getElementById('home-link').classList.add('visible'), 3400);
+  setTimeout(() => document.getElementById('quill').classList.add('visible'), 4000);
+</script>
+</body>
+</html>
