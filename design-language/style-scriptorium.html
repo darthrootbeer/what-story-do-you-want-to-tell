@@ -495,14 +495,25 @@
       background: var(--vellum-bg);
       position: relative;
       overflow: hidden;
+      /* Page-edge shadow — looks like a physical sheet */
+      box-shadow:
+        inset 0 6px 32px rgba(0,0,0,0.18),
+        inset 0 -6px 32px rgba(0,0,0,0.12),
+        inset 6px 0 20px rgba(0,0,0,0.08),
+        inset -6px 0 20px rgba(0,0,0,0.08);
     }
+    /* Layered paper texture — two feTurbulence passes for fiber depth */
     .vellum-section::before {
       content: '';
       position: absolute;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='p1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' seed='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='600' height='600' filter='url(%23p1)' opacity='0.12'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='p2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.18' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23p2)' opacity='0.06'/%3E%3C/svg%3E");
+      background-blend-mode: multiply;
       pointer-events: none;
       z-index: 0;
+      opacity: 0.9;
     }
     /* Red rubrication line down the left margin */
     .vellum-section::after {
@@ -511,7 +522,7 @@
       top: 0; bottom: 0;
       left: 120px;
       width: 2px;
-      background: rgba(139,26,26,0.3);
+      background: rgba(139,26,26,0.28);
     }
     .vellum-inner {
       position: relative;
@@ -527,30 +538,71 @@
     .vellum-inner .draw-line {
       background: linear-gradient(90deg, var(--red), transparent);
     }
+    /* Letterpress h2 — text pressed into paper */
     .vellum-inner h2 {
-      color: var(--ink);
+      color: rgba(35,22,8,0.85);
       font-size: clamp(28px, 4vw, 52px);
-      text-shadow: none;
+      text-shadow:
+        0 1px 0 rgba(255,255,255,0.55),
+        0 -1px 0 rgba(0,0,0,0.22),
+        1px 0 0 rgba(255,255,255,0.25),
+        -1px 0 0 rgba(0,0,0,0.08);
     }
     .vellum-inner p {
-      color: var(--ink);
+      color: rgba(35,22,8,0.82);
       line-height: 1.95;
     }
-    /* Red drop cap inside vellum */
+    /* Red drop cap inside vellum — letterpress pressed into page */
     .vellum-inner .drop-cap::first-letter {
       font-family: 'Uncial Antiqua', serif;
       font-size: 5.2em;
       float: left;
       line-height: 0.72;
       margin: 8px 14px 0 0;
-      color: var(--red);
-      text-shadow: 0 0 16px rgba(139,26,26,0.3);
+      color: rgba(120,20,20,0.88);
+      text-shadow:
+        0 1px 0 rgba(255,220,200,0.6),
+        0 -1px 0 rgba(80,0,0,0.3),
+        1px 1px 1px rgba(0,0,0,0.12);
     }
     /* Rubrication — red first word */
     .rubric {
-      color: var(--red-bright);
+      color: rgba(140,24,24,0.9);
       font-family: 'Uncial Antiqua', serif;
       font-size: 1.1em;
+      text-shadow:
+        0 1px 0 rgba(255,200,180,0.5),
+        0 -1px 0 rgba(80,0,0,0.25);
+    }
+    /* ── CHAPTER GRID inside vellum — dark ink on cream ── */
+    .vellum-inner .chapter-grid {
+      border-top: 2px solid rgba(139,26,26,0.35);
+    }
+    .vellum-inner .chapter-number {
+      color: var(--red);
+      opacity: 0.22;
+      border-right-color: rgba(139,26,26,0.2);
+      text-shadow:
+        0 1px 0 rgba(255,220,200,0.5),
+        0 -1px 0 rgba(80,0,0,0.2);
+    }
+    /* Chapter heading and text — legible dark ink on cream */
+    .vellum-inner .chapter-content h3 {
+      color: rgba(35,22,8,0.88);
+      letter-spacing: 0;
+      text-transform: none;
+      font-family: 'Uncial Antiqua', serif;
+      font-size: clamp(16px, 2.2vw, 24px);
+      /* Letterpress: pressed into vellum */
+      text-shadow:
+        0 1px 0 rgba(255,240,210,0.7),
+        0 -1px 0 rgba(0,0,0,0.2),
+        0 1px 2px rgba(0,0,0,0.08);
+      margin-bottom: 14px;
+    }
+    .vellum-inner .chapter-content p {
+      color: rgba(35,22,8,0.75);
+      margin-bottom: 0;
     }
     /* Marginal gloss in vellum section */
     .vellum-gloss {
@@ -564,8 +616,8 @@
       font-family: 'IM Fell English', serif;
       font-style: italic;
       font-size: 13px;
-      color: rgba(42,31,14,0.7);
-      border-left: 2px solid rgba(139,26,26,0.25);
+      color: rgba(42,31,14,0.68);
+      border-left: 2px solid rgba(139,26,26,0.22);
       padding-left: 16px;
       line-height: 1.65;
       opacity: 0;
@@ -579,7 +631,7 @@
       font-size: 8px;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--red);
+      color: rgba(139,26,26,0.75);
       margin-bottom: 6px;
     }
 
@@ -1006,13 +1058,13 @@
       </div>
     </div>
 
-    <p class="reveal" style="color: var(--ink);">The text was in a hand none of us recognized. Not Latin — something older. The illuminations in the margins were not grotesques. They were maps. Or perhaps instructions. Brother William spent six days in the locked room with the codex. He emerged having aged, he said, only in his understanding. His hair, the others noted privately, had gone entirely white.</p>
+    <p class="reveal">The text was in a hand none of us recognized. Not Latin — something older. The illuminations in the margins were not grotesques. They were maps. Or perhaps instructions. Brother William spent six days in the locked room with the codex. He emerged having aged, he said, only in his understanding. His hair, the others noted privately, had gone entirely white.</p>
 
     <div class="chapter-grid reveal">
       <div class="chapter-number">I</div>
       <div class="chapter-content">
         <h3>The manuscript does not require your belief.</h3>
-        <p style="color:var(--ink); margin-bottom:0;">It requires only that you turn the page. The rest follows with a logic older than faith — cause and effect dressed in the grammar of the sacred.</p>
+        <p>It requires only that you turn the page. The rest follows with a logic older than faith — cause and effect dressed in the grammar of the sacred.</p>
       </div>
     </div>
   </div>
