@@ -1274,16 +1274,22 @@
     const observerOptions = { threshold: 0.2, rootMargin: '0px 0px -60px 0px' };
     let stbRevealed = false;
 
+    const stbObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting || stbRevealed) return;
+        stbRevealed = true;
+        setTimeout(revealSTB, 400);
+      });
+    }, { threshold: 0.65, rootMargin: '0px 0px -80px 0px' });
+    stbObserver.observe(document.getElementById('beat-4'));
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
         const el = entry.target;
 
-        // Beat 4 special case
-        if (el.id === 'beat-4' && !stbRevealed) {
-          stbRevealed = true;
-          setTimeout(revealSTB, 300);
-        }
+        // Beat 4 handled by dedicated stbObserver above
+        if (el.id === 'beat-4') return;
 
         // Generic reveals by class
         el.querySelectorAll('.reveal-tag').forEach((e, i) => {
