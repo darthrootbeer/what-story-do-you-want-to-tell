@@ -16,13 +16,18 @@ Live at: [darthrootbeer.github.io/what-story-do-you-want-to-tell](https://darthr
 ├── phase-1-overview/           Plain-English overview of Phase 1
 ├── phase-1-technical/          Full technical deep-dive
 │
-├── design-language/            Visual design system — 18 style explorations
+├── design-language/            Visual design system — 24 style explorations
 │   ├── index.html              Gallery index
-│   └── style-*.html            Individual style demos
+│   ├── style-*.html            Individual style demos
+│   └── pipeline/               Design Aesthetic Pipeline templates and briefs
+│       └── brief-intake.md     Stage 1 intake template
 │
 ├── assets/                     Images and SVGs used by the live site
+│   └── archive/                Old assets kept for reference
 ├── archive/                    Old pages kept for reference, not linked from live site
 │
+├── docs/                       Contributor guides
+│   └── how-to-build-a-style.md  Guide for creating new style demos
 ├── styles-gallery.html         Redirect stub → design-language/ (backward compat)
 ├── README.md                   This file
 ├── ARCHITECTURE.md             How the project is built and how to extend it
